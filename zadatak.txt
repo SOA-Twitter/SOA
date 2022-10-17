@@ -1,0 +1,4 @@
+1. Napravite REST servis koji podržava operacije kreiranja tvita
+i dobavljanja svih tvitova u sistemu (možete ih čuvati u memoriji)
+
+2. Servis pokrenite u Docker kontejneru
