@@ -5,4 +5,5 @@ type Tweet struct {
 	Text      string `json:"text" validate:"required"`
 	Picture   string `json:"picture"`
 	CreatedOn string `json:"-"`
+	DeletedOn string
 }

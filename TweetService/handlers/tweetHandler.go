@@ -8,23 +8,28 @@ import (
 )
 
 type TweetHandler struct {
-	l *log.Logger
+	l        *log.Logger
+	repoImpl data.TweetRepo
 }
 type KeyProduct struct {
 }
 
-func NewTweetHandler(l *log.Logger) *TweetHandler {
-	return &TweetHandler{l}
+func NewTweetHandler(l *log.Logger, twRepo data.TweetRepo) *TweetHandler {
+	// *TODO test repoImpl Dependency Injection line behavior
+	return &TweetHandler{l, twRepo}
 }
+
 func (t *TweetHandler) GetTweets(w http.ResponseWriter, h *http.Request) {
 	t.l.Println("Handle GET tweet")
-	tweets := data.GetAll()
+	// tweets := data.GetAll()
+	tweets := t.repoImpl.GetAll()
 	data.RenderJson(w, tweets)
 }
 func (t *TweetHandler) CreateTweet(w http.ResponseWriter, h *http.Request) {
 	t.l.Println("Handle POST tweet")
 	tweet := h.Context().Value(KeyProduct{}).(*data.Tweet)
-	data.CreateTweet(tweet)
+	// data.CreateTweet(tweet)
+	t.repoImpl.CreateTweet(tweet)
 	w.WriteHeader(http.StatusCreated)
 }
 

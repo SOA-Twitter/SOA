@@ -1,26 +1,36 @@
 package main
 
 import (
+	"TweeterMicro/TweetService/data"
 	"TweeterMicro/TweetService/handlers"
 	"context"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("app_port")
 	if len(port) == 0 {
 		port = "8080"
 	}
 
-	l := log.New(os.Stdout, "Tweet-Api", log.LstdFlags)
-	tweetHandler := handlers.NewTweetHandler(l)
+	l := log.New(os.Stdout, "[Tweet-Api] ", log.LstdFlags)
+
+	// *Dependency Injection of DB-communication into TweetHandler's repoImpl field
+	// assign either NewPostgreSQL or NewInMemory to tweetRepoImpl
+	tweetRepoImpl, err := data.NewInMemory(l)
+	if err != nil {
+		l.Fatal(err)
+	}
+	tweetHandler := handlers.NewTweetHandler(l, &tweetRepoImpl)
+
 	r := mux.NewRouter()
 	r.Use(tweetHandler.MiddlewareContentTypeSet)
 	getRouter := r.Methods(http.MethodGet).Subrouter()
@@ -37,6 +47,8 @@ func main() {
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
+	l.Println("Server listening on port ", port)
+
 	go func() {
 		err := s.ListenAndServe()
 		if err != nil {
