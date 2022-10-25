@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//New implementation that uses postgres, it implements the iTweetRepo
+// New implementation that uses postgres, it implements the iTweetRepo
 type TweetRepoPostgreSql struct {
 	log *log.Logger
 	db  *gorm.DB
@@ -19,13 +19,13 @@ type TweetRepoPostgreSql struct {
 
 // Constructor
 func NewPostgreSql(log *log.Logger) (TweetRepoPostgreSql, error) {
-	username := os.Getenv("db_username")
-	host := os.Getenv("db_host")
-	password := os.Getenv("db_password")
-	name := os.Getenv("db_name")
-	port := os.Getenv("db_port")
+	USERNAME := os.Getenv("db_username")
+	DB_HOST := os.Getenv("db_host")
+	PASSWORD := os.Getenv("db_password")
+	DB_NAME := os.Getenv("db_name")
+	PORT := os.Getenv("db_port")
 
-	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s", host, username, name, password, port)
+	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%s", DB_HOST, USERNAME, DB_NAME, PASSWORD, PORT)
 
 	db, err := gorm.Open(postgres.Open(dbUri), &gorm.Config{})
 
@@ -42,7 +42,7 @@ func setup(db *gorm.DB) {
 }
 
 func (twRepo *TweetRepoPostgreSql) GetAll() Tweets {
-	twRepo.log.Println("{TweetRepoPostgreSql} - getting all tweets")
+	twRepo.log.Println("{TweetRepoPostgresSql} - getting all tweets")
 	var tweets []*Tweet
 
 	twRepo.db.Find(&tweets)
