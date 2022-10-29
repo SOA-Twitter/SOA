@@ -31,6 +31,7 @@ func (t *TweetHandler) CreateTweet(w http.ResponseWriter, h *http.Request) {
 	// data.CreateTweet(tweet)
 	t.repoImpl.CreateTweet(tweet)
 	w.WriteHeader(http.StatusCreated)
+	//data.RenderJson(w, tweet)
 }
 
 func (p *TweetHandler) MiddlewareProductValidation(next http.Handler) http.Handler {

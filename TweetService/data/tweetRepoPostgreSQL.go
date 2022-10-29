@@ -59,7 +59,7 @@ func (twRepo *TweetRepoPostgreSql) GetAll() Tweets {
 // 	return tweets
 // }
 
-func (twRepo *TweetRepoPostgreSql) CreateTweet(tw *Tweet) {
+func (twRepo *TweetRepoPostgreSql) CreateTweet(tw *Tweet) *Tweet {
 	twRepo.log.Println("{TweetRepoPostgreSql} - posting tweet")
 
 	// *TODO: ID auto-increment for new Tweets
@@ -68,6 +68,7 @@ func (twRepo *TweetRepoPostgreSql) CreateTweet(tw *Tweet) {
 	tw.DeletedOn = ""
 
 	twRepo.db.Create(tw)
+	return tw
 }
 
 func (twRepo *TweetRepoPostgreSql) PutTweet(tw *Tweet, id int) error {

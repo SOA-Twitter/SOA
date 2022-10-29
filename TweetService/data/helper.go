@@ -24,3 +24,9 @@ func RenderJson(w http.ResponseWriter, v interface{}) {
 	}
 	w.Write(js)
 }
+func ExecuteQuery(query string, values ...interface{}) error {
+	if err := Session.Query(query).Bind(values...).Exec(); err != nil {
+		return err
+	}
+	return nil
+}

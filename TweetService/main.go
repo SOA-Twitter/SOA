@@ -25,7 +25,7 @@ func main() {
 
 	// *Dependency Injection of DB-communication into TweetHandler's repoImpl field
 	// assign either NewPostgreSQL or NewInMemory to tweetRepoImpl
-	tweetRepoImpl, err := data.NewInMemory(l)
+	tweetRepoImpl, err := data.CassandraConnection(l)
 	if err != nil {
 		l.Fatal(err)
 	}
