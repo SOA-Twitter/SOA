@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"TweeterMicro/auth/data"
-	"TweeterMicro/auth/model"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"time"
 )
 
 var db = data.ConnectToDB()
@@ -22,20 +22,48 @@ func NewAuthHandler(l *log.Logger) *AuthHandler {
 
 func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	a.l.Println("Login handler")
-	user := &model.User{}
+	expirationTime := time.Now().Add(time.Second * 1200)
+	user := &data.User{}
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
-		var resp = map[string]interface{}{"status": false, "message": "Invalid request"}
-		json.NewEncoder(w).Encode(resp)
+		http.Error(w, "Bad JSON format", http.StatusBadRequest)
 		return
 	}
-	resp := FindOne(user.Email, user.Password)
-	json.NewEncoder(w).Encode(resp)
+	tokenString, err := FindOne(user.Username, user.Password)
+	if err != nil {
+		http.Error(w, "Invalid credentials!", http.StatusUnauthorized)
+		a.l.Println("Invalid credentials!")
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: expirationTime,
+	})
+	json.NewEncoder(w).Encode(tokenString)
 }
+func FindOne(username, password string) (string, error) {
+	user := &data.User{}
+	log.Println(user.Username)
+	if err := db.Where("Username = ?", username).First(user).Error; err != nil {
+		log.Println("Invalid Email")
+		return "", err
+	}
+	log.Println(user.Username)
 
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		log.Println("Invalid Password")
+		return "", err
+
+	}
+	token, _ := data.CreateJwt(username)
+
+	return token, nil
+}
 func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	a.l.Println("Register handler")
-	user := &model.User{}
+	user := &data.User{}
 	json.NewDecoder(r.Body).Decode(user)
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -53,24 +81,6 @@ func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(createdUser)
 	w.WriteHeader(http.StatusCreated)
-}
-
-func FindOne(email, password string) map[string]interface{} {
-	user := &model.User{}
-	if err := db.Where("Email = ?", email).First(user).Error; err != nil {
-		var resp = map[string]interface{}{"status": false, "message": "Email address not found"}
-		return resp
-
-	}
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		var resp = map[string]interface{}{"status": false, "message": "Invalid login credential"}
-		return resp
-	}
-	token, _ := data.CreateJwt(email, password)
-	var response = map[string]interface{}{"status": false, "message": "logged in"}
-	response["token"] = token
-	return response
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {

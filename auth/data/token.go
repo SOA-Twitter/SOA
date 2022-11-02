@@ -1,9 +1,9 @@
-package model
+package data
 
 import "github.com/golang-jwt/jwt/v4"
 
 type Claims struct {
-	Email    string
+	Username string
 	Password string
 	*jwt.StandardClaims
 }

@@ -1,7 +1,6 @@
 package data
 
 import (
-	"TweeterMicro/auth/model"
 	"fmt"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -34,7 +33,7 @@ func ConnectToDB() *gorm.DB {
 		fmt.Println("error", err)
 		panic(err)
 	}
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&User{})
 	fmt.Println("Successfully connected", db)
 	return db
 }
