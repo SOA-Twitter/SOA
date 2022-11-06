@@ -3,15 +3,15 @@ package main
 import (
 	"TweeterMicro/TweetService/data"
 	"TweeterMicro/TweetService/handlers"
-	"context"
+	"TweeterMicro/TweetService/proto/tweet"
+	"fmt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
-	"net/http"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -20,48 +20,55 @@ func main() {
 	if len(port) == 0 {
 		port = "8080"
 	}
-
 	l := log.New(os.Stdout, "[Tweet-Api] ", log.LstdFlags)
-
-	// *Dependency Injection of DB-communication into TweetHandler's repoImpl field
-	// assign either NewPostgreSQL or NewInMemory to tweetRepoImpl
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 8001))
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+	grpcServer := grpc.NewServer()
 	tweetRepoImpl, err := data.CassandraConnection(l)
 	if err != nil {
-		l.Fatal(err)
+		log.Println("Error connecting...")
 	}
-	tweetHandler := handlers.NewTweetHandler(l, &tweetRepoImpl)
+	tweetHandler := handlers.NewTweet(l, &tweetRepoImpl)
+	tweet.RegisterTweetServiceServer(grpcServer, tweetHandler)
+	reflection.Register(grpcServer)
 
-	r := mux.NewRouter()
-	r.Use(tweetHandler.MiddlewareContentTypeSet)
-	getRouter := r.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/all", tweetHandler.GetTweets)
-
-	postRouter := r.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/createTweet", tweetHandler.CreateTweet)
-	postRouter.Use(tweetHandler.MiddlewareProductValidation)
-
-	s := &http.Server{
-		Addr:         ":" + port,
-		Handler:      r,
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
-	}
-	l.Println("Server listening on port ", port)
-
+	grpcServer.Serve(lis)
 	go func() {
-		err := s.ListenAndServe()
-		if err != nil {
-			l.Fatal(err)
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatal("server error: ", err)
+
 		}
 	}()
-	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan, syscall.SIGINT)
-	signal.Notify(sigChan, syscall.SIGTERM)
+	stopCh := make(chan os.Signal)
+	signal.Notify(stopCh, syscall.SIGTERM)
+	<-stopCh
+	grpcServer.Stop()
 
-	sig := <-sigChan
-	l.Println("Graceful shutdown", sig)
+	//
+	//port := os.Getenv("app_port")
+	//if len(port) == 0 {
+	//	port = "8080"
+	//}
+	//
+	//l := log.New(os.Stdout, "[Tweet-Api] ", log.LstdFlags)
+	//
+	//// *Dependency Injection of DB-communication into TweetHandler's repoImpl field
+	//// assign either NewPostgreSQL or NewInMemory to tweetRepoImpl
+	//tweetRepoImpl, err := data.CassandraConnection(l)
+	//if err != nil {
+	//	l.Fatal(err)
+	//}
+	//tweetHandler := handlers.NewTweetHandler(l, &tweetRepoImpl)
+	//
+	//r := mux.NewRouter()
+	//r.Use(tweetHandler.MiddlewareContentTypeSet)
+	//getRouter := r.Methods(http.MethodGet).Subrouter()
+	//getRouter.HandleFunc("/all", tweetHandler.GetTweets)
+	//
+	//postRouter := r.Methods(http.MethodPost).Subrouter()
+	//postRouter.HandleFunc("/createTweet", tweetHandler.CreateTweet)
+	//postRouter.Use(tweetHandler.MiddlewareProductValidation)
 
-	tc, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	s.Shutdown(tc)
 }

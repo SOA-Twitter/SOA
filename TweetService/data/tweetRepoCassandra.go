@@ -1,16 +1,17 @@
 package data
 
 import (
+	"TweeterMicro/TweetService/proto/tweet"
 	"github.com/gocql/gocql"
 	"log"
-	"time"
 )
 
 type TweetRepoCassandra struct {
-	log *log.Logger
+	log     *log.Logger
+	session *gocql.Session
 }
 
-var Session *gocql.Session
+//var Session *gocql.Session
 
 func CassandraConnection(log *log.Logger) (TweetRepoCassandra, error) {
 	log.Println("Connecting to Cassandra database...")
@@ -18,45 +19,42 @@ func CassandraConnection(log *log.Logger) (TweetRepoCassandra, error) {
 	cluster.Keyspace = "tweets"
 	//	cluster.ProtoVersion = 5
 	var err error
-	Session, err = cluster.CreateSession()
+	session, err := cluster.CreateSession()
 	if err != nil {
 		log.Println("Error establishing a database connection")
 		return TweetRepoCassandra{}, err
 	}
 	log.Println("Connected to database")
-	return TweetRepoCassandra{log}, nil
+	return TweetRepoCassandra{log, session}, nil
 }
 
-func (t TweetRepoCassandra) GetAll() Tweets {
+func (t TweetRepoCassandra) GetAll() []*tweet.Tweet {
 	t.log.Println("{TweetRepoCassandra} - getting all tweets")
-	var tweets []*Tweet
+	tweets := []*tweet.Tweet{}
 	m := map[string]interface{}{}
-	iter := Session.Query("SELECT * FROM tweets").Iter()
+	iter := t.session.Query("SELECT * FROM tweets").Iter()
 	for iter.MapScan(m) {
-		tweets = append(tweets, &Tweet{
-			ID:        m["id"].(int),
-			Text:      m["text"].(string),
-			Picture:   m["picture"].(string),
-			CreatedOn: m["created_on"].(string),
-			DeletedOn: m["deleted_on"].(string),
+		tweets = append(tweets, &tweet.Tweet{
+			Id:      m["id"].(int32),
+			Text:    m["text"].(string),
+			Picture: m["picture"].(string),
 		})
 		m = map[string]interface{}{}
 	}
-
 	return tweets
 }
 
-func (t TweetRepoCassandra) CreateTweet(tw *Tweet) {
+func (t TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("{TweetRepoCassandra} - create tweet")
 
-	query := "INSERT INTO tweets(id,text, picture,created_on, deleted_on) VALUES(?,?, ?, ?, ?)"
+	query := "INSERT INTO tweets(id,text, picture) VALUES(?,?, ?)"
 
-	createdOn := time.Now().UTC().String()
-	deletedOn := ""
-	err := ExecuteQuery(query, 2, tw.Text, tw.Picture, createdOn, deletedOn)
+	err := t.session.Query(query).Bind(2, tw.Text, tw.Picture).Exec()
 	if err != nil {
 		t.log.Println("Error happened during Querying")
+		return err
 	}
+	return nil
 
 }
 

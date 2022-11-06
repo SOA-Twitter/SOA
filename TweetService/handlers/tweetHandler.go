@@ -2,35 +2,50 @@ package handlers
 
 import (
 	"TweeterMicro/TweetService/data"
+	"TweeterMicro/TweetService/proto/tweet"
 	"context"
 	"log"
 	"net/http"
 )
 
 type TweetHandler struct {
+	tweet.UnimplementedTweetServiceServer
 	l        *log.Logger
 	repoImpl data.TweetRepo
 }
 type KeyProduct struct {
 }
 
-func NewTweetHandler(l *log.Logger, twRepo data.TweetRepo) *TweetHandler {
-	// *TODO test repoImpl Dependency Injection line behavior
-	return &TweetHandler{l, twRepo}
+func NewTweet(l *log.Logger, repoImpl data.TweetRepo) *TweetHandler {
+	return &TweetHandler{
+		l:        l,
+		repoImpl: repoImpl}
 }
 
-func (t *TweetHandler) GetTweets(w http.ResponseWriter, h *http.Request) {
+func (t *TweetHandler) GetTweets(ctx context.Context, r *tweet.GetTweetRequest) (*tweet.GetTweetResponse, error) {
 	t.l.Println("Handle GET tweet")
 	// tweets := data.GetAll()
+
 	tweets := t.repoImpl.GetAll()
-	data.RenderJson(w, tweets)
+	return &tweet.GetTweetResponse{
+		TweetList: tweets,
+	}, nil
 }
-func (t *TweetHandler) CreateTweet(w http.ResponseWriter, h *http.Request) {
+func (t *TweetHandler) CreateTweet(ctx context.Context, r *tweet.PostTweetRequest) (*tweet.PostTweetResponse, error) {
 	t.l.Println("Handle POST tweet")
-	tweet := h.Context().Value(KeyProduct{}).(*data.Tweet)
+	res := &data.Tweet{
+		Text:    r.Text,
+		Picture: r.Picture,
+	}
 	// data.CreateTweet(tweet)
-	t.repoImpl.CreateTweet(tweet)
-	w.WriteHeader(http.StatusCreated)
+	err := t.repoImpl.CreateTweet(res)
+	if err != nil {
+
+	}
+	return &tweet.PostTweetResponse{
+		Id:     res.Id,
+		Status: http.StatusCreated,
+	}, nil
 	//data.RenderJson(w, tweet)
 }
 
