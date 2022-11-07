@@ -17,8 +17,8 @@ message GetTweetResponse{
   repeated  Tweet tweet_list = 1;
 }
 message PostTweetRequest{
-  string text = 2;
-  string picture = 3;
+  string text = 1;
+  string picture = 2;
 }
 message PostTweetResponse{
   int32 id = 1;

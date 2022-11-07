@@ -29,13 +29,13 @@ func CassandraConnection(log *log.Logger) (TweetRepoCassandra, error) {
 }
 
 func (t TweetRepoCassandra) GetAll() []*tweet.Tweet {
-	t.log.Println("{TweetRepoCassandra} - getting all tweets")
+	t.log.Println("{TweetRepoCassandra} - Getting all tweets")
 	tweets := []*tweet.Tweet{}
 	m := map[string]interface{}{}
 	iter := t.session.Query("SELECT * FROM tweets").Iter()
 	for iter.MapScan(m) {
 		tweets = append(tweets, &tweet.Tweet{
-			Id:      m["id"].(int32),
+			Id:      int32(m["id"].(int)),
 			Text:    m["text"].(string),
 			Picture: m["picture"].(string),
 		})

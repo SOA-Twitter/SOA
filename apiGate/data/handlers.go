@@ -29,8 +29,8 @@ func (tw *TweetHandler) GetTweets(w http.ResponseWriter, r *http.Request) {
 	tw.l.Println("Resp", resp)
 }
 func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
-	dao := &TweetDAO{}
-	err := FromJSON(dao, r.Body)
+	dao := TweetDAO{}
+	err := FromJSON(&dao, r.Body)
 	if err != nil {
 		tw.l.Println("Cannot unmarshal json")
 		http.Error(w, "Cannot unmarshal json", http.StatusBadRequest)
@@ -44,4 +44,6 @@ func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
 		tw.l.Println("Error occurred during creating tweet")
 		return
 	}
+	w.Write([]byte("200 - CREATED"))
+
 }

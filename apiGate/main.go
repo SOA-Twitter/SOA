@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +19,12 @@ func main() {
 
 	l := log.New(os.Stdout, "[API_GATE] ", log.LstdFlags)
 
-	tweetConn, err := grpc.Dial("localhost:8001", grpc.WithInsecure())
+	tweetConn, err := grpc.DialContext(
+		context.Background(),
+		"localhost:9092",
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 		l.Println("ERooor")
 	}

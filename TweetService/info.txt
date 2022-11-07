@@ -5,4 +5,48 @@
 
 > CREATE KEYSPACE tweets WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 > use tweets;
-> Create Table tweets ( id int primary key, text text, picture text, created_on text, deleted_on text);
+> Create Table tweets ( id int primary key, text text, picture text);
+
+---------------------------------------------------------------------------
+Create proto:
+
+protoc --go_out=./tweet --go_opt=paths=source_relative --go-grpc_out=./tweet --go-grpc_opt=paths=source_relative tweet_service.proto
+
+---------------------------------------------------------------------------
+TEST RPC SERVER FROM COMMAND LINE
+> go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+> grpcurl -help
+> grpcurl -plaintext localhost:9092 list
+   Output:
+   TweetService
+   grpc.reflection.v1alpha.ServerReflection
+
+> grpcurl -plaintext localhost:9092 list TweetService
+   Output:
+   TweetService.GetTweets
+   TweetService.PostTweet
+
+> grpcurl -plaintext localhost:9092 describe TweetService.PostTweet
+  Output:
+  TweetService.PostTweet is a method:
+  rpc PostTweet ( .PostTweetRequest ) returns ( .PostTweetResponse );
+
+> grpcurl -plaintext localhost:9092 describe .PostTweetRequest
+  Output:
+  PostTweetRequest is a message:
+  message PostTweetRequest {
+    string text = 1;
+    string picture = 2;
+  }
+
+> grpcurl --plaintext -d '{"text":"test", "picture":"text"}' localhost:9092  TweetService.PostTweet
+  Output:
+  {
+    "status": 201
+  }
+
+
+
+
+
+
