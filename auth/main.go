@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TweeterMicro/auth/data"
 	"TweeterMicro/auth/handlers"
 	"TweeterMicro/auth/middleware"
 	"context"
@@ -20,7 +21,11 @@ func main() {
 		port = "8081"
 	}
 	l := log.New(os.Stdout, "[Auth-Api]", log.LstdFlags)
-	authHandler := handlers.NewAuthHandler(l)
+	authRepo, err := data.PostgresConnection(l)
+	if err != nil {
+		log.Println("Error connecting to postgres...")
+	}
+	authHandler := handlers.NewAuthHandler(l, &authRepo)
 
 	r := mux.NewRouter()
 	s := r.Methods(http.MethodPost).Subrouter()
@@ -37,6 +42,7 @@ func main() {
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
+	l.Println("Server listening on port", port)
 
 	go func() {
 		err := srv.ListenAndServe()

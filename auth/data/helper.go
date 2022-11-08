@@ -9,7 +9,6 @@ import (
 var SECRET = []byte("super-secret-auth-key")
 
 func CreateJwt(username string) (string, error) {
-
 	claims := &Claims{
 		Username: username,
 		StandardClaims: &jwt.StandardClaims{

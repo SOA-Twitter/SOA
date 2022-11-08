@@ -10,14 +10,15 @@ import (
 	"time"
 )
 
-var db = data.ConnectToDB()
+//var db = data.ConnectToDB()
 
 type AuthHandler struct {
-	l *log.Logger
+	l    *log.Logger
+	repo data.AuthRepo
 }
 
-func NewAuthHandler(l *log.Logger) *AuthHandler {
-	return &AuthHandler{l}
+func NewAuthHandler(l *log.Logger, repo data.AuthRepo) *AuthHandler {
+	return &AuthHandler{l, repo}
 }
 
 func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -29,12 +30,13 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad JSON format", http.StatusBadRequest)
 		return
 	}
-	tokenString, err := FindOne(user.Username, user.Password)
+	err = a.repo.FindUser(user.Username, user.Password)
 	if err != nil {
-		http.Error(w, "Invalid credentials!", http.StatusUnauthorized)
-		a.l.Println("Invalid credentials!")
+		http.Error(w, "Wrong credentials!", http.StatusBadRequest)
 		return
 	}
+	tokenString, _ := data.CreateJwt(user.Username)
+
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
 		Value:   tokenString,
@@ -42,25 +44,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 	json.NewEncoder(w).Encode(tokenString)
 }
-func FindOne(username, password string) (string, error) {
-	user := &data.User{}
-	log.Println(user.Username)
-	if err := db.Where("Username = ?", username).First(user).Error; err != nil {
-		log.Println("Invalid Email")
-		return "", err
-	}
-	log.Println(user.Username)
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		log.Println("Invalid Password")
-		return "", err
-
-	}
-	token, _ := data.CreateJwt(username)
-
-	return token, nil
-}
 func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	a.l.Println("Register handler")
 	user := &data.User{}
@@ -72,15 +56,12 @@ func (a *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Password = string(pass)
-	createdUser := db.Create(user)
-	var errMessage = createdUser.Error
-	if createdUser.Error != nil {
-		fmt.Println(errMessage)
-		a.l.Println("Unable to Create user", errMessage)
 
+	err = a.repo.Register(user)
+	if err != nil {
+		a.l.Println("Error registration")
 	}
-	json.NewEncoder(w).Encode(createdUser)
-	w.WriteHeader(http.StatusCreated)
+
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {

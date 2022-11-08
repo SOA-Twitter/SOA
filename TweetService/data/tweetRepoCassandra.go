@@ -28,7 +28,7 @@ func CassandraConnection(log *log.Logger) (TweetRepoCassandra, error) {
 	return TweetRepoCassandra{log, session}, nil
 }
 
-func (t TweetRepoCassandra) GetAll() []*tweet.Tweet {
+func (t *TweetRepoCassandra) GetAll() []*tweet.Tweet {
 	t.log.Println("{TweetRepoCassandra} - Getting all tweets")
 	tweets := []*tweet.Tweet{}
 	m := map[string]interface{}{}
@@ -44,7 +44,7 @@ func (t TweetRepoCassandra) GetAll() []*tweet.Tweet {
 	return tweets
 }
 
-func (t TweetRepoCassandra) CreateTweet(tw *Tweet) error {
+func (t *TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("{TweetRepoCassandra} - create tweet")
 
 	query := "INSERT INTO tweets(id,text, picture) VALUES(?,?, ?)"
