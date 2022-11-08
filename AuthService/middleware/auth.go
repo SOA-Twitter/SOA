@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"TweeterMicro/auth/data"
+	"TweeterMicro/AuthService/data"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 )
 
-var SECRET = []byte("super-secret-auth-key")
+var SECRET = []byte("super-secret-AuthService-key")
 
 func VerifyJwt(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

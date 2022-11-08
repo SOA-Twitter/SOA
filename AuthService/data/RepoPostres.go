@@ -39,6 +39,18 @@ func setup(db *gorm.DB) {
 	db.AutoMigrate(&User{})
 }
 
+func QueryError(text string) error {
+	return &errorString{text}
+}
+
+type errorString struct {
+	s string
+}
+
+func (e *errorString) Error() string {
+	return e.s
+}
+
 func (ps *AuthRepoPostgres) Register(user *User) error {
 	ps.l.Println("{AuthRepoPostgres} - Creating user")
 	createdUser := ps.db.Create(user)
@@ -46,7 +58,7 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 	if createdUser.Error != nil {
 		fmt.Println(errMessage)
 		ps.l.Println("Unable to Create user.", errMessage)
-		return errMessage
+		return QueryError("Please try again later.")
 	}
 	return nil
 
@@ -56,12 +68,12 @@ func (ps *AuthRepoPostgres) FindUser(username string, password string) error {
 	user := &User{}
 	if err := ps.db.Where("Username = ?", username).First(user).Error; err != nil {
 		ps.l.Println("Invalid Username")
-		return err
+		return QueryError("Invalid credentials!!")
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		ps.l.Println("Invalid Password")
-		return err
+		return QueryError("Invalid credentials!!")
 	}
 	return nil
 }

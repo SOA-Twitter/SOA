@@ -1,0 +1,22 @@
+-START POSTGRES
+> sudo -u  postgres psql
+
+
+ LIST DATABASES
+> \l
+
+-CONNECT TO DATABASE_NAME
+> \c authdatabase
+
+
+-SHOW TABLES
+> \dt
+
+-SHOW TABLE
+> TABLE table_name;
+
+------------------------------------------------------------
+
+Create proto:
+
+protoc --go_out=./auth --go_opt=paths=source_relative --go-grpc_out=./auth --go-grpc_opt=paths=source_relative auth_service.proto

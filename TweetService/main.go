@@ -26,13 +26,13 @@ func main() {
 	l := log.New(os.Stdout, "[Tweet-Api] ", log.LstdFlags)
 	tweetRepoImpl, err := data.CassandraConnection(l)
 	if err != nil {
-		log.Println("Error connecting to cassandra...")
+		l.Println("Error connecting to cassandra...")
 	}
 
 	//PORT FIXED FOR NOW
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9092))
 	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
+		l.Fatalf("Failed to listen: %v", err)
 	}
 
 	tweetHandler := handlers.NewTweet(l, &tweetRepoImpl)

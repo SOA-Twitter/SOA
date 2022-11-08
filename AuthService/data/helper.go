@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var SECRET = []byte("super-secret-auth-key")
+var SECRET = []byte("super-secret-AuthService-key")
 
 func CreateJwt(username string) (string, error) {
 	claims := &Claims{

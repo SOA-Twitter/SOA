@@ -19,7 +19,8 @@ type KeyProduct struct {
 func NewTweet(l *log.Logger, repoImpl data.TweetRepo) *TweetHandler {
 	return &TweetHandler{
 		l:        l,
-		repoImpl: repoImpl}
+		repoImpl: repoImpl,
+	}
 }
 
 func (t *TweetHandler) GetTweets(ctx context.Context, r *tweet.GetTweetRequest) (*tweet.GetTweetResponse, error) {
