@@ -33,7 +33,7 @@ func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
 	err := FromJSON(&dao, r.Body)
 	if err != nil {
 		tw.l.Println("Cannot unmarshal json")
-		http.Error(w, "Cannot unmarshal json", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
 		return
 	}
 	_, err = tw.pr.PostTweet(context.Background(), &tweet.PostTweetRequest{

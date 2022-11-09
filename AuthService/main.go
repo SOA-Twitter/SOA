@@ -44,45 +44,4 @@ func main() {
 	signal.Notify(stopCh, syscall.SIGTERM)
 	<-stopCh
 	grpcServer.Stop()
-
-	//l := log.New(os.Stdout, "[Auth-Api]", log.LstdFlags)
-	//authRepo, err := data.PostgresConnection(l)
-	//if err != nil {
-	//	log.Println("Error connecting to postgres...")
-	//}
-	//authHandler := handlers.NewAuthHandler(l, &authRepo)
-	//
-	//r := mux.NewRouter()
-	//s := r.Methods(http.MethodPost).Subrouter()
-	//s.HandleFunc("/login", authHandler.Login)
-	//s.HandleFunc("/register", authHandler.Register)
-	//
-	//m := r.Methods(http.MethodGet).Subrouter()
-	//m.HandleFunc("/home", handlers.Home)
-	//m.Use(middleware.VerifyJwt)
-	//srv := &http.Server{
-	//	Addr:         ":" + port,
-	//	Handler:      r,
-	//	IdleTimeout:  120 * time.Second,
-	//	ReadTimeout:  1 * time.Second,
-	//	WriteTimeout: 1 * time.Second,
-	//}
-	//l.Println("Server listening on port", port)
-	//
-	//go func() {
-	//	err := srv.ListenAndServe()
-	//	if err != nil {
-	//		l.Fatal(err)
-	//	}
-	//}()
-	//sigChan := make(chan os.Signal)
-	//signal.Notify(sigChan, syscall.SIGINT)
-	//signal.Notify(sigChan, syscall.SIGTERM)
-	//
-	//sig := <-sigChan
-	//l.Println("Graceful shutdown", sig)
-	//
-	//tc, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	//srv.Shutdown(tc)
-
 }

@@ -42,18 +42,14 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 		Token:  tokenString,
 		Status: http.StatusOK,
 	}, nil
-
-	//http.SetCookie(w, &http.Cookie{
-	//	Name:    "token",
-	//	Value:   tokenString,
-	//	Expires: expirationTime,
-	//})
-	//json.NewEncoder(w).Encode(tokenString)
 }
 
 func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*auth.RegisterResponse, error) {
 	a.l.Println("Register handler")
-	user := &data.User{}
+	user := &data.User{
+		Username: r.Username,
+		Password: r.Password,
+	}
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		a.l.Println("Encryption failed", err)
@@ -74,7 +70,6 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Status: http.StatusCreated,
 	}, nil
 }
-
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Hello")))
 

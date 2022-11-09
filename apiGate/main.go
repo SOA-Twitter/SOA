@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TweeterMicro/AuthService/proto/auth"
 	"TweeterMicro/TweetService/proto/tweet"
 	"TweeterMicro/apiGate/data"
 	"context"
@@ -19,6 +20,25 @@ func main() {
 
 	l := log.New(os.Stdout, "[API_GATE] ", log.LstdFlags)
 
+	authConn, err := grpc.DialContext(
+		context.Background(),
+		"localhost:8081",
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		l.Fatalf("Error connecting to Auth_Service: %v\n", err)
+	}
+	defer authConn.Close()
+	authClient := auth.NewAuthServiceClient(authConn)
+	authHandler := data.NewAuthHandler(l, authClient)
+	r := mux.NewRouter()
+
+	authRouter := r.PathPrefix("/auth").Subrouter()
+	authRouter.HandleFunc("/login", authHandler.Login).Methods(http.MethodPost)
+	authRouter.HandleFunc("/register", authHandler.Register).Methods(http.MethodPost)
+
+	//--------------------------------------------------------
 	tweetConn, err := grpc.DialContext(
 		context.Background(),
 		"localhost:9092",
@@ -26,12 +46,11 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		l.Println("ERooor")
+		l.Fatalf("Error connecting to Tweet_Service: %v\n", err)
 	}
 	defer tweetConn.Close()
 	tweetClient := tweet.NewTweetServiceClient(tweetConn)
 	tweetHandler := data.NewTweetHandler(l, tweetClient)
-	r := mux.NewRouter()
 
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
 	tweetRouter.HandleFunc("/getTweets", tweetHandler.GetTweets).Methods(http.MethodGet)
