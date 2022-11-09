@@ -20,7 +20,7 @@ func NewTweetHandler(l *log.Logger, pr tweet.TweetServiceClient) *TweetHandler {
 	return &TweetHandler{l, pr}
 }
 func (tw *TweetHandler) GetTweets(w http.ResponseWriter, r *http.Request) {
-	resp, err := tw.pr.GetTweets(context.Background(), nil)
+	resp, err := tw.pr.GetTweets(context.Background(), &tweet.GetTweetRequest{})
 	if err != nil {
 		tw.l.Println("Error getting tweets")
 		http.Error(w, "Error getting tweets", http.StatusNotFound)

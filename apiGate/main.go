@@ -53,6 +53,7 @@ func main() {
 	tweetHandler := data.NewTweetHandler(l, tweetClient)
 
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
+	tweetRouter.Use(authHandler.VerifyJwt)
 	tweetRouter.HandleFunc("/getTweets", tweetHandler.GetTweets).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 

@@ -23,3 +23,33 @@ func CreateJwt(username string) (string, error) {
 	}
 	return tokenString, nil
 }
+func ValidateJwt(tokenString string) error {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return SECRET, nil
+	})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return err
+		}
+		return err
+	}
+	// NOTE > read below
+	if !token.Valid {
+		return err
+	}
+	return nil
+}
+
+/*
+	NOTE:  VALID = JWT Library functionality:
+
+	func (c StandardClaims) Valid() error {
+		vErr := new(ValidationError)
+		now := TimeFunc().Unix()
+		if !c.VerifyExpiresAt(now, false) {
+			delta := time.Unix(now, 0).Sub(time.Unix(c.ExpiresAt, 0))
+			vErr.Inner = fmt.Errorf("%s by %s", ErrTokenExpired, delta)
+			vErr.Errors |= ValidationErrorExpired
+		}
+*/

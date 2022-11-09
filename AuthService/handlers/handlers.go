@@ -70,6 +70,19 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Status: http.StatusCreated,
 	}, nil
 }
+func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*auth.VerifyResponse, error) {
+	a.l.Println("Verify JWT")
+	err := data.ValidateJwt(r.Token)
+	if err != nil {
+		a.l.Println("JWT expired")
+		return &auth.VerifyResponse{
+			Status: http.StatusUnauthorized,
+		}, nil
+	}
+	return &auth.VerifyResponse{
+		Status: http.StatusOK,
+	}, nil
+}
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Hello")))
 

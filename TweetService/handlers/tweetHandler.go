@@ -51,12 +51,12 @@ func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest)
 	//data.RenderJson(w, tweet)
 }
 
-func (p *TweetHandler) MiddlewareProductValidation(next http.Handler) http.Handler {
+func (t *TweetHandler) MiddlewareProductValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, h *http.Request) {
 		tweet, err := data.DecodeBody(h.Body)
 		if err != nil {
 			http.Error(w, "Unable to decode json", http.StatusBadRequest)
-			p.l.Fatal(err)
+			t.l.Fatal(err)
 			return
 		}
 
@@ -66,9 +66,9 @@ func (p *TweetHandler) MiddlewareProductValidation(next http.Handler) http.Handl
 		next.ServeHTTP(w, h)
 	})
 }
-func (p *TweetHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
+func (t *TweetHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
-		p.l.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
+		t.l.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
 
 		rw.Header().Add("Content-Type", "application/json")
 
