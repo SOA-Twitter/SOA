@@ -5,6 +5,7 @@ service AuthService {
   rpc Login(LoginRequest) returns(LoginResponse){}
   rpc Register(RegisterRequest) returns(RegisterResponse){}
   rpc VerifyJwt(VerifyRequest) returns(VerifyResponse){}
+  rpc GetUserId(UserIdRequest) returns(UserIdResponse){}
 }
 message LoginRequest{
   string username = 1;
@@ -27,5 +28,12 @@ message VerifyRequest{
 }
 message VerifyResponse{
   int32 status = 1;
+}
+message UserIdRequest{
+  string token = 1;
+}
+
+message UserIdResponse {
+  string userId = 1;
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TweeterMicro/AuthService/proto/auth"
 	"TweeterMicro/TweetService/data"
 	"TweeterMicro/TweetService/handlers"
 	"TweeterMicro/TweetService/proto/tweet"
@@ -20,22 +21,26 @@ func main() {
 	if len(port) == 0 {
 		port = "8080"
 	}
-
-	grpcServer := grpc.NewServer()
-
 	l := log.New(os.Stdout, "[Tweet-Api] ", log.LstdFlags)
 	tweetRepoImpl, err := data.CassandraConnection(l)
 	if err != nil {
 		l.Println("Error connecting to cassandra...")
 	}
 
+	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+	ac := auth.NewAuthServiceClient(conn)
+
 	//PORT FIXED FOR NOW
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9092))
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}
-
-	tweetHandler := handlers.NewTweet(l, &tweetRepoImpl)
+	grpcServer := grpc.NewServer()
+	tweetHandler := handlers.NewTweet(l, &tweetRepoImpl, ac)
 	tweet.RegisterTweetServiceServer(grpcServer, tweetHandler)
 	reflection.Register(grpcServer)
 

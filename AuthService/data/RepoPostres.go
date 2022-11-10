@@ -61,9 +61,8 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 		return QueryError("Please try again later.")
 	}
 	return nil
-
 }
-func (ps *AuthRepoPostgres) FindUser(username string, password string) error {
+func (ps *AuthRepoPostgres) CheckCredentials(username string, password string) error {
 	ps.l.Println("{AuthRepoPostgres} - Check if credentials are valid")
 	user := &User{}
 	if err := ps.db.Where("Username = ?", username).First(user).Error; err != nil {
@@ -75,5 +74,13 @@ func (ps *AuthRepoPostgres) FindUser(username string, password string) error {
 		ps.l.Println("Invalid Password")
 		return QueryError("Invalid credentials!!")
 	}
+
 	return nil
+}
+func (ps *AuthRepoPostgres) FindUserID(username string) (string, error) {
+	ps.l.Println("{AuthRepoPostgres} - Find User Id")
+	user := &User{}
+	err := ps.db.Where("Username = ?", username).First(user).Error
+	return user.UserId, err
+
 }

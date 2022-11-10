@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"TweeterMicro/AuthService/proto/auth"
 	"TweeterMicro/TweetService/data"
 	"TweeterMicro/TweetService/proto/tweet"
 	"context"
@@ -12,14 +13,16 @@ type TweetHandler struct {
 	tweet.UnimplementedTweetServiceServer
 	l        *log.Logger
 	repoImpl data.TweetRepo
+	ac       auth.AuthServiceClient
 }
 type KeyProduct struct {
 }
 
-func NewTweet(l *log.Logger, repoImpl data.TweetRepo) *TweetHandler {
+func NewTweet(l *log.Logger, repoImpl data.TweetRepo, ac auth.AuthServiceClient) *TweetHandler {
 	return &TweetHandler{
 		l:        l,
 		repoImpl: repoImpl,
+		ac:       ac,
 	}
 }
 
@@ -34,12 +37,20 @@ func (t *TweetHandler) GetTweets(ctx context.Context, r *tweet.GetTweetRequest) 
 }
 func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest) (*tweet.PostTweetResponse, error) {
 	t.l.Println("Handle POST tweet")
+	resp, err := t.ac.GetUserId(context.Background(), &auth.UserIdRequest{
+		Token: r.Token,
+	})
+	if err != nil {
+
+	}
 	res := &data.Tweet{
 		Text:    r.Text,
 		Picture: r.Picture,
+		UserId:  resp.UserId,
 	}
+
 	// data.CreateTweet(tweet)
-	err := t.repoImpl.CreateTweet(res)
+	err = t.repoImpl.CreateTweet(res)
 	if err != nil {
 		t.l.Println("Error occurred during tweet creation")
 		return nil, err

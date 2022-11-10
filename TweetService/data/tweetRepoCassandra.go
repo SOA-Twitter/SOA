@@ -3,6 +3,7 @@ package data
 import (
 	"TweeterMicro/TweetService/proto/tweet"
 	"github.com/gocql/gocql"
+	"github.com/google/uuid"
 	"log"
 )
 
@@ -35,7 +36,6 @@ func (t *TweetRepoCassandra) GetAll() []*tweet.Tweet {
 	iter := t.session.Query("SELECT * FROM tweets").Iter()
 	for iter.MapScan(m) {
 		tweets = append(tweets, &tweet.Tweet{
-			Id:      int32(m["id"].(int)),
 			Text:    m["text"].(string),
 			Picture: m["picture"].(string),
 		})
@@ -46,10 +46,11 @@ func (t *TweetRepoCassandra) GetAll() []*tweet.Tweet {
 
 func (t *TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("{TweetRepoCassandra} - create tweet")
+	id := uuid.New().String()
+	t.log.Println(tw.UserId)
 
-	query := "INSERT INTO tweets(id,text, picture) VALUES(?,?, ?)"
-
-	err := t.session.Query(query).Bind(2, tw.Text, tw.Picture).Exec()
+	query := "INSERT INTO tweets(id,text, picture,user_id) VALUES(?,?, ?,?)"
+	err := t.session.Query(query).Bind(id, tw.Text, tw.Picture, tw.UserId).Exec()
 	if err != nil {
 		t.log.Println("Error happened during Querying")
 		return err

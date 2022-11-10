@@ -8,8 +8,9 @@ import (
 
 var SECRET = []byte("super-secret-AuthService-key")
 
-func CreateJwt(username string) (string, error) {
+func CreateJwt(userId string, username string) (string, error) {
 	claims := &Claims{
+		UserId:   userId,
 		Username: username,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Second * 1200).Unix(),

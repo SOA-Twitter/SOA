@@ -5,7 +5,7 @@
 
 > CREATE KEYSPACE tweets WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 > use tweets;
-> Create Table tweets ( id int primary key, text text, picture text);
+> Create Table tweets ( id text primary key, text text, picture text, user_id text);
 
 ---------------------------------------------------------------------------
 Create proto:
