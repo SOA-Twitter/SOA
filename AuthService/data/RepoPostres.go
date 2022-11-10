@@ -15,7 +15,7 @@ type AuthRepoPostgres struct {
 	db *gorm.DB
 }
 
-func PostgresConnection(l *log.Logger) (AuthRepoPostgres, error) {
+func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
 	err := godotenv.Load("local.env")
 	if err != nil {
 		l.Fatalf("Some error occurred. Err: %s", err)
@@ -29,11 +29,11 @@ func PostgresConnection(l *log.Logger) (AuthRepoPostgres, error) {
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {
 		l.Println("Error establishing a database connection")
-		return AuthRepoPostgres{}, err
+		return &AuthRepoPostgres{}, err
 	}
 	setup(db)
 	l.Println("Successfully connected to postgres database")
-	return AuthRepoPostgres{l, db}, nil
+	return &AuthRepoPostgres{l, db}, nil
 }
 func setup(db *gorm.DB) {
 	db.AutoMigrate(&User{})

@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}
-	authHandler := handlers.NewAuthHandler(l, &authRepo)
+	authHandler := handlers.NewAuthHandler(l, authRepo)
 	auth.RegisterAuthServiceServer(grpcServer, authHandler)
 	reflection.Register(grpcServer)
 
