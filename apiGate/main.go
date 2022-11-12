@@ -5,15 +5,16 @@ import (
 	"apiGate/protos/auth"
 	"apiGate/protos/tweet"
 	"context"
-	"github.com/gorilla/mux"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 
 	authConn, err := grpc.DialContext(
 		context.Background(),
-		"localhost:8081",
+		"localhost:8001",
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)

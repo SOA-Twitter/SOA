@@ -4,7 +4,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY . .
-RUN go CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN go build -o main .
 
 FROM alpine
 COPY --from=build_container /app/main .

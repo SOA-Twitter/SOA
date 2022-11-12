@@ -17,7 +17,13 @@ services:
       context: ./AuthService
       dockerfile: Dockerfile
     environment:
-      PORT: '8001'
+      AUTH_PORT: '8001'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authdatabase
+      # POSTGRES_HOST: localhost
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
     ports:
       - '8001:8001'
     depends_on:
@@ -25,9 +31,24 @@ services:
 
   postgres:
     image: postgres
-    restart: always
     volumes:
       - /home/GolandProjects/posgres/:/posgres/data
+    container_name: db
+    restart: on-failure
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authdatabase
+      # POSTGRES_HOST: localhost
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 20
 
   tweet_service:
     build:
@@ -44,14 +65,14 @@ services:
     image: cassandra:4.0
     restart: always
     ports:
-      - '9042-9042'
+      - '9042:9042'
     volumes:
       - /home/GolandProjects/cass/:/cass/data
     healthcheck:
       test: echo 'db.runCommand("ping").ok'
       interval: 10s
       timeout: 10s
-      retries: 10
+      retries: 20
 
 
 

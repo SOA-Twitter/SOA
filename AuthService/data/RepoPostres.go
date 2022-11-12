@@ -2,12 +2,12 @@ package data
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
+	"log"
+	"os"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"os"
 )
 
 type AuthRepoPostgres struct {
@@ -16,15 +16,16 @@ type AuthRepoPostgres struct {
 }
 
 func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
-	err := godotenv.Load("local.env")
-	if err != nil {
-		l.Fatalf("Some error occurred. Err: %s", err)
-	}
-	USERNAME := os.Getenv("db_username")
-	DB_HOST := os.Getenv("db_host")
-	PASSWORD := os.Getenv("db_password")
-	DB_NAME := os.Getenv("db_name")
-	PORT := os.Getenv("db_port")
+	// err := godotenv.Load("local.env")
+	// if err != nil {
+	// 	l.Fatalf("Some error occurred. Err: %s", err)
+	// }
+	USERNAME := os.Getenv("POSTGRES_USER")
+	DB_HOST := os.Getenv("POSTGRES_HOST")
+	PASSWORD := os.Getenv("POSTGRES_PASSWORD")
+	DB_NAME := os.Getenv("POSTGRES_DB")
+	PORT := os.Getenv("POSTGRES_PORT")
+	l.Println("\n" + USERNAME + DB_HOST + PASSWORD + DB_NAME + PORT + "\n")
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", DB_HOST, USERNAME, DB_NAME, PASSWORD, PORT)
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {
