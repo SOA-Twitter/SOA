@@ -1,9 +1,9 @@
 package main
 
 import (
-	"TweeterMicro/AuthService/proto/auth"
-	"TweeterMicro/TweetService/proto/tweet"
-	"TweeterMicro/apiGate/data"
+	"apiGate/data"
+	"apiGate/protos/auth"
+	"apiGate/protos/tweet"
 	"context"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"

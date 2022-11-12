@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"TweeterMicro/AuthService/data"
-	"TweeterMicro/AuthService/proto/auth"
+	"AuthService/data"
+	"AuthService/proto/auth"
 	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"

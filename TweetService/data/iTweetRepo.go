@@ -1,6 +1,6 @@
 package data
 
-import "TweeterMicro/TweetService/proto/tweet"
+import "TweetService/proto/tweet"
 
 type TweetRepo interface {
 	GetAll() []*tweet.Tweet

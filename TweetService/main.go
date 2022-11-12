@@ -1,10 +1,10 @@
 package main
 
 import (
-	"TweeterMicro/AuthService/proto/auth"
-	"TweeterMicro/TweetService/data"
-	"TweeterMicro/TweetService/handlers"
-	"TweeterMicro/TweetService/proto/tweet"
+	"TweetService/data"
+	"TweetService/handlers"
+	"TweetService/proto/auth"
+	"TweetService/proto/tweet"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	port := os.Getenv("app_port")
+	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8080"
 	}
@@ -27,7 +27,7 @@ func main() {
 		l.Println("Error connecting to cassandra...")
 	}
 
-	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:8001", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 	ac := auth.NewAuthServiceClient(conn)
 
 	//PORT FIXED FOR NOW
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9092))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}

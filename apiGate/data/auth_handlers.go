@@ -1,7 +1,7 @@
 package data
 
 import (
-	"TweeterMicro/AuthService/proto/auth"
+	"apiGate/protos/auth"
 	"context"
 	"encoding/json"
 	"log"

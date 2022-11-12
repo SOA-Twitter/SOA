@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"TweeterMicro/AuthService/proto/auth"
-	"TweeterMicro/TweetService/data"
-	"TweeterMicro/TweetService/proto/tweet"
+	"TweetService/data"
+	"TweetService/proto/auth"
+	"TweetService/proto/tweet"
 	"context"
 	"log"
 	"net/http"

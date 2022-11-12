@@ -1,7 +1,7 @@
 package data
 
 import (
-	"TweeterMicro/TweetService/proto/tweet"
+	"apiGate/protos/tweet"
 	"context"
 	"log"
 	"net/http"

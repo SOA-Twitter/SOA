@@ -1,7 +1,7 @@
 package data
 
 import (
-	"TweeterMicro/TweetService/proto/tweet"
+	"TweetService/proto/tweet"
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
 	"log"

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"TweeterMicro/AuthService/data"
-	"TweeterMicro/AuthService/handlers"
-	"TweeterMicro/AuthService/proto/auth"
+	"AuthService/data"
+	"AuthService/handlers"
+	"AuthService/proto/auth"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -16,7 +16,7 @@ import (
 
 func main() {
 
-	port := os.Getenv("Auth_port")
+	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = "8081"
 	}
