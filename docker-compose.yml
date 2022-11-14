@@ -1,6 +1,5 @@
 version: "3.1"
 
-
 services:
   api_gate:
     build:
@@ -16,7 +15,6 @@ services:
       TWEET_PORT: ${TWEET_PORT}
     ports:
       - '8081:8081'
-
 
   auth_service:
     build:
@@ -73,7 +71,3 @@ services:
       interval: 10s
       timeout: 10s
       retries: 20
-
-
-
-
