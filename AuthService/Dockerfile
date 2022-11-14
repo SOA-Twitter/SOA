@@ -1,12 +1,13 @@
-FROM golang:alpine as build_container
+FROM golang:alpine as builder
 WORKDIR /app
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
 COPY . .
-RUN go build -o main .
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+
 
 FROM alpine
-COPY --from=build_container /app/main .
-EXPOSE 8001
+WORKDIR /root/
+
+COPY --from=builder /app/main .
+EXPOSE 8081
 CMD ["./main"]

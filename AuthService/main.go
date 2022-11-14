@@ -19,7 +19,7 @@ func main() {
 
 	port := os.Getenv("AUTH_PORT")
 	if len(port) == 0 {
-		port = "8001"
+		port = "8002"
 	}
 	grpcServer := grpc.NewServer()
 	l := log.New(os.Stdout, "[Auth-Api]", log.LstdFlags)

@@ -4,28 +4,33 @@ version: "3.1"
 services:
   api_gate:
     build:
-      context: ./apiGate
+      context: ./apiGate/
       dockerfile: Dockerfile
+    container_name: api_gate
+    restart: on-failure
     environment:
-      PORT: '8081'
+      API_GATE_PORT: ${API_GATE_PORT}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
+      TWEET_HOST: ${TWEET_HOST}
+      TWEET_PORT: ${TWEET_PORT}
     ports:
       - '8081:8081'
 
 
   auth_service:
     build:
-      context: ./AuthService
+      context: ./AuthService/
       dockerfile: Dockerfile
     environment:
-      AUTH_PORT: '8001'
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: authdatabase
-      # POSTGRES_HOST: localhost
-      POSTGRES_HOST: 127.0.0.1
-      POSTGRES_PORT: 5432
+      AUTH_PORT: ${AUTH_PORT}
+      USER: ${AUTH_DB_USER}
+      PASSWORD: ${AUTH_DB_PASS}
+      DB: ${AUTH_DB}
+      HOST: ${AUTH_DB_HOST}
+      PORT: ${AUTH_DB_PORT}
     ports:
-      - '8001:8001'
+      - ${AUTH_PORT}:${AUTH_PORT}
     depends_on:
       - postgres
 
@@ -33,17 +38,12 @@ services:
     image: postgres
     volumes:
       - /home/GolandProjects/posgres/:/posgres/data
-    container_name: db
+    container_name: user_db
     restart: on-failure
-    ports:
-      - '5432:5432'
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: authdatabase
-      # POSTGRES_HOST: localhost
-      POSTGRES_HOST: 127.0.0.1
-      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS}
+      POSTGRES_DB: ${AUTH_DB}
     healthcheck:
       test: echo 'db.runCommand("ping").ok'
       interval: 10s
@@ -52,12 +52,12 @@ services:
 
   tweet_service:
     build:
-      context: ./TweetService
+      context: ./TweetService/
       dockerfile: Dockerfile
     environment:
-      PORT: '9092'
+      TWEET_PORT: ${TWEET_PORT}
     ports:
-      - '9092:9092'
+      - ${TWEET_PORT}:${TWEET_PORT}
     depends_on:
       - cassandra
 

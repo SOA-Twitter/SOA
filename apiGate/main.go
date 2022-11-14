@@ -19,11 +19,18 @@ import (
 
 func main() {
 
+	port := os.Getenv("API_GATE_PORT")
+	if len(port) == 0 {
+		port = ":8082"
+	}
+	authHost := os.Getenv("AUTH_HOST")
+	authPort := os.Getenv("AUTH_PORT")
+
 	l := log.New(os.Stdout, "[API_GATE] ", log.LstdFlags)
 
 	authConn, err := grpc.DialContext(
 		context.Background(),
-		"localhost:8001",
+		authHost+":"+authPort,
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
@@ -40,9 +47,12 @@ func main() {
 	authRouter.HandleFunc("/register", authHandler.Register).Methods(http.MethodPost)
 
 	//--------------------------------------------------------
+
+	tweetPort := os.Getenv("TWEET_PORT")
+	tweetHost := os.Getenv("TWEET_HOST")
 	tweetConn, err := grpc.DialContext(
 		context.Background(),
-		"localhost:9092",
+		tweetHost+":"+tweetPort,
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
@@ -59,13 +69,13 @@ func main() {
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 
 	s := &http.Server{
-		Addr:         ":8080",
+		Addr:         port,
 		Handler:      r,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
-	l.Println("Server listening on port 8080")
+	l.Println("Server listening on port" + port)
 
 	go func() {
 		err := s.ListenAndServe()

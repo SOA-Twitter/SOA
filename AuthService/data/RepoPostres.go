@@ -20,11 +20,11 @@ func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
 	// if err != nil {
 	// 	l.Fatalf("Some error occurred. Err: %s", err)
 	// }
-	USERNAME := os.Getenv("POSTGRES_USER")
-	DB_HOST := os.Getenv("POSTGRES_HOST")
-	PASSWORD := os.Getenv("POSTGRES_PASSWORD")
-	DB_NAME := os.Getenv("POSTGRES_DB")
-	PORT := os.Getenv("POSTGRES_PORT")
+	USERNAME := os.Getenv("USER")
+	DB_HOST := os.Getenv("HOST")
+	PASSWORD := os.Getenv("PASSWORD")
+	DB_NAME := os.Getenv("DB")
+	PORT := os.Getenv("PORT")
 	l.Println("\n" + USERNAME + DB_HOST + PASSWORD + DB_NAME + PORT + "\n")
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", DB_HOST, USERNAME, DB_NAME, PASSWORD, PORT)
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})

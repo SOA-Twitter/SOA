@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("TWEET_PORT")
 	if len(port) == 0 {
 		port = "8080"
 	}
@@ -26,8 +26,9 @@ func main() {
 	if err != nil {
 		l.Println("Error connecting to cassandra...")
 	}
+	authPort := os.Getenv("AUTH_PORT")
 
-	conn, err := grpc.Dial("localhost:8001", grpc.WithInsecure())
+	conn, err := grpc.Dial(authPort+":"+authPort, grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
