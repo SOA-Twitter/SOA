@@ -5,6 +5,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
 	"log"
+	"os"
 )
 
 type TweetRepoCassandra struct {
@@ -16,7 +17,8 @@ type TweetRepoCassandra struct {
 
 func CassandraConnection(log *log.Logger) (TweetRepoCassandra, error) {
 	log.Println("Connecting to Cassandra database...")
-	cluster := gocql.NewCluster("127.0.0.1")
+	cassUri := os.Getenv("CASS_URI")
+	cluster := gocql.NewCluster(cassUri)
 	cluster.Keyspace = "tweets"
 	//	cluster.ProtoVersion = 5
 	var err error

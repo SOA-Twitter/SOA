@@ -41,7 +41,8 @@ func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest)
 		Token: r.Token,
 	})
 	if err != nil {
-
+		t.l.Println("Error creating tweet")
+		t.l.Println(err)
 	}
 	res := &data.Tweet{
 		Text:    r.Text,
