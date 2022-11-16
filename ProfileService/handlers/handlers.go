@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"TweeterMicro/ProfileService/data"
-	"TweeterMicro/ProfileService/proto/profile"
+	"ProfileService/data"
+	"ProfileService/proto/auth"
+	"ProfileService/proto/profile"
 	"context"
 	"log"
 )
@@ -10,17 +11,38 @@ import (
 type ProfileHandler struct {
 	profile.UnimplementedProfileServiceServer
 	l    *log.Logger
-	repo data.ProfileRepo
+	repo *data.ProfileRepo
+	as   auth.AuthServiceClient
 }
 
-func NewProfileHandler(l *log.Logger, repo data.ProfileRepo) *ProfileHandler {
+func NewProfileHandler(l *log.Logger, repo *data.ProfileRepo, as auth.AuthServiceClient) *ProfileHandler {
 	return &ProfileHandler{
 		l:    l,
 		repo: repo,
+		as:   as,
 	}
 }
 func (pr *ProfileHandler) Register(ctx context.Context, r *profile.RegisterRequest) (*profile.RegisterResponse, error) {
 	pr.l.Println("Register handler")
+	user := &data.User{
+		Username: r.GetUsername(),
+		Password: r.GetPassword(),
+		FirstName: r.GetFirstName(),
+		LastName: r.GetLastName(),
+		Email: r.GetEmail(),
+		Gender: r.GetGender(),
+		Country: r.GetCountry(),
+	}
+	userId, err := pr.repo.Register(user)
+	if err != nil{
+		pr.l.Println("Error inserting user into db")
+		return nil, err
+	}
+	//resp, err := pr.as.Register(context.Background(), &auth.UserIdRequest{
+	//	UserId: userId,
+	//	Username: user.Username,
+	//	Password: user.Password,
+	//})
 
 	//TODO REGISTER HANDLER
 
