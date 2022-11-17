@@ -5,10 +5,8 @@ import (
 	"TweetService/handlers"
 	"TweetService/proto/auth"
 	"TweetService/proto/tweet"
-	"context"
 	"fmt"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -31,18 +29,18 @@ func main() {
 	authPort := os.Getenv("AUTH_PORT")
 	authHost := os.Getenv("AUTH_HOST")
 
-	//conn, err := grpc.Dial(authHost+":"+authPort, grpc.WithInsecure())
-	//if err != nil {
-	//	l.Println("error connecting to auth service")
-	//	l.Println(err)
-	//	l.Println(conn)
-	//}
-	conn, err := grpc.DialContext(
-		context.Background(),
-		authHost+":"+authPort,
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	conn, err := grpc.Dial(authHost+":"+authPort, grpc.WithInsecure())
+	if err != nil {
+		l.Println("error connecting to auth service")
+		l.Println(err)
+		l.Println(conn)
+	}
+	//conn, err := grpc.DialContext(
+	//	context.Background(),
+	//	authHost+":"+authPort,
+	//	grpc.WithBlock(),
+	//	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	//)
 	if err != nil {
 		l.Println("error connecting to auth service")
 		l.Println(err)
@@ -57,7 +55,7 @@ func main() {
 		l.Fatalf("Failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	tweetHandler := handlers.NewTweet(l, &tweetRepoImpl, ac)
+	tweetHandler := handlers.NewTweet(l, tweetRepoImpl, ac)
 	tweet.RegisterTweetServiceServer(grpcServer, tweetHandler)
 	reflection.Register(grpcServer)
 

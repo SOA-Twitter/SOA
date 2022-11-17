@@ -2,6 +2,7 @@ package data
 
 import (
 	"TweetService/proto/tweet"
+	"fmt"
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
 	"log"
@@ -15,20 +16,46 @@ type TweetRepoCassandra struct {
 
 //var Session *gocql.Session
 
-func CassandraConnection(log *log.Logger) (TweetRepoCassandra, error) {
+func CassandraConnection(log *log.Logger) (*TweetRepoCassandra, error) {
 	log.Println("Connecting to Cassandra database...")
 	cassUri := os.Getenv("CASS_URI")
 	cluster := gocql.NewCluster(cassUri)
-	cluster.Keyspace = "tweets"
+	cluster.Keyspace = "system"
 	//	cluster.ProtoVersion = 5
 	var err error
 	session, err := cluster.CreateSession()
 	if err != nil {
 		log.Println("Error establishing a database connection")
-		return TweetRepoCassandra{}, err
+		return nil, err
+	}
+	err = session.Query(
+		fmt.Sprintf(`CREATE KEYSPACE IF NOT EXISTS %s
+					WITH replication = {
+						'class' : 'SimpleStrategy',
+						'replication_factor' : %d
+					}`, "tweets", 1)).Exec()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+
+	}
+	err = session.Query(
+		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
+					(id text primary key, text text, picture text, user_id text)`,
+			"tweets")).Exec()
+	if err != nil {
+		log.Println(err)
+	}
+	session.Close()
+	cluster.Keyspace = "tweets"
+	cluster.Consistency = gocql.One
+	session, err = cluster.CreateSession()
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
 	log.Println("Connected to database")
-	return TweetRepoCassandra{log, session}, nil
+	return &TweetRepoCassandra{log, session}, nil
 }
 
 func (t *TweetRepoCassandra) GetAll() []*tweet.Tweet {
