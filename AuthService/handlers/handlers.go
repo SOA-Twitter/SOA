@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 //var db = data.ConnectToDB()
@@ -25,6 +26,17 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo) *AuthHandler {
 		l:    l,
 		repo: repo,
 	}
+}
+
+func PasswordRegex(password string) error {
+	pattern, compileErr := regexp.Compile("[a-zA-Z]{8,}")
+	if compileErr == nil {
+		res := pattern.MatchString(password)
+		if res == true {
+			return nil
+		}
+	}
+	return compileErr
 }
 
 func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginResponse, error) {
@@ -61,6 +73,17 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Username: r.Username,
 		Password: r.Password,
 	}
+
+	result := PasswordRegex(user.Password)
+
+	if result != nil {
+		a.l.Println("Password must contain minimum eight characters, at least one uppercase letter," +
+			" one lowercase letter, one number and one special character")
+		return &auth.RegisterResponse{
+			Status: http.StatusBadRequest,
+		}, result
+	}
+
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		a.l.Println("Encryption failed", err)
