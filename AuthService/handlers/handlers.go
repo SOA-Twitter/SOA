@@ -29,14 +29,13 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo) *AuthHandler {
 }
 
 func PasswordRegex(password string) error {
-	pattern, compileErr := regexp.Compile("[a-zA-Z]{8,}")
-	if compileErr == nil {
-		res := pattern.MatchString(password)
-		if res == true {
-			return nil
-		}
+	pattern := regexp.MustCompile("[a-zA-Z]{8,}")
+
+	res := pattern.MatchString(password)
+	if res == true {
+		return nil
 	}
-	return compileErr
+	return fmt.Errorf("Pattern error")
 }
 
 func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginResponse, error) {
@@ -89,7 +88,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		a.l.Println("Encryption failed", err)
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,
-		}, err
+		}, result
 	}
 	user.Password = string(pass)
 
