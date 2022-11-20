@@ -3,6 +3,7 @@ package handlers
 import (
 	"AuthService/data"
 	"AuthService/proto/auth"
+	"bufio"
 	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
@@ -10,6 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 )
 
@@ -29,7 +31,7 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo) *AuthHandler {
 }
 
 func PasswordRegex(password string) error {
-	pattern := regexp.MustCompile("[a-zA-Z]{8,}")
+	pattern := regexp.MustCompile("[a-zA-Z]{7,}")
 
 	res := pattern.MatchString(password)
 	if res == true {
@@ -76,11 +78,34 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	result := PasswordRegex(user.Password)
 
 	if result != nil {
-		a.l.Println("Password must contain minimum eight characters, at least one uppercase letter," +
-			" one lowercase letter, one number and one special character")
+		a.l.Println("Password must be at least 7 characters long.")
+		//a.l.Println("Password must contain minimum eight characters, at least one uppercase letter," +
+		//	" one lowercase letter, one number and one special character")
 		return &auth.RegisterResponse{
 			Status: http.StatusBadRequest,
 		}, result
+	}
+
+	file, err1 := os.Open("10k-most-common.txt")
+
+	if err1 != nil {
+		a.l.Println("Error opening 10k-most-common.txt file")
+		a.l.Println(err1)
+	}
+	defer file.Close()
+
+	var passwords []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		passwords = append(passwords, scanner.Text())
+	}
+
+	for _, v := range passwords {
+		if user.Password == v {
+			return &auth.RegisterResponse{
+				Status: http.StatusBadRequest,
+			}, nil
+		}
 	}
 
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
