@@ -1,0 +1,10 @@
+Create unencrypted private key and CSR with a single command:
+-openssl req -newkey rsa:2048 -nodes -keyout cert.key -out cert.csr
+
+
+Create a Self-Signed Certificate
+    A self-signed certificate is a certificate that's
+    signed with its own private key. It can be used to
+    encrypt data just as well as CA-signed certificates,
+    but our users will be shown a warning that says the certificate isn't trusted.
+-openssl req -key cert.key -new -x509 -days 365 -out cert.crt

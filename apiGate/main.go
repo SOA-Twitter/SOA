@@ -83,7 +83,7 @@ func main() {
 	l.Println("Server listening on port" + port)
 
 	go func() {
-		err := s.ListenAndServe()
+		err := s.ListenAndServeTLS("certificates/cert.crt", "certificates/cert.key")
 		if err != nil {
 			l.Fatal(err)
 		}

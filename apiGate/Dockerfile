@@ -10,5 +10,6 @@ FROM alpine
 WORKDIR /root/
 
 COPY --from=builder /app/main .
+COPY ./certificates ./certificates
 EXPOSE 8081
 CMD ["./main"]
