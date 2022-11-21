@@ -48,6 +48,7 @@ func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request!", http.StatusBadRequest)
 		return
 	}
+	tw.l.Println(dao.Text + dao.Picture + c.Value)
 
 	_, err = tw.pr.PostTweet(context.Background(), &tweet.PostTweetRequest{
 		Text:    dao.Text,

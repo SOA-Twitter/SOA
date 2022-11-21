@@ -53,6 +53,8 @@ services:
       context: ./TweetService/
       dockerfile: Dockerfile
     environment:
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
       TWEET_PORT: ${TWEET_PORT}
       CASS_URI: ${CASS_URI}
     ports:

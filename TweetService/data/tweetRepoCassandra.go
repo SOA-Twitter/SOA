@@ -4,7 +4,6 @@ import (
 	"TweetService/proto/tweet"
 	"fmt"
 	"github.com/gocql/gocql"
-	"github.com/google/uuid"
 	"log"
 	"os"
 )
@@ -36,12 +35,10 @@ func CassandraConnection(log *log.Logger) (*TweetRepoCassandra, error) {
 					}`, "tweets", 1)).Exec()
 	if err != nil {
 		log.Println(err)
-		return nil, err
-
 	}
 	err = session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(id text primary key, text text, picture text, user_id text)`,
+					(id UUID PRIMARY KEY, text text, picture text, user_id text)`,
 			"tweets")).Exec()
 	if err != nil {
 		log.Println(err)
@@ -55,7 +52,7 @@ func CassandraConnection(log *log.Logger) (*TweetRepoCassandra, error) {
 		return nil, err
 	}
 	log.Println("Connected to database")
-	return &TweetRepoCassandra{log, session}, nil
+	return &TweetRepoCassandra{log: log, session: session}, nil
 }
 
 func (t *TweetRepoCassandra) GetAll() []*tweet.Tweet {
@@ -75,11 +72,9 @@ func (t *TweetRepoCassandra) GetAll() []*tweet.Tweet {
 
 func (t *TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("{TweetRepoCassandra} - create tweet")
-	id := uuid.New().String()
-	t.log.Println(tw.UserId)
+	id, _ := gocql.RandomUUID()
 
-	query := "INSERT INTO tweets(id,text, picture,user_id) VALUES(?,?, ?,?)"
-	err := t.session.Query(query).Bind(id, tw.Text, tw.Picture, tw.UserId).Exec()
+	err := t.session.Query(`INSERT INTO tweets(id,text, picture,user_id) VALUES(?,?, ?,?)`, id, tw.Text, tw.Picture, tw.UserId).Exec()
 	if err != nil {
 		t.log.Println("Error happened during Querying")
 		return err
