@@ -27,6 +27,7 @@ services:
       DB: ${AUTH_DB}
       HOST: ${AUTH_DB_HOST}
       PORT: ${AUTH_DB_PORT}
+      SECRET: ${SECRET}
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
     depends_on:

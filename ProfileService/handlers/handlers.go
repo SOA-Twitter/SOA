@@ -25,7 +25,7 @@ func NewProfileHandler(l *log.Logger, repo *data.ProfileRepo, as auth.AuthServic
 func (pr *ProfileHandler) Register(ctx context.Context, r *profile.RegisterRequest) (*profile.RegisterResponse, error) {
 	pr.l.Println("Register handler")
 	//user := &data.User{
-	//	Username: r.GetUsername(),
+	//	Email: r.GetUsername(),
 	//	Password: r.GetPassword(),
 	//	FirstName: r.GetFirstName(),
 	//	LastName: r.GetLastName(),
@@ -40,7 +40,7 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.RegisterReque
 	//}
 	//resp, err := pr.as.Register(context.Background(), &auth.UserIdRequest{
 	//	UserId: userId,
-	//	Username: user.Username,
+	//	Email: user.Email,
 	//	Password: user.Password,
 	//})
 

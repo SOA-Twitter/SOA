@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/mail"
 	"time"
 )
 
@@ -14,7 +15,7 @@ type AuthHandler struct {
 	pr auth.AuthServiceClient
 }
 type UserDAO struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -34,7 +35,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token, err := ah.pr.Login(context.Background(), &auth.LoginRequest{
-		Username: user.Username,
+		Email:    user.Email,
 		Password: user.Password,
 	})
 	if err != nil {
@@ -59,12 +60,27 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
 		return
 	}
+	_, err = mail.ParseAddress(user.Email)
+	if err != nil {
+		ah.l.Println("Wrong email format")
+		http.Error(w, "Wrong email format!.", http.StatusBadRequest)
+		return
+	}
+	result := ValidatePassword(user.Password)
+
+	if result != nil {
+		ah.l.Println("Wrong password format")
+		http.Error(w, "Password must be at least 7 characters long, with at least"+
+			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		return
+	}
 	res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
-		Username: user.Username,
+		Email:    user.Email,
 		Password: user.Password,
 	})
 	if err != nil {
 		json.NewEncoder(w).Encode(res.Status)
+		http.Error(w, "invalid email", http.StatusBadRequest)
 		return
 	}
 	json.NewEncoder(w).Encode(res.Status)

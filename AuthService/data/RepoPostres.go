@@ -63,11 +63,11 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 	}
 	return nil
 }
-func (ps *AuthRepoPostgres) CheckCredentials(username string, password string) error {
+func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) error {
 	ps.l.Println("{AuthRepoPostgres} - Check if credentials are valid")
 	user := &User{}
-	if err := ps.db.Where("Username = ?", username).First(user).Error; err != nil {
-		ps.l.Println("Invalid Username")
+	if err := ps.db.Where("Email = ?", email).First(user).Error; err != nil {
+		ps.l.Println("Invalid Email")
 		return QueryError("Invalid credentials!!")
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
@@ -81,7 +81,7 @@ func (ps *AuthRepoPostgres) CheckCredentials(username string, password string) e
 func (ps *AuthRepoPostgres) FindUserID(username string) (string, error) {
 	ps.l.Println("{AuthRepoPostgres} - Find User Id")
 	user := &User{}
-	err := ps.db.Where("Username = ?", username).First(user).Error
+	err := ps.db.Where("Email = ?", username).First(user).Error
 	return user.UserId, err
 
 }

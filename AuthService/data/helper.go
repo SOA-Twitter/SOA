@@ -3,15 +3,16 @@ package data
 import (
 	"github.com/golang-jwt/jwt/v4"
 	"log"
+	"os"
 	"time"
 )
 
-var SECRET = []byte("super-secret-AuthService-key")
+var SECRET = os.Getenv("SECRET")
 
-func CreateJwt(userId string, username string) (string, error) {
+func CreateJwt(userId string, email string) (string, error) {
 	claims := &Claims{
-		UserId:   userId,
-		Username: username,
+		UserId: userId,
+		Email:  email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Second * 1200).Unix(),
 		},

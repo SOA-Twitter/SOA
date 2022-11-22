@@ -12,7 +12,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 )
 
 //var db = data.ConnectToDB()
@@ -30,40 +29,31 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo) *AuthHandler {
 	}
 }
 
-func PasswordRegex(password string) error {
-	pattern := regexp.MustCompile("[a-zA-Z]{7,}")
-
-	res := pattern.MatchString(password)
-	if res == true {
-		return nil
-	}
-	return fmt.Errorf("Pattern error")
-}
-
 func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginResponse, error) {
 	a.l.Println("Login handler")
 	res := &data.User{
-		Username: r.Username,
+		Email:    r.Email,
 		Password: r.Password,
 	}
-	err := a.repo.CheckCredentials(res.Username, res.Password)
+	err := a.repo.CheckCredentials(res.Email, res.Password)
 	if err != nil {
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
 		}, err
 	}
-	userId, err := a.repo.FindUserID(res.Username)
+	userId, err := a.repo.FindUserID(res.Email)
 	if err != nil {
 		a.l.Println("Cannot find userId")
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
 		}, err
 	}
-	tokenString, _ := data.CreateJwt(userId, res.Username)
+	tokenString, _ := data.CreateJwt(userId, res.Email)
 	return &auth.LoginResponse{
 		Token:  tokenString,
 		Status: http.StatusOK,
 	}, nil
+
 }
 
 func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*auth.RegisterResponse, error) {
@@ -71,19 +61,8 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	id := uuid.New().String()
 	user := &data.User{
 		UserId:   id,
-		Username: r.Username,
+		Email:    r.Email,
 		Password: r.Password,
-	}
-
-	result := PasswordRegex(user.Password)
-
-	if result != nil {
-		a.l.Println("Password must be at least 7 characters long.")
-		//a.l.Println("Password must contain minimum eight characters, at least one uppercase letter," +
-		//	" one lowercase letter, one number and one special character")
-		return &auth.RegisterResponse{
-			Status: http.StatusBadRequest,
-		}, result
 	}
 
 	file, err1 := os.Open("10k-most-common.txt")
@@ -108,16 +87,16 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		}
 	}
 
-	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		a.l.Println("Encryption failed", err)
+	pass, err2 := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err2 != nil {
+		a.l.Println("Encryption failed", err2)
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,
-		}, result
+		}, err2
 	}
 	user.Password = string(pass)
 
-	err = a.repo.Register(user)
+	err := a.repo.Register(user)
 	if err != nil {
 		a.l.Println("Error registration")
 		return &auth.RegisterResponse{
