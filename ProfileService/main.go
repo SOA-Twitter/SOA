@@ -21,7 +21,7 @@ import (
 func main() {
 	port := os.Getenv("PROFILE_PORT")
 	if len(port) == 0 {
-		port = "9099"
+		port = "8090"
 	}
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -62,7 +62,6 @@ func main() {
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatal("Server error: ", err)
-
 		}
 	}()
 	stopCh := make(chan os.Signal)

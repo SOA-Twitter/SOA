@@ -3,11 +3,11 @@ syntax = "proto3";
 option go_package = "proto/profile";
 
 service ProfileService{
-  rpc Register(RegisterRequest) returns (RegisterResponse){}
+  rpc Register(ProfileRegisterRequest) returns (ProfileRegisterResponse){}
   rpc GetUserProfile(UserProfRequest) returns (UserProfResponse){}
 
 }
-message RegisterRequest{
+message ProfileRegisterRequest{
   string username = 1;
   string password = 2;
   string firstName = 3;
@@ -16,7 +16,7 @@ message RegisterRequest{
   string gender = 6;
   string country = 7;
 }
-message RegisterResponse{
+message ProfileRegisterResponse{
 
 }
 message UserProfRequest{

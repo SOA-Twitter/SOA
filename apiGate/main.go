@@ -3,6 +3,7 @@ package main
 import (
 	"apiGate/data"
 	"apiGate/protos/auth"
+	"apiGate/protos/profile"
 	"apiGate/protos/tweet"
 	"context"
 	gorillaHandlers "github.com/gorilla/handlers"
@@ -67,6 +68,27 @@ func main() {
 	tweetRouter.Use(authHandler.VerifyJwt)
 	tweetRouter.HandleFunc("/getTweets", tweetHandler.GetTweets).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
+
+	//----------------------------------------------------------
+	profileHost := os.Getenv("PROFILE_HOST")
+	profilePort := os.Getenv("PROFILE_PORT")
+	profileConn, err := grpc.DialContext(
+		context.Background(),
+		profileHost+":"+profilePort,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		l.Fatalf("Error connecting to Profile_service: %v\n", err)
+	}
+	defer profileConn.Close()
+
+	profileClient := profile.NewProfileServiceClient(profileConn)
+	profileHandler := data.NewProfileHandler(l, profileClient)
+
+	profileRouter := r.PathPrefix("/profile").Subrouter()
+	profileRouter.Use(authHandler.VerifyJwt)
+	profileRouter.HandleFunc("/register", profileHandler.Register1).Methods(http.MethodPost)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
