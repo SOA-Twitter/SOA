@@ -9,24 +9,22 @@ service ProfileService{
 }
 message ProfileRegisterRequest{
   string username = 1;
-  string password = 2;
-  string firstName = 3;
-  string lastName = 4;
-  string email = 5;
-  string gender = 6;
-  string country = 7;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string gender = 5;
+  string country = 6;
 }
 message ProfileRegisterResponse{
 
 }
 message UserProfRequest{
   string username = 1;
-  string password = 2;
-  string firstName = 3;
-  string lastName = 4;
-  string email = 5;
-  string gender = 6;
-  string country = 7;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string gender = 5;
+  string country = 6;
 }
 message UserProfResponse{
 

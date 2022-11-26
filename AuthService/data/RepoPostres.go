@@ -78,10 +78,9 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 
 	return nil
 }
-func (ps *AuthRepoPostgres) FindUserID(username string) (string, error) {
-	ps.l.Println("{AuthRepoPostgres} - Find User Id")
+func (ps *AuthRepoPostgres) FindUserEmail(email string) (string, error) {
+	ps.l.Println("{AuthRepoPostgres} - Find User Email")
 	user := &User{}
-	err := ps.db.Where("Email = ?", username).First(user).Error
-	return user.UserId, err
-
+	err := ps.db.Where("Email = ?", email).First(user).Error
+	return user.Email, err
 }

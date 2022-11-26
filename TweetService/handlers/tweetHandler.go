@@ -46,9 +46,9 @@ func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest)
 		return nil, err
 	}
 	res := &data.Tweet{
-		Text:    r.Text,
-		Picture: r.Picture,
-		UserId:  resp.UserId,
+		Text:      r.Text,
+		Picture:   r.Picture,
+		UserEmail: resp.UserEmail,
 	}
 	errorcic := t.repoImpl.CreateTweet(res)
 	if errorcic != nil {

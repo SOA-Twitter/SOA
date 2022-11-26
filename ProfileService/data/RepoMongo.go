@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -44,7 +43,7 @@ func (pr *ProfileRepo) Disconnect(ctx context.Context) error {
 	return nil
 }
 
-func (pr *ProfileRepo) Register(user *User) (string, error) {
+func (pr *ProfileRepo) Register(user *User) error {
 	pr.l.Println("RepoMongo - Register")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -55,8 +54,9 @@ func (pr *ProfileRepo) Register(user *User) (string, error) {
 	}
 	pr.l.Printf("User ID: %v\n", result.InsertedID)
 
-	useId := result.InsertedID.(primitive.ObjectID)
+	//useId := result.InsertedID.(primitive.ObjectID)
+	//useId.Hex()
 
-	return useId.Hex(), nil
+	return nil
 
 }

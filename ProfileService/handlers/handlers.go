@@ -24,27 +24,19 @@ func NewProfileHandler(l *log.Logger, repo *data.ProfileRepo, as auth.AuthServic
 }
 func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegisterRequest) (*profile.ProfileRegisterResponse, error) {
 	pr.l.Println("Register handler")
-	//user := &data.User{
-	//	Email: r.GetUsername(),
-	//	Password: r.GetPassword(),
-	//	FirstName: r.GetFirstName(),
-	//	LastName: r.GetLastName(),
-	//	Email: r.GetEmail(),
-	//	Gender: r.GetGender(),
-	//	Country: r.GetCountry(),
-	//}
-	//userId, err := pr.repo.Register(user)
-	//if err != nil{
-	//	pr.l.Println("Error inserting user into db")
-	//	return nil, err
-	//}
-	//resp, err := pr.as.Register(context.Background(), &auth.UserIdRequest{
-	//	UserId: userId,
-	//	Email: user.Email,
-	//	Password: user.Password,
-	//})
-
-	//TODO REGISTER HANDLER
+	user := &data.User{
+		Username:  r.GetUsername(),
+		FirstName: r.GetFirstName(),
+		LastName:  r.GetLastName(),
+		Email:     r.GetEmail(),
+		Gender:    r.GetGender(),
+		Country:   r.GetCountry(),
+	}
+	err := pr.repo.Register(user)
+	if err != nil {
+		pr.l.Println("Error inserting user into db")
+		return nil, err
+	}
 
 	return &profile.ProfileRegisterResponse{}, nil
 }

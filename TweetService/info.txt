@@ -1,11 +1,19 @@
 >sudo docker run -p 9042:9042 --rm --name cassandra -d cassandra:4.0
+
+
+
+-----------------------------------------------------------------------------
 >sudo docker container ls
 >sudo docker exec -it ID bash
 >cqlsh
 
 > CREATE KEYSPACE tweets WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 > use tweets;
-> Create Table tweets ( id text primary key, text text, picture text, user_id text);
+> Create Table tweets ( id UUID primary key, text text, picture text, user_email text);
+
+
+OVU TABELU TREBA DA KREIRAS PRE NEGO UBACIS TWIT ************************
+srusi kontejner, pokrenes program i iskucas kod iznad
 
 ---------------------------------------------------------------------------
 Create proto:

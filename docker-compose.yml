@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile
     environment:
       AUTH_PORT: ${AUTH_PORT}
+      PROFILE_PORT: ${PROFILE_PORT}
+      PROFILE_HOST: ${PROFILE_HOST}
       USER: ${AUTH_DB_USER}
       PASSWORD: ${AUTH_DB_PASS}
       DB: ${AUTH_DB}

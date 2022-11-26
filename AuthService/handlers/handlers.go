@@ -3,11 +3,11 @@ package handlers
 import (
 	"AuthService/data"
 	"AuthService/proto/auth"
+	"AuthService/proto/profile"
 	"bufio"
 	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
@@ -20,12 +20,14 @@ type AuthHandler struct {
 	auth.UnimplementedAuthServiceServer
 	l    *log.Logger
 	repo data.AuthRepo
+	ps   profile.ProfileServiceClient
 }
 
-func NewAuthHandler(l *log.Logger, repo data.AuthRepo) *AuthHandler {
+func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileServiceClient) *AuthHandler {
 	return &AuthHandler{
 		l:    l,
 		repo: repo,
+		ps:   ps,
 	}
 }
 
@@ -41,9 +43,9 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 			Status: http.StatusNotFound,
 		}, err
 	}
-	userId, err := a.repo.FindUserID(res.Email)
+	userId, err := a.repo.FindUserEmail(res.Email)
 	if err != nil {
-		a.l.Println("Cannot find userId")
+		a.l.Println("Cannot find user")
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
 		}, err
@@ -58,15 +60,18 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 
 func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*auth.RegisterResponse, error) {
 	a.l.Println("Register handler")
-	id := uuid.New().String()
 	user := &data.User{
-		UserId:   id,
 		Email:    r.Email,
 		Password: r.Password,
 	}
-
+	_, err := a.repo.FindUserEmail(user.Email)
+	if err == nil {
+		a.l.Println("Email already exists")
+		return &auth.RegisterResponse{
+			Status: http.StatusBadRequest,
+		}, nil
+	}
 	file, err1 := os.Open("10k-most-common.txt")
-
 	if err1 != nil {
 		a.l.Println("Error opening 10k-most-common.txt file")
 		a.l.Println(err1)
@@ -96,13 +101,27 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	}
 	user.Password = string(pass)
 
-	err := a.repo.Register(user)
-	if err != nil {
+	err3 := a.repo.Register(user)
+	if err3 != nil {
 		a.l.Println("Error registration")
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,
-		}, err
+		}, err3
 	}
+	_, err4 := a.ps.Register(context.Background(), &profile.ProfileRegisterRequest{
+		Email:     r.Email,
+		Username:  r.Username,
+		FirstName: r.FirstName,
+		LastName:  r.LastName,
+		Gender:    r.Gender,
+		Country:   r.Country,
+	})
+	if err4 != nil {
+		return &auth.RegisterResponse{
+			Status: http.StatusInternalServerError,
+		}, err3
+	}
+
 	return &auth.RegisterResponse{
 		Status: http.StatusCreated,
 	}, nil
@@ -120,8 +139,8 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 		Status: http.StatusOK,
 	}, nil
 }
-func (a *AuthHandler) GetUserId(ctx context.Context, r *auth.UserIdRequest) (*auth.UserIdResponse, error) {
-	a.l.Println("Get UserID")
+func (a *AuthHandler) GetUserEmail(ctx context.Context, r *auth.UserIdRequest) (*auth.UserIdResponse, error) {
+	a.l.Println("Get User Email")
 	claims := &data.Claims{}
 	_, err := jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return data.SECRET, nil
@@ -130,7 +149,7 @@ func (a *AuthHandler) GetUserId(ctx context.Context, r *auth.UserIdRequest) (*au
 		return nil, err
 	}
 	return &auth.UserIdResponse{
-		UserId: claims.UserId,
+		UserEmail: claims.Email,
 	}, nil
 }
 func Home(w http.ResponseWriter, r *http.Request) {

@@ -11,8 +11,7 @@ var SECRET = os.Getenv("SECRET")
 
 func CreateJwt(userId string, email string) (string, error) {
 	claims := &Claims{
-		UserId: userId,
-		Email:  email,
+		Email: email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Second * 1200).Unix(),
 		},

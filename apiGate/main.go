@@ -88,7 +88,7 @@ func main() {
 
 	profileRouter := r.PathPrefix("/profile").Subrouter()
 	profileRouter.Use(authHandler.VerifyJwt)
-	profileRouter.HandleFunc("/register", profileHandler.Register1).Methods(http.MethodPost)
+	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),

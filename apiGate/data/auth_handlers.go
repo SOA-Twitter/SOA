@@ -14,9 +14,14 @@ type AuthHandler struct {
 	l  *log.Logger
 	pr auth.AuthServiceClient
 }
-type UserDAO struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+type User struct {
+	Username  string `json:"username" `
+	Email     string `json:"email" `
+	Password  string `json:"password"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Gender    string `json:"gender"`
+	Country   string `json:"country"`
 }
 
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
@@ -26,7 +31,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Login")
 
 	var expirationTime = time.Now().Add(time.Second * 1200)
-	user := UserDAO{}
+	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
 		ah.l.Println("Cannot unmarshal json")
@@ -53,7 +58,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Register")
 
-	user := UserDAO{}
+	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
 		ah.l.Println("Cannot unmarshal json")
@@ -75,8 +80,13 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
-		Email:    user.Email,
-		Password: user.Password,
+		Email:     user.Email,
+		Password:  user.Password,
+		Username:  user.Username,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Gender:    user.Gender,
+		Country:   user.Country,
 	})
 	if err != nil {
 		json.NewEncoder(w).Encode(res.Status)

@@ -15,6 +15,6 @@ func NewProfileHandler(l *log.Logger, pr profile.ProfileServiceClient) *ProfileH
 	return &ProfileHandler{l, pr}
 }
 
-func (ah *ProfileHandler) Register1(w http.ResponseWriter, r *http.Request) {
+func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
 
 }
