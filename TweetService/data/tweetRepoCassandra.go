@@ -38,7 +38,7 @@ func CassandraConnection(log *log.Logger) (*TweetRepoCassandra, error) {
 	}
 	err = session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(id UUID PRIMARY KEY, text text, picture text, user_id text)`,
+					(id UUID PRIMARY KEY, text text, picture text, user_email text)`,
 			"tweets")).Exec()
 	if err != nil {
 		log.Println(err)
@@ -74,7 +74,7 @@ func (t *TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("{TweetRepoCassandra} - create tweet")
 	id, _ := gocql.RandomUUID()
 
-	err := t.session.Query(`INSERT INTO tweets(id,text, picture,user_id) VALUES(?,?, ?,?)`, id, tw.Text, tw.Picture, tw.UserId).Exec()
+	err := t.session.Query(`INSERT INTO tweets(id, text, picture, user_email) VALUES(?,?, ?,?)`, id, tw.Text, tw.Picture, tw.UserEmail).Exec()
 	if err != nil {
 		t.log.Println("Error happened during Querying")
 		return err
