@@ -20,3 +20,14 @@
 Create proto:
 
 protoc --go_out=./auth --go_opt=paths=source_relative --go-grpc_out=./auth --go-grpc_opt=paths=source_relative auth_service.proto
+
+------------------------------------------------------------
+Salt generation inside hash function in golang library bcrypt:
+
+	p.salt = base64Encode(unencodedSalt)            <------
+	hash, err := bcrypt(password, p.cost, p.salt)   <------
+	if err != nil {
+		return nil, err
+	}
+	p.hash = hash
+	return p, err

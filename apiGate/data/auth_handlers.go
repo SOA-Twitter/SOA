@@ -150,7 +150,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (ah *AuthHandler) VerifyJwt(next http.Handler) http.Handler {
+func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
 		c, err := r.Cookie("token")
@@ -163,13 +163,17 @@ func (ah *AuthHandler) VerifyJwt(next http.Handler) http.Handler {
 			return
 		}
 		tokenString := c.Value
-		status, err := ah.pr.VerifyJwt(context.Background(), &auth.VerifyRequest{
+		resp, err := ah.pr.VerifyJwt(context.Background(), &auth.VerifyRequest{
 			Token: tokenString,
 		})
-		if err != nil || status.Status != http.StatusOK {
+		if err != nil || resp.Status != http.StatusOK {
 			http.Error(w, "Unauthorized!", http.StatusUnauthorized)
 			return
 		}
+
+		//OVDE DOBIJEMO ROLU
+		//i proverimo da li korisnik sme da pristupi stranici
+
 		next.ServeHTTP(w, r)
 
 	})

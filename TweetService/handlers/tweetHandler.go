@@ -37,7 +37,7 @@ func (t *TweetHandler) GetTweets(ctx context.Context, r *tweet.GetTweetRequest) 
 }
 func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest) (*tweet.PostTweetResponse, error) {
 	t.l.Println("Handle POST tweet")
-	resp, err := t.ac.GetUserId(context.Background(), &auth.UserIdRequest{
+	resp, err := t.ac.GetUserId(context.Background(), &auth.UserRequest{
 		Token: r.Token,
 	})
 	if err != nil {

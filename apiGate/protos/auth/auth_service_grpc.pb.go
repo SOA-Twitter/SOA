@@ -25,7 +25,7 @@ type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	VerifyJwt(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error)
-	GetUserId(ctx context.Context, in *UserIdRequest, opts ...grpc.CallOption) (*UserIdResponse, error)
+	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
 type authServiceClient struct {
@@ -63,9 +63,9 @@ func (c *authServiceClient) VerifyJwt(ctx context.Context, in *VerifyRequest, op
 	return out, nil
 }
 
-func (c *authServiceClient) GetUserId(ctx context.Context, in *UserIdRequest, opts ...grpc.CallOption) (*UserIdResponse, error) {
-	out := new(UserIdResponse)
-	err := c.cc.Invoke(ctx, "/AuthService/GetUserId", in, out, opts...)
+func (c *authServiceClient) GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, "/AuthService/GetUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	VerifyJwt(context.Context, *VerifyRequest) (*VerifyResponse, error)
-	GetUserId(context.Context, *UserIdRequest) (*UserIdResponse, error)
+	GetUser(context.Context, *UserRequest) (*UserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -96,8 +96,8 @@ func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest
 func (UnimplementedAuthServiceServer) VerifyJwt(context.Context, *VerifyRequest) (*VerifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyJwt not implemented")
 }
-func (UnimplementedAuthServiceServer) GetUserId(context.Context, *UserIdRequest) (*UserIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserId not implemented")
+func (UnimplementedAuthServiceServer) GetUser(context.Context, *UserRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -166,20 +166,20 @@ func _AuthService_VerifyJwt_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_GetUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserIdRequest)
+func _AuthService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GetUserId(ctx, in)
+		return srv.(AuthServiceServer).GetUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthService/GetUserId",
+		FullMethod: "/AuthService/GetUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GetUserId(ctx, req.(*UserIdRequest))
+		return srv.(AuthServiceServer).GetUser(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -204,8 +204,8 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_VerifyJwt_Handler,
 		},
 		{
-			MethodName: "GetUserId",
-			Handler:    _AuthService_GetUserId_Handler,
+			MethodName: "GetUser",
+			Handler:    _AuthService_GetUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

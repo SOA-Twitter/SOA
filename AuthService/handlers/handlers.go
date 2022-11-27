@@ -6,7 +6,6 @@ import (
 	"AuthService/proto/profile"
 	"bufio"
 	"context"
-	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -43,14 +42,14 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 			Status: http.StatusNotFound,
 		}, err
 	}
-	userId, err := a.repo.FindUserEmail(res.Email)
+	userEmail, err := a.repo.FindUserEmail(res.Email)
 	if err != nil {
 		a.l.Println("Cannot find user")
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
 		}, err
 	}
-	tokenString, _ := data.CreateJwt(userId, res.Email)
+	tokenString, _ := data.CreateJwt(userEmail)
 	return &auth.LoginResponse{
 		Token:  tokenString,
 		Status: http.StatusOK,
@@ -100,6 +99,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		}, err2
 	}
 	user.Password = string(pass)
+	user.Role = "user"
 
 	err3 := a.repo.Register(user)
 	if err3 != nil {
@@ -135,12 +135,13 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 			Status: http.StatusUnauthorized,
 		}, nil
 	}
+	//ovde func
 	return &auth.VerifyResponse{
 		Status: http.StatusOK,
 	}, nil
 }
-func (a *AuthHandler) GetUserEmail(ctx context.Context, r *auth.UserIdRequest) (*auth.UserIdResponse, error) {
-	a.l.Println("Get User Email")
+func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.UserResponse, error) {
+	a.l.Println("Get User from JWT")
 	claims := &data.Claims{}
 	_, err := jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return data.SECRET, nil
@@ -148,11 +149,8 @@ func (a *AuthHandler) GetUserEmail(ctx context.Context, r *auth.UserIdRequest) (
 	if err != nil {
 		return nil, err
 	}
-	return &auth.UserIdResponse{
+	return &auth.UserResponse{
 		UserEmail: claims.Email,
+		UserRole:  claims.Role,
 	}, nil
-}
-func Home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(fmt.Sprintf("Hello")))
-
 }

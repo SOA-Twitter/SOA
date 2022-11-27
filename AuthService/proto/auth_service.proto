@@ -5,7 +5,7 @@ service AuthService {
   rpc Login(LoginRequest) returns(LoginResponse){}
   rpc Register(RegisterRequest) returns(RegisterResponse){}
   rpc VerifyJwt(VerifyRequest) returns(VerifyResponse){}
-  rpc GetUserId(UserIdRequest) returns(UserIdResponse){}
+  rpc GetUser(UserRequest) returns(UserResponse){}
 }
 message LoginRequest{
   string email = 1;
@@ -23,6 +23,9 @@ message RegisterRequest{
   string email = 5;
   string gender = 6;
   string country = 7;
+  int32 age = 8;
+  string companyName = 9;
+  string companyWebsite = 10;
 }
 
 message RegisterResponse{
@@ -34,11 +37,12 @@ message VerifyRequest{
 message VerifyResponse{
   int32 status = 1;
 }
-message UserIdRequest{
+message UserRequest{
   string token = 1;
 }
 
-message UserIdResponse {
-  string userEmail = 1;
+message UserResponse {
+  string userRole = 1;
+  string userEmail = 2;
 }
 

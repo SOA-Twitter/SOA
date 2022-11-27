@@ -14,6 +14,9 @@ message ProfileRegisterRequest{
   string email = 4;
   string gender = 5;
   string country = 6;
+  int32 age = 7;
+  string companyName = 8;
+  string companyWebsite = 9;
 }
 message ProfileRegisterResponse{
 
@@ -25,6 +28,9 @@ message UserProfRequest{
   string email = 4;
   string gender = 5;
   string country = 6;
+  int32 age = 7;
+  string companyName = 8;
+  string companyWebsite = 9;
 }
 message UserProfResponse{
 

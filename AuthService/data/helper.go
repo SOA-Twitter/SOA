@@ -9,7 +9,7 @@ import (
 
 var SECRET = os.Getenv("SECRET")
 
-func CreateJwt(userId string, email string) (string, error) {
+func CreateJwt(email string) (string, error) {
 	claims := &Claims{
 		Email: email,
 		StandardClaims: &jwt.StandardClaims{

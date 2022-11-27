@@ -65,7 +65,7 @@ func main() {
 	tweetHandler := data.NewTweetHandler(l, tweetClient)
 
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
-	tweetRouter.Use(authHandler.VerifyJwt)
+	tweetRouter.Use(authHandler.Authorize)
 	tweetRouter.HandleFunc("/getTweets", tweetHandler.GetTweets).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 
@@ -87,7 +87,7 @@ func main() {
 	profileHandler := data.NewProfileHandler(l, profileClient)
 
 	profileRouter := r.PathPrefix("/profile").Subrouter()
-	profileRouter.Use(authHandler.VerifyJwt)
+	profileRouter.Use(authHandler.Authorize)
 	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
