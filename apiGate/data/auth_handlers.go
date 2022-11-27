@@ -17,10 +17,13 @@ type AuthHandler struct {
 }
 
 type Gender string
+type Role string
 
 const (
-	Male   Gender = "Male"
-	Female Gender = "Female"
+	Male         Gender = "Male"
+	Female       Gender = "Female"
+	RegularUser  Role   = "RegularUser"
+	BusinessUser Role   = "BusinessUser"
 )
 
 func (gender Gender) IsValid() error {
@@ -32,13 +35,17 @@ func (gender Gender) IsValid() error {
 }
 
 type User struct {
-	Username  string `json:"username" `
-	Email     string `json:"email" `
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Gender    Gender `json:"gender"`
-	Country   string `json:"country"`
+	Username       string `json:"username"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
+	Gender         Gender `json:"gender"`
+	Country        string `json:"country"`
+	Age            int    `json:"age"`
+	CompanyName    string `json:"company_name"`
+	CompanyWebsite string `json:"company_website"`
+	Role           Role   `json:"role"`
 }
 
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
@@ -100,19 +107,19 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.FirstName == "" {
+	if user.FirstName == "" && len(user.FirstName) > 1 {
 		ah.l.Println("First name cannot be empty")
 		http.Error(w, "First name cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	if user.LastName == "" {
+	if user.LastName == "" && len(user.LastName) > 1 {
 		ah.l.Println("Last name cannot be empty")
 		http.Error(w, "Last name cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	if user.Country == "" {
+	if user.Country == "" && len(user.Country) >= 4 {
 		ah.l.Println("Country cannot be empty")
 		http.Error(w, "Country cannot be empty", http.StatusBadRequest)
 		return
@@ -131,23 +138,51 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
-		Email:     user.Email,
-		Password:  user.Password,
-		Username:  user.Username,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Gender:    string(user.Gender),
-		Country:   user.Country,
-	})
-
-	if err != nil {
-		json.NewEncoder(w).Encode(res.Status)
-		http.Error(w, "invalid email", http.StatusBadRequest)
+	if user.Age < 18 {
+		ah.l.Println("User must have at least 18 years")
+		http.Error(w, "User must have at least 18 years", http.StatusBadRequest)
 		return
 	}
-	json.NewEncoder(w).Encode(res.Status)
 
+	if user.CompanyName != "" && user.CompanyWebsite != "" {
+		res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
+			Email:          user.Email,
+			Password:       user.Password,
+			Username:       user.Username,
+			FirstName:      user.FirstName,
+			LastName:       user.LastName,
+			Gender:         string(user.Gender),
+			Country:        user.Country,
+			CompanyName:    user.CompanyName,
+			CompanyWebsite: user.CompanyWebsite,
+			Role:           string(RegularUser),
+		})
+
+		if err != nil {
+			json.NewEncoder(w).Encode(res.Status)
+			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
+			return
+		}
+		json.NewEncoder(w).Encode(res.Status)
+	} else {
+		res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
+			Email:     user.Email,
+			Password:  user.Password,
+			Username:  user.Username,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Gender:    string(user.Gender),
+			Country:   user.Country,
+			Role:      string(BusinessUser),
+		})
+
+		if err != nil {
+			json.NewEncoder(w).Encode(res.Status)
+			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
+			return
+		}
+		json.NewEncoder(w).Encode(res.Status)
+	}
 }
 
 func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {

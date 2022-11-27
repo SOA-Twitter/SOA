@@ -99,7 +99,6 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		}, err2
 	}
 	user.Password = string(pass)
-	user.Role = "user"
 
 	err3 := a.repo.Register(user)
 	if err3 != nil {
@@ -108,6 +107,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusInternalServerError,
 		}, err3
 	}
+
 	_, err4 := a.ps.Register(context.Background(), &profile.ProfileRegisterRequest{
 		Email:     r.Email,
 		Username:  r.Username,
@@ -116,6 +116,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Gender:    r.Gender,
 		Country:   r.Country,
 	})
+
 	if err4 != nil {
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,
@@ -126,6 +127,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Status: http.StatusCreated,
 	}, nil
 }
+
 func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*auth.VerifyResponse, error) {
 	a.l.Println("Verify JWT")
 	err := data.ValidateJwt(r.Token)
@@ -135,11 +137,15 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 			Status: http.StatusUnauthorized,
 		}, nil
 	}
-	//ovde func
+	claims := &data.Claims{}
+	_, err = jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {
+		return data.SECRET, nil
+	})
 	return &auth.VerifyResponse{
 		Status: http.StatusOK,
 	}, nil
 }
+
 func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.UserResponse, error) {
 	a.l.Println("Get User from JWT")
 	claims := &data.Claims{}
