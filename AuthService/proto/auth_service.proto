@@ -26,6 +26,7 @@ message RegisterRequest{
   int32 age = 8;
   string companyName = 9;
   string companyWebsite = 10;
+  string role = 11;
 }
 
 message RegisterResponse{
