@@ -3,21 +3,21 @@ package data
 import (
 	"github.com/golang-jwt/jwt/v4"
 	"log"
-	"os"
 	"time"
 )
 
-var SECRET = os.Getenv("SECRET")
+var SampleSecretKey = []byte("SecretYouShouldHide")
 
-func CreateJwt(email string) (string, error) {
+func CreateJwt(email string, role string) (string, error) {
 	claims := &Claims{
+		Role:  role,
 		Email: email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Second * 1200).Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(SECRET)
+	tokenString, err := token.SignedString(SampleSecretKey)
 	if err != nil {
 		log.Println(err.Error())
 		return "", err
@@ -27,7 +27,7 @@ func CreateJwt(email string) (string, error) {
 func ValidateJwt(tokenString string) error {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return SECRET, nil
+		return SampleSecretKey, nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {

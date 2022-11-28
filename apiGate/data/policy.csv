@@ -1,0 +1,2 @@
+p, RegularUser, /tweet/postTweets, POST
+p, BusinessUser, /tweet/getTweets, GET

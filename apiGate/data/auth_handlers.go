@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/casbin/casbin"
 	"log"
 	"net/http"
 	"net/mail"
@@ -155,7 +156,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Country:        user.Country,
 			CompanyName:    user.CompanyName,
 			CompanyWebsite: user.CompanyWebsite,
-			Role:           string(RegularUser),
+			Role:           string(BusinessUser),
 		})
 
 		if err != nil {
@@ -173,7 +174,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			LastName:  user.LastName,
 			Gender:    string(user.Gender),
 			Country:   user.Country,
-			Role:      string(BusinessUser),
+			Role:      string(RegularUser),
 		})
 
 		if err != nil {
@@ -185,9 +186,18 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HasPermission(userRola, path, method string) bool {
+	e := casbin.NewEnforcer("data/rbac_model.conf", "data/policy.csv")
+	if e.Enforce(userRola, path, method) {
+		return true
+	}
+	return false
+}
+
 func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
+		ah.l.Println(r.Method, r.URL.Path)
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
@@ -205,10 +215,11 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized!", http.StatusUnauthorized)
 			return
 		}
-
-		//OVDE DOBIJEMO ROLU
-		//i proverimo da li korisnik sme da pristupi stranici
-
+		if !HasPermission(resp.UserRole, r.URL.Path, r.Method) {
+			ah.l.Printf("User '%s' is not allowed to '%s' resource '%s'", resp.UserRole, r.Method, r.URL.Path)
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
 		next.ServeHTTP(w, r)
 
 	})

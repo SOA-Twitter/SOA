@@ -22,3 +22,6 @@ Create new txt file (root.ext) with this code in it:
 
 -openssl x509 -req -CA rootCA.crt -CAkey rootCA.key -in
  cert.csr -out cert.crt -days 365 -CAcreateserial -extfile root. ext
+
+
+ --------------------------------------------------------------------------------------

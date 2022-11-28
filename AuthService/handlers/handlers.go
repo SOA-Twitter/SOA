@@ -42,14 +42,15 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 			Status: http.StatusNotFound,
 		}, err
 	}
-	userEmail, err := a.repo.FindUserEmail(res.Email)
-	if err != nil {
+	email, role, err2 := a.repo.FindUserEmail(res.Email)
+	if err2 != nil {
 		a.l.Println("Cannot find user")
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
-		}, err
+		}, err2
 	}
-	tokenString, _ := data.CreateJwt(userEmail)
+	a.l.Println(role)
+	tokenString, _ := data.CreateJwt(email, role)
 	return &auth.LoginResponse{
 		Token:  tokenString,
 		Status: http.StatusOK,
@@ -62,8 +63,9 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	user := &data.User{
 		Email:    r.Email,
 		Password: r.Password,
+		Role:     r.Role,
 	}
-	_, err := a.repo.FindUserEmail(user.Email)
+	_, _, err := a.repo.FindUserEmail(user.Email)
 	if err == nil {
 		a.l.Println("Email already exists")
 		return &auth.RegisterResponse{
@@ -107,6 +109,8 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusInternalServerError,
 		}, err3
 	}
+	a.l.Println("______________________________")
+	a.l.Println(user.Role)
 
 	_, err4 := a.ps.Register(context.Background(), &profile.ProfileRegisterRequest{
 		Email:     r.Email,
@@ -139,10 +143,11 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 	}
 	claims := &data.Claims{}
 	_, err = jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return data.SECRET, nil
+		return data.SampleSecretKey, nil
 	})
 	return &auth.VerifyResponse{
-		Status: http.StatusOK,
+		Status:   http.StatusOK,
+		UserRole: claims.Role,
 	}, nil
 }
 
@@ -150,7 +155,7 @@ func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.U
 	a.l.Println("Get User from JWT")
 	claims := &data.Claims{}
 	_, err := jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return data.SECRET, nil
+		return data.SampleSecretKey, nil
 	})
 	if err != nil {
 		return nil, err
