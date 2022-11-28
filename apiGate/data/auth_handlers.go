@@ -104,48 +104,27 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	err3 := ValidatePassword(user.Password)
 	if err3 != nil {
 		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 7 characters long, with at least"+
+		http.Error(w, "Password must be at least 8 characters long, with at least"+
 			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
 		return
 	}
 
-	_, error1 := regexp.MatchString("(^$)|([a-zA-Z-']{2,})", user.FirstName)
-	if error1 != nil {
-		ah.l.Println("First name must be at least 2 characters long")
-		http.Error(w, "First name must be at least 2 characters long", http.StatusBadRequest)
-		return
-	}
+	if user.CompanyName != "" && user.CompanyWebsite != "" {
 
-	_, error2 := regexp.MatchString("(^$)|([a-zA-Z-']{2,})", user.LastName)
-	if error2 != nil {
-		ah.l.Println("Last name must be at least 2 characters long")
-		http.Error(w, "Last name must be at least 2 characters long", http.StatusBadRequest)
-		return
-	}
-
-	_, error3 := regexp.MatchString("(^$)|([a-zA-Z-]{4,})", user.Country)
-	if error3 != nil {
-		ah.l.Println("Country name must be at least 4 characters")
-		http.Error(w, "Country name must be at least 4 characters", http.StatusBadRequest)
-		return
-	}
-
-	_, error4 := regexp.MatchString("(^$)|([a-zA-Z]{4,6})", string(user.Gender))
-
-	if error4 != nil {
-		ah.l.Println("Gender regex fail")
-		http.Error(w, "Gender regex fail", http.StatusBadRequest)
-		return
-	} else {
-		err4 := user.Gender.IsValid()
-		if err4 != nil {
-			ah.l.Println("Invalid gender")
-			http.Error(w, "Invalid gender", http.StatusBadRequest)
+		_, error1 := regexp.MatchString("([a-zA-Z-']+)", user.CompanyName)
+		if error1 != nil {
+			ah.l.Println("Company name must not be empty")
+			http.Error(w, "Company name must not be empty", http.StatusBadRequest)
 			return
 		}
-	}
 
-	if user.CompanyName != "" && user.CompanyWebsite != "" {
+		_, error2 := regexp.MatchString("([a-zA-Z-']+)", user.CompanyWebsite)
+		if error2 != nil {
+			ah.l.Println("Company website must not be empty")
+			http.Error(w, "Company website must not be empty", http.StatusBadRequest)
+			return
+		}
+
 		res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
 			Email:          user.Email,
 			Password:       user.Password,
@@ -162,6 +141,41 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(res.Status)
 	} else {
+		_, error1 := regexp.MatchString("([a-zA-Z-']{2,})", user.FirstName)
+		if error1 != nil {
+			ah.l.Println("First name must be at least 2 characters long")
+			http.Error(w, "First name must be at least 2 characters long", http.StatusBadRequest)
+			return
+		}
+
+		_, error2 := regexp.MatchString("([a-zA-Z-']{2,})", user.LastName)
+		if error2 != nil {
+			ah.l.Println("Last name must be at least 2 characters long")
+			http.Error(w, "Last name must be at least 2 characters long", http.StatusBadRequest)
+			return
+		}
+
+		_, error3 := regexp.MatchString("([a-zA-Z-]{4,})", user.Country)
+		if error3 != nil {
+			ah.l.Println("Country name must be at least 4 characters")
+			http.Error(w, "Country name must be at least 4 characters", http.StatusBadRequest)
+			return
+		}
+
+		_, error4 := regexp.MatchString("([a-zA-Z]{4,6})", string(user.Gender))
+
+		if error4 != nil {
+			ah.l.Println("Gender regex fail")
+			http.Error(w, "Gender regex fail", http.StatusBadRequest)
+			return
+		} else {
+			err4 := user.Gender.IsValid()
+			if err4 != nil {
+				ah.l.Println("Invalid gender")
+				http.Error(w, "Invalid gender", http.StatusBadRequest)
+				return
+			}
+		}
 
 		if user.Age < 18 {
 			ah.l.Println("User must have at least 18 years")

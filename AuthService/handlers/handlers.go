@@ -70,7 +70,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		a.l.Println("Email already exists")
 		return &auth.RegisterResponse{
 			Status: http.StatusBadRequest,
-		}, nil
+		}, err
 	}
 	file, err1 := os.Open("10k-most-common.txt")
 	if err1 != nil {

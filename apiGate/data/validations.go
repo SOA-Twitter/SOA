@@ -31,7 +31,7 @@ func ValidatePassword(s string) error {
 		default:
 		}
 	}
-	sevenOrMore = letters >= 7
+	sevenOrMore = letters >= 8
 	if sevenOrMore && number && upper && special && lower == true {
 		return nil
 	}
