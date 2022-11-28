@@ -16,10 +16,6 @@ type AuthRepoPostgres struct {
 }
 
 func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
-	// err := godotenv.Load("local.env")
-	// if err != nil {
-	// 	l.Fatalf("Some error occurred. Err: %s", err)
-	// }
 	USERNAME := os.Getenv("USER")
 	DB_HOST := os.Getenv("HOST")
 	PASSWORD := os.Getenv("PASSWORD")
@@ -63,6 +59,19 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 	}
 	return nil
 }
+
+func (ps *AuthRepoPostgres) Delete(email string) error {
+	ps.l.Println("{AuthRepoPostgres} - Delete user")
+	user := &User{}
+	err := ps.db.Where("Email = ?", email).Delete(&user).Error
+	if err != nil {
+		ps.l.Println("Error deleting user with email ")
+		ps.l.Println(email)
+		return QueryError("Error deleting user")
+	}
+	return nil
+}
+
 func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) error {
 	ps.l.Println("{AuthRepoPostgres} - Check if credentials are valid")
 	user := &User{}
@@ -78,6 +87,7 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 
 	return nil
 }
+
 func (ps *AuthRepoPostgres) FindUserEmail(email string) (string, string, error) {
 	ps.l.Println("{AuthRepoPostgres} - Find User Email")
 	user := &User{}

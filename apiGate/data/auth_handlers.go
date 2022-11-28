@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
+	"regexp"
 	"time"
 )
 
@@ -108,41 +109,40 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.FirstName == "" && len(user.FirstName) > 1 {
-		ah.l.Println("First name cannot be empty")
-		http.Error(w, "First name cannot be empty", http.StatusBadRequest)
+	_, error1 := regexp.MatchString("(^$)|([a-zA-Z-']{2,})", user.FirstName)
+	if error1 != nil {
+		ah.l.Println("First name must be at least 2 characters long")
+		http.Error(w, "First name must be at least 2 characters long", http.StatusBadRequest)
 		return
 	}
 
-	if user.LastName == "" && len(user.LastName) > 1 {
-		ah.l.Println("Last name cannot be empty")
-		http.Error(w, "Last name cannot be empty", http.StatusBadRequest)
+	_, error2 := regexp.MatchString("(^$)|([a-zA-Z-']{2,})", user.LastName)
+	if error2 != nil {
+		ah.l.Println("Last name must be at least 2 characters long")
+		http.Error(w, "Last name must be at least 2 characters long", http.StatusBadRequest)
 		return
 	}
 
-	if user.Country == "" && len(user.Country) >= 4 {
-		ah.l.Println("Country cannot be empty")
-		http.Error(w, "Country cannot be empty", http.StatusBadRequest)
+	_, error3 := regexp.MatchString("(^$)|([a-zA-Z-]{4,})", user.Country)
+	if error3 != nil {
+		ah.l.Println("Country name must be at least 4 characters")
+		http.Error(w, "Country name must be at least 4 characters", http.StatusBadRequest)
 		return
 	}
 
-	if user.Gender == "" {
-		ah.l.Println("Gender cannot be empty")
-		http.Error(w, "Gender cannot be empty", http.StatusBadRequest)
-		return
-	}
+	_, error4 := regexp.MatchString("(^$)|([a-zA-Z]{4,6})", string(user.Gender))
 
-	err4 := user.Gender.IsValid()
-	if err4 != nil {
-		ah.l.Println("Invalid gender")
-		http.Error(w, "Invalid gender", http.StatusBadRequest)
+	if error4 != nil {
+		ah.l.Println("Gender regex fail")
+		http.Error(w, "Gender regex fail", http.StatusBadRequest)
 		return
-	}
-
-	if user.Age < 18 {
-		ah.l.Println("User must have at least 18 years")
-		http.Error(w, "User must have at least 18 years", http.StatusBadRequest)
-		return
+	} else {
+		err4 := user.Gender.IsValid()
+		if err4 != nil {
+			ah.l.Println("Invalid gender")
+			http.Error(w, "Invalid gender", http.StatusBadRequest)
+			return
+		}
 	}
 
 	if user.CompanyName != "" && user.CompanyWebsite != "" {
@@ -150,10 +150,6 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Email:          user.Email,
 			Password:       user.Password,
 			Username:       user.Username,
-			FirstName:      user.FirstName,
-			LastName:       user.LastName,
-			Gender:         string(user.Gender),
-			Country:        user.Country,
 			CompanyName:    user.CompanyName,
 			CompanyWebsite: user.CompanyWebsite,
 			Role:           string(BusinessUser),
@@ -166,6 +162,13 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(res.Status)
 	} else {
+
+		if user.Age < 18 {
+			ah.l.Println("User must have at least 18 years")
+			http.Error(w, "User must have at least 18 years", http.StatusBadRequest)
+			return
+		}
+
 		res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
 			Email:     user.Email,
 			Password:  user.Password,
@@ -174,6 +177,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			LastName:  user.LastName,
 			Gender:    string(user.Gender),
 			Country:   user.Country,
+			Age:       int32(user.Age),
 			Role:      string(RegularUser),
 		})
 
@@ -186,9 +190,9 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HasPermission(userRola, path, method string) bool {
+func HasPermission(userRole, path, method string) bool {
 	e := casbin.NewEnforcer("data/rbac_model.conf", "data/policy.csv")
-	if e.Enforce(userRola, path, method) {
+	if e.Enforce(userRole, path, method) {
 		return true
 	}
 	return false

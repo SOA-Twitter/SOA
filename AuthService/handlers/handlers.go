@@ -113,18 +113,29 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	a.l.Println(user.Role)
 
 	_, err4 := a.ps.Register(context.Background(), &profile.ProfileRegisterRequest{
-		Email:     r.Email,
-		Username:  r.Username,
-		FirstName: r.FirstName,
-		LastName:  r.LastName,
-		Gender:    r.Gender,
-		Country:   r.Country,
+		Email:          r.Email,
+		Username:       r.Username,
+		FirstName:      r.FirstName,
+		LastName:       r.LastName,
+		Gender:         r.Gender,
+		Country:        r.Country,
+		Age:            r.Age,
+		CompanyWebsite: r.CompanyWebsite,
+		CompanyName:    r.CompanyName,
 	})
 
 	if err4 != nil {
+		error1 := a.repo.Delete(r.Email)
+		if error1 != nil {
+			a.l.Println("Error deleting user with email " + user.Email)
+			return &auth.RegisterResponse{
+				Status: http.StatusInternalServerError,
+			}, error1
+		}
+		a.l.Println("Deleting user with email " + user.Email)
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,
-		}, err3
+		}, err4
 	}
 
 	return &auth.RegisterResponse{
