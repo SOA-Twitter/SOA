@@ -2,7 +2,9 @@ package data
 
 import (
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"log"
+	"net/smtp"
 	"time"
 )
 
@@ -41,6 +43,55 @@ func ValidateJwt(tokenString string) error {
 	}
 	return nil
 }
+
+func SendAccountActivationEmail(providedEmail string) (string, error) {
+	const accountActivationPath = "https://localhost:8081/auth/activate/"
+	// Sender data
+	from := "testsupport@gmail.com"
+	password := "HaL4WI5p7m*8W(o)"
+
+	// Receiver email
+	to := []string{
+		providedEmail,
+	}
+
+	// smtp server config
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	// Generating Activation uuid
+	activationUUID := generateActivationUUID()
+
+	// Text
+	message := []byte("Follow the verification link to activate your Twitterclone account: " + accountActivationPath + activationUUID)
+
+	// Email Auth
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Send
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
+	if err != nil {
+		return "", err
+	}
+	return activationUUID, nil
+}
+func generateActivationUUID() string {
+	// *TODO: Generate uuid
+	//requestUUID := uuid.NewUUID()
+	requestUUID := uuid.New().String()
+	return requestUUID
+}
+func GetFromClaims(token string) (*Claims, error) {
+	claims := &Claims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return SampleSecretKey, nil
+	})
+	return claims, err
+}
+
+//func SaveAccountActivationRequest(activationUUID string, email string) error {
+//	SaveActivationRequest()
+//}
 
 /*
 	NOTE:  VALID = JWT Library functionality:

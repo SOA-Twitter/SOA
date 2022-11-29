@@ -34,6 +34,8 @@ func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
 }
 func setup(db *gorm.DB) {
 	db.AutoMigrate(&User{})
+	//	TODO* check db tables
+	db.AutoMigrate(&ActivationRequest{})
 }
 
 func QueryError(text string) error {
@@ -60,6 +62,20 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 	return nil
 }
 
+func (ps *AuthRepoPostgres) Edit(user *User) error {
+	ps.l.Println("{AuthRepoPostgres} - Editing user")
+	//sqlStatement := `
+	//	UPDATE users
+	//	SET Password = $2
+	//	WHERE Email = $1;`
+	//_, err := ps.db.Exec(sqlStatement, user.Email, user.Password)
+	//if err != nil {
+	//	panic(err)
+	//}
+	errUpdating := ps.db.Save(user).Error
+	return errUpdating
+}
+
 func (ps *AuthRepoPostgres) Delete(email string) error {
 	ps.l.Println("{AuthRepoPostgres} - Delete user")
 	user := &User{}
@@ -84,6 +100,10 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 		ps.l.Println("Invalid Password")
 		return QueryError("Invalid credentials!!")
 	}
+	// *TODO:
+	// if user.IsActivated != true {
+	// 	return errors.New("Account activation is needed before 1st login.")
+	// }
 
 	return nil
 }
@@ -93,4 +113,45 @@ func (ps *AuthRepoPostgres) FindUserEmail(email string) (string, string, error) 
 	user := &User{}
 	err := ps.db.Where("Email = ?", email).First(user).Error
 	return user.Email, user.Role, err
+}
+func (ps *AuthRepoPostgres) FindUser(email string) (*User, error) {
+	ps.l.Println("{AuthRepoPostgres} - Find Whole User")
+	user := &User{}
+	err := ps.db.Where("Email = ?", email).First(user).Error
+	return user, err
+}
+func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registeredEmail string) error {
+	ps.l.Println("{AuthRepoPostgres} - Save acc. activation request")
+
+	activationRequest := &ActivationRequest{
+		ActivationUUID: activationUUID,
+		Email:          registeredEmail,
+	}
+	//*TODO: check if db.Create() makes another table for new Struct, or whether it tries saving in Users table
+	createdRequest := ps.db.Create(activationRequest)
+	var errMessage = createdRequest.Error
+	if createdRequest.Error != nil {
+		fmt.Println(errMessage)
+		ps.l.Println("Unable to Create Account Activation Request.", errMessage)
+		return QueryError("Please try again later.")
+	}
+	return nil
+}
+
+func (ps *AuthRepoPostgres) FindActivationRequest(activationUUID string) (*ActivationRequest, error) {
+	ps.l.Println("{AuthRepoPostgres} - Find Account Activation Request")
+	activationReq := &ActivationRequest{}
+	err := ps.db.Where("ActivationUUID = ?", activationUUID).First(activationReq).Error
+	return activationReq, err
+}
+func (ps *AuthRepoPostgres) DeleteActivationRequest(activationUUID string, email string) error {
+	ps.l.Println("{AuthRepoPostgres} - Delete Account Activation Request")
+	activationReq := &ActivationRequest{}
+	err := ps.db.Where("ActivationUUID = ? AND Email = ?", activationUUID, email).Delete(&activationReq).Error
+	if err != nil {
+		ps.l.Println("Error deleting Account Activation Request")
+		ps.l.Println(email)
+		return QueryError("Error deleting Account Activation Request")
+	}
+	return nil
 }

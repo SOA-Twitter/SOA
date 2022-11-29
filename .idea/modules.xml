@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SOA.iml" filepath="$PROJECT_DIR$/.idea/SOA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SOA-remote.iml" filepath="$PROJECT_DIR$/.idea/SOA-remote.iml" />
     </modules>
   </component>
 </project>

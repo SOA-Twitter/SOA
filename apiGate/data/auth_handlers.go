@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/casbin/casbin"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"net/mail"
@@ -49,6 +50,11 @@ type User struct {
 	CompanyWebsite string `json:"company_website"`
 	Role           Role   `json:"role"`
 }
+type ChangePass struct {
+	OldPassword      string `json:"old_password"`
+	NewPassword      string `json:"new_password"`
+	RepeatedPassword string `json:"repeated_password"`
+}
 
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{l, pr}
@@ -81,6 +87,61 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Expires: expirationTime,
 	})
 	json.NewEncoder(w).Encode(token.Status)
+}
+func (ah *AuthHandler) ActivateProfile(w http.ResponseWriter, r *http.Request) {
+	ah.l.Println("API-Gate - Activate profile")
+	activationUUID := mux.Vars(r)["activationId"]
+	res, err := ah.pr.ActivateProfile(context.Background(), &auth.ActivationRequest{
+		ActivationUUID: activationUUID,
+	})
+	if err != nil {
+		ah.l.Println("Cannot activate profile")
+		http.Error(w, "Cannot activate profile. Error occurred", http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(res.Status)
+}
+func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	ah.l.Println("API-Gate - Change Password")
+	pass := ChangePass{}
+	err := FromJSON(&pass, r.Body)
+	if err != nil {
+		ah.l.Println("Cannot unmarshal json")
+		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		return
+	}
+	err3 := ValidatePassword(pass.NewPassword)
+	if err3 != nil {
+		ah.l.Println("Wrong password format")
+		http.Error(w, "Password must be at least 8 characters long, with at least"+
+			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		return
+	}
+	if pass.NewPassword != pass.RepeatedPassword {
+		ah.l.Println("Passwords do NOT match")
+
+	}
+	c, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Bad request!", http.StatusBadRequest)
+		return
+	}
+	res, err := ah.pr.ChangePassword(context.Background(), &auth.ChangePasswordRequest{
+		OldPassword: pass.OldPassword,
+		NewPassword: pass.NewPassword,
+		Token:       c.Value,
+	})
+	if err != nil {
+		json.NewEncoder(w).Encode(res.Status)
+		http.Error(w, "Unable to save new password", http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(res.Status)
+
 }
 
 func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {

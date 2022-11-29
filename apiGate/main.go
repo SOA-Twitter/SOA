@@ -89,6 +89,8 @@ func main() {
 	profileRouter := r.PathPrefix("/profile").Subrouter()
 	profileRouter.Use(authHandler.Authorize)
 	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
+	profileRouter.HandleFunc("/changePassword", authHandler.ChangePassword).Methods(http.MethodPost)
+	profileRouter.HandleFunc("/activate/{activationId}", authHandler.Register).Methods(http.MethodPost)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
