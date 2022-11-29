@@ -78,6 +78,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 
 	activationReq, errNotFound := a.repo.FindActivationRequest(r.ActivationUUID)
 	if errNotFound != nil {
+		a.l.Println("Error Finding Account Activation Request")
 		return &auth.ActivationResponse{
 			Status: http.StatusNotFound,
 		}
@@ -85,6 +86,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 
 	foundUser, errUserNotFound := a.repo.FindUser(activationReq.Email)
 	if errUserNotFound != nil {
+		a.l.Println("Error Finding User for email " + activationReq.Email)
 		return &auth.ActivationResponse{
 			Status: http.StatusNotFound,
 		}
@@ -93,14 +95,16 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 	foundUser.IsActivated = true
 	errEditting := a.repo.Edit(foundUser)
 	if errEditting != nil {
+		a.l.Println("Error Editing User (Activating Account)")
 		return &auth.ActivationResponse{
 			Status: http.StatusInternalServerError,
 		}
 	}
 	errDelAccActReq := a.repo.DeleteActivationRequest(activationReq.ActivationUUID, activationReq.Email)
 	if errDelAccActReq != nil {
-		//	*TODO: NEKAKAV ROLLBACK?
+		a.l.Println("Error Deleting Account Activation Request")
 
+		//	*TODO: NEKAKAV ROLLBACK?
 	}
 
 	return &auth.ActivationResponse{
