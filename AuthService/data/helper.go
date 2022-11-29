@@ -47,7 +47,7 @@ func ValidateJwt(tokenString string) error {
 func SendAccountActivationEmail(providedEmail string) (string, error) {
 	const accountActivationPath = "https://localhost:8081/auth/activate/"
 	// Sender data
-	from := "testsupport@gmail.com"
+	from := "twittertest282@gmail.com"
 	password := "HaL4WI5p7m*8W(o)"
 
 	// Receiver email
@@ -63,6 +63,7 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 	activationUUID := generateActivationUUID()
 
 	// Text
+
 	message := []byte("Follow the verification link to activate your Twitterclone account: " + accountActivationPath + activationUUID)
 
 	// Email Auth
@@ -71,8 +72,10 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 	// Send
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
 	if err != nil {
+		log.Println("PUKLO")
 		return "", err
 	}
+	log.Println("USPESNO SLANJE MEJLA")
 	return activationUUID, nil
 }
 func generateActivationUUID() string {

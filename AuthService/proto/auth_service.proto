@@ -6,6 +6,8 @@ service AuthService {
   rpc Register(RegisterRequest) returns(RegisterResponse){}
   rpc VerifyJwt(VerifyRequest) returns(VerifyResponse){}
   rpc GetUser(UserRequest) returns(UserResponse){}
+  rpc ChangePassword(ChangePasswordRequest) returns(ChangePasswordResponse){}
+  rpc ActivateProfile(ActivationRequest) returns(ActivationResponse){}
 }
 message LoginRequest{
   string email = 1;
@@ -47,4 +49,17 @@ message UserResponse {
   string userRole = 1;
   string userEmail = 2;
 }
-
+message ChangePasswordRequest{
+  string token = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
+}
+message ChangePasswordResponse{
+  int32 status = 1;
+}
+message ActivationRequest{
+  string activationUUID = 1;
+}
+message ActivationResponse{
+  int32 status = 1;
+}

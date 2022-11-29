@@ -101,8 +101,8 @@ func main() {
 		Addr:         port,
 		Handler:      cors(r),
 		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+		ReadTimeout:  4 * time.Second,
+		WriteTimeout: 4 * time.Second,
 	}
 	l.Println("Server listening on port" + port)
 

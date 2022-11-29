@@ -37,7 +37,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 	claims, err := data.GetFromClaims(r.Token)
 	if err != nil {
 		a.l.Println("Error getting claims")
-		return &ChangePasswordResponse{
+		return &auth.ChangePasswordResponse{
 			Status: http.StatusNotFound,
 		}, err
 	}
@@ -47,7 +47,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 
 	if err1 != nil && err1 == bcrypt.ErrMismatchedHashAndPassword {
 		a.l.Println("Invalid Password")
-		return &ChangePasswordResponse{
+		return &auth.ChangePasswordResponse{
 			Status: http.StatusBadRequest,
 		}, err
 
@@ -56,7 +56,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 	pass, err2 := bcrypt.GenerateFromPassword([]byte(r.NewPassword), bcrypt.DefaultCost)
 	if err2 != nil {
 		a.l.Println("Encryption failed for new PW", err2)
-		return &auth.RegisterResponse{
+		return &auth.ChangePasswordResponse{
 			Status: http.StatusInternalServerError,
 		}, err2
 	}
@@ -65,14 +65,14 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 	err3 := a.repo.Edit(foundUser)
 	if err3 != nil {
 		a.l.Println("Error Updating existing User (Password)")
-		return &auth.RegisterResponse{
+		return &auth.ChangePasswordResponse{
 			Status: http.StatusInternalServerError,
 		}, err3
 	}
-	return &ChangePasswordResponse{}, nil
+	return &auth.ChangePasswordResponse{Status: http.StatusOK}, nil
 
 }
-func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationRequest) *auth.ActivationResponse {
+func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationRequest) (*auth.ActivationResponse, error) {
 	// Find {{KEY}} in DB, that equals to URL final section (activationUUID); Then set user.IsActivated = true, for user.Email == value of {{KEY}}
 	// Finally delete the used acc. activation request from db
 
@@ -81,7 +81,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 		a.l.Println("Error Finding Account Activation Request")
 		return &auth.ActivationResponse{
 			Status: http.StatusNotFound,
-		}
+		}, errNotFound
 	}
 
 	foundUser, errUserNotFound := a.repo.FindUser(activationReq.Email)
@@ -89,7 +89,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 		a.l.Println("Error Finding User for email " + activationReq.Email)
 		return &auth.ActivationResponse{
 			Status: http.StatusNotFound,
-		}
+		}, errUserNotFound
 	}
 
 	foundUser.IsActivated = true
@@ -98,7 +98,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 		a.l.Println("Error Editing User (Activating Account)")
 		return &auth.ActivationResponse{
 			Status: http.StatusInternalServerError,
-		}
+		}, errEditting
 	}
 	errDelAccActReq := a.repo.DeleteActivationRequest(activationReq.ActivationUUID, activationReq.Email)
 	if errDelAccActReq != nil {
@@ -109,7 +109,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 
 	return &auth.ActivationResponse{
 		Status: http.StatusOK,
-	}
+	}, nil
 }
 
 func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginResponse, error) {
