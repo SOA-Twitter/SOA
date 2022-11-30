@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"net/smtp"
+	"os"
 	"time"
 )
 
@@ -47,13 +48,9 @@ func ValidateJwt(tokenString string) error {
 func SendAccountActivationEmail(providedEmail string) (string, error) {
 	const accountActivationPath = "https://localhost:8081/auth/activate/"
 	// Sender data
-	//from := "twittertest282@outlook.com"
+	from := os.Getenv("MAIL_ADDRESS")
 
-	from := "twittertest282@gmail.com"
-
-	//password := "HaL4WI5p7m*8W(o)"
-	//password := "wxxlhqljvcrvsefg"
-	password := "xfxkdwgmyomnadua"
+	password := os.Getenv("MAIL_PASSWORD")
 
 	// Receiver email
 	to := []string{
@@ -63,11 +60,7 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 	// smtp server config
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
-	//smtpHost := "smtp.office365.com"
-	// smtpHost := "smtp-mail.outlook.com"
-	//smtpPort := "587"
-
-	// Generating Activation uuid
+	address := smtpHost + ":" + smtpPort
 	activationUUID := generateActivationUUID()
 
 	// Text
@@ -83,21 +76,22 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 	// Email Sender Auth
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	// Send
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
+	err := smtp.SendMail(address, auth, from, to, message)
 	if err != nil {
-		log.Println("\n\nPUKLO\n\n", err)
+		log.Println("Error sending mail", err)
 		return "", err
 	}
-	log.Println("\n\nUSPESNO SLANJE MEJLA\n\n")
+	log.Println("Mail successfully sent")
 	return activationUUID, nil
 }
+
 func generateActivationUUID() string {
 	// *TODO: Generate uuid
 	//requestUUID := uuid.NewUUID()
 	requestUUID := uuid.New().String()
 	return requestUUID
 }
+
 func GetFromClaims(token string) (*Claims, error) {
 	claims := &Claims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {

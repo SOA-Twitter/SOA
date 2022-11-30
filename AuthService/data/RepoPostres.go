@@ -62,18 +62,15 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 	return nil
 }
 
-func (ps *AuthRepoPostgres) Edit(user *User) error {
+func (ps *AuthRepoPostgres) Edit(email string) error {
 	ps.l.Println("{AuthRepoPostgres} - Editing user")
-	//sqlStatement := `
-	//	UPDATE users
-	//	SET Password = $2
-	//	WHERE Email = $1;`
-	//_, err := ps.db.Exec(sqlStatement, user.Email, user.Password)
-	//if err != nil {
-	//	panic(err)
-	//}
-	errUpdating := ps.db.Save(user).Error
-	return errUpdating
+	user := &User{}
+	err := ps.db.Where("Email = ?", email).Update("is_activated", true).Error
+	if err != nil {
+		ps.l.Println("Error updating user " + user.Email)
+		return QueryError("Error updating user " + user.Email)
+	}
+	return err
 }
 
 func (ps *AuthRepoPostgres) Delete(email string) error {
@@ -114,12 +111,14 @@ func (ps *AuthRepoPostgres) FindUserEmail(email string) (string, string, error) 
 	err := ps.db.Where("Email = ?", email).First(user).Error
 	return user.Email, user.Role, err
 }
+
 func (ps *AuthRepoPostgres) FindUser(email string) (*User, error) {
 	ps.l.Println("{AuthRepoPostgres} - Find Whole User")
 	user := &User{}
 	err := ps.db.Where("Email = ?", email).First(user).Error
 	return user, err
 }
+
 func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registeredEmail string) error {
 	ps.l.Println("{AuthRepoPostgres} - Save acc. activation request")
 
@@ -141,13 +140,17 @@ func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registe
 func (ps *AuthRepoPostgres) FindActivationRequest(activationUUID string) (*ActivationRequest, error) {
 	ps.l.Println("{AuthRepoPostgres} - Find Account Activation Request")
 	activationReq := &ActivationRequest{}
-	err := ps.db.Where("ActivationUUID = ?", activationUUID).First(activationReq).Error
+	ps.l.Println("--------------------------")
+	ps.l.Println(activationUUID)
+	ps.l.Println("--------------------------")
+	err := ps.db.Where("activation_uuid = ?", activationUUID).First(activationReq).Error
 	return activationReq, err
 }
+
 func (ps *AuthRepoPostgres) DeleteActivationRequest(activationUUID string, email string) error {
 	ps.l.Println("{AuthRepoPostgres} - Delete Account Activation Request")
 	activationReq := &ActivationRequest{}
-	err := ps.db.Where("ActivationUUID = ? AND Email = ?", activationUUID, email).Delete(&activationReq).Error
+	err := ps.db.Where("activation_uuid = ? AND Email = ?", activationUUID, email).Delete(&activationReq).Error
 	if err != nil {
 		ps.l.Println("Error deleting Account Activation Request")
 		ps.l.Println(email)

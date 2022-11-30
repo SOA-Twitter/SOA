@@ -67,7 +67,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 	}
 	foundUser.Password = string(pass)
 
-	err3 := a.repo.Edit(foundUser)
+	err3 := a.repo.Edit(foundUser.Email)
 	if err3 != nil {
 		a.l.Println("Error Updating existing User (Password)")
 		return &auth.ChangePasswordResponse{
@@ -98,8 +98,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 		}, errUserNotFound
 	}
 
-	foundUser.IsActivated = true
-	errEditting := a.repo.Edit(foundUser)
+	errEditting := a.repo.Edit(foundUser.Email)
 	if errEditting != nil {
 		a.l.Println("Error Editing User (Activating Account)")
 		return &auth.ActivationResponse{
@@ -204,6 +203,13 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	// *TODO:
 	activationUUID, errEmailing := data.SendAccountActivationEmail(user.Email)
 	if errEmailing != nil {
+		error1 := a.repo.Delete(r.Email)
+		if error1 != nil {
+			a.l.Println("Error deleting user with email " + user.Email)
+			return &auth.RegisterResponse{
+				Status: http.StatusInternalServerError,
+			}, error1
+		}
 		a.l.Println("Email delivery failed for: ", user.Email, errEmailing)
 		return &auth.RegisterResponse{
 			Status: http.StatusBadRequest,
@@ -212,6 +218,13 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 
 	errActivationReqSave := a.repo.SaveActivationRequest(activationUUID, user.Email)
 	if errActivationReqSave != nil {
+		error1 := a.repo.Delete(r.Email)
+		if error1 != nil {
+			a.l.Println("Error deleting user with email " + user.Email)
+			return &auth.RegisterResponse{
+				Status: http.StatusInternalServerError,
+			}, error1
+		}
 		a.l.Println("Error Writing Account Activation Request to DB")
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,

@@ -46,7 +46,7 @@ func main() {
 	authRouter := r.PathPrefix("/auth").Subrouter()
 	authRouter.HandleFunc("/login", authHandler.Login).Methods(http.MethodPost)
 	authRouter.HandleFunc("/register", authHandler.Register).Methods(http.MethodPost)
-
+	authRouter.HandleFunc("/activate/{activationId}", authHandler.ActivateProfile).Methods(http.MethodPost)
 	//--------------------------------------------------------
 
 	tweetPort := os.Getenv("TWEET_PORT")
@@ -90,10 +90,6 @@ func main() {
 	profileRouter.Use(authHandler.Authorize)
 	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
 	profileRouter.HandleFunc("/changePassword", authHandler.ChangePassword).Methods(http.MethodPost)
-	// *TODO: ispraviti authHandler.Register na authHandler.ActivateProfile?
-	// *TODO: za aktivaciju naloga i reset lozinke ne treba authHandler.Authorize,
-	// TODO:  trebalo bi bez Kukii-ja da se pristupi
-	profileRouter.HandleFunc("/activate/{activationId}", authHandler.ActivateProfile).Methods(http.MethodPost)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),

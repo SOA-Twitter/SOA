@@ -88,9 +88,13 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 	json.NewEncoder(w).Encode(token.Status)
 }
+
 func (ah *AuthHandler) ActivateProfile(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Activate profile")
 	activationUUID := mux.Vars(r)["activationId"]
+	ah.l.Println("----------------------")
+	ah.l.Println(activationUUID)
+	ah.l.Println("----------------------")
 	res, err := ah.pr.ActivateProfile(context.Background(), &auth.ActivationRequest{
 		ActivationUUID: activationUUID,
 	})
@@ -101,6 +105,7 @@ func (ah *AuthHandler) ActivateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(res.Status)
 }
+
 func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Change Password")
 	pass := ChangePass{}

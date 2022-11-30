@@ -1,6 +1,8 @@
 -START POSTGRES
 > sudo -u  postgres psql
 
+-Kako se povezati u terminalu da vidis podatke u postgresu
+psql -h postgres -p 5432 -U postgres -d authdatabase
 
  LIST DATABASES
 > \l

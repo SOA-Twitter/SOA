@@ -32,6 +32,8 @@ services:
       HOST: ${AUTH_DB_HOST}
       PORT: ${AUTH_DB_PORT}
       SECRET: ${SECRET}
+      MAIL_ADDRESS: ${MAIL_ADDRESS}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
     depends_on:
@@ -40,7 +42,7 @@ services:
   postgres:
     image: postgres
     volumes:
-      - /postgres/:/postgres/data
+      - postgres:/postgres/data
     container_name: user_db
     restart: on-failure
     environment:
@@ -75,7 +77,7 @@ services:
     ports:
       - '9042:9042'
     volumes:
-      - /cassandra/:/cass/data
+      - cassandra:/cass/data
     healthcheck:
       test: ["CMD-SHELL", "cqlsh -e ' describe cluster'"]
       interval: 10s
