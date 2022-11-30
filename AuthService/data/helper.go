@@ -47,8 +47,13 @@ func ValidateJwt(tokenString string) error {
 func SendAccountActivationEmail(providedEmail string) (string, error) {
 	const accountActivationPath = "https://localhost:8081/auth/activate/"
 	// Sender data
+	//from := "twittertest282@outlook.com"
+
 	from := "twittertest282@gmail.com"
-	password := "HaL4WI5p7m*8W(o)"
+
+	//password := "HaL4WI5p7m*8W(o)"
+	//password := "wxxlhqljvcrvsefg"
+	password := "xfxkdwgmyomnadua"
 
 	// Receiver email
 	to := []string{
@@ -58,24 +63,33 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 	// smtp server config
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
+	//smtpHost := "smtp.office365.com"
+	// smtpHost := "smtp-mail.outlook.com"
+	//smtpPort := "587"
 
 	// Generating Activation uuid
 	activationUUID := generateActivationUUID()
 
 	// Text
+	body := "Follow the verification link to activate your Twitterclone account: " + accountActivationPath + activationUUID
+	stringMsg :=
+		"From: " + from + "\n" +
+			"To: " + to[0] + "\n" +
+			"Subject: Twitter clone account activation\n\n" +
+			body
 
-	message := []byte("Follow the verification link to activate your Twitterclone account: " + accountActivationPath + activationUUID)
+	message := []byte(stringMsg)
 
-	// Email Auth
+	// Email Sender Auth
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
 	// Send
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
 	if err != nil {
-		log.Println("PUKLO")
+		log.Println("\n\nPUKLO\n\n", err)
 		return "", err
 	}
-	log.Println("USPESNO SLANJE MEJLA")
+	log.Println("\n\nUSPESNO SLANJE MEJLA\n\n")
 	return activationUUID, nil
 }
 func generateActivationUUID() string {

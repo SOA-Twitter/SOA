@@ -30,6 +30,11 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileService
 	}
 }
 
+// *TODO: Handler for password recovery..
+//func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRequest) (*auth.ChangePasswordResponse, error) {
+//	//	*TODO  	Implement
+//}
+
 func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error) {
 	a.l.Println("Change password handler")
 
@@ -75,6 +80,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationRequest) (*auth.ActivationResponse, error) {
 	// Find {{KEY}} in DB, that equals to URL final section (activationUUID); Then set user.IsActivated = true, for user.Email == value of {{KEY}}
 	// Finally delete the used acc. activation request from db
+	a.l.Println("{authService} ActivateProfile Handler")
 
 	activationReq, errNotFound := a.repo.FindActivationRequest(r.ActivationUUID)
 	if errNotFound != nil {
