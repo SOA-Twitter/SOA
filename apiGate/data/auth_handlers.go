@@ -50,14 +50,17 @@ type User struct {
 	CompanyWebsite string `json:"company_website"`
 	Role           Role   `json:"role"`
 }
+
 type ChangePass struct {
 	OldPassword      string `json:"old_password"`
 	NewPassword      string `json:"new_password"`
 	RepeatedPassword string `json:"repeated_password"`
 }
+
 type Email struct {
 	Email string `json:"email"`
 }
+
 type RecoverProfile struct {
 	NewPassword      string `json:"new_password"`
 	RepeatedPassword string `json:"repeated_password"`
@@ -95,6 +98,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 	json.NewEncoder(w).Encode(token.Status)
 }
+
 func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API - Gate -Send Recovery Email")
 	email := Email{}
@@ -104,6 +108,7 @@ func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
 		return
 	}
+
 	res, err := ah.pr.SendRecoveryEmail(context.Background(), &auth.SendRecoveryEmailRequest{
 		RecoveryEmail: email.Email,
 	})
@@ -114,6 +119,7 @@ func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request)
 	}
 	json.NewEncoder(w).Encode(res.Status)
 }
+
 func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Recover profile")
 	recProfil := RecoverProfile{}
@@ -138,6 +144,7 @@ func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
 		NewPassword:      recProfil.NewPassword,
 		RepeatedPassword: recProfil.RepeatedPassword,
+		RecoveryUUID:     mux.Vars(r)["recId"],
 	})
 	if err != nil {
 		ah.l.Println("Cannot recover profile")
