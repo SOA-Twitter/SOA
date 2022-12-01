@@ -64,11 +64,17 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 
 func (ps *AuthRepoPostgres) Edit(email string) error {
 	ps.l.Println("{AuthRepoPostgres} - Editing user")
-	user := &User{}
-	err := ps.db.Where("Email = ?", email).Update("is_activated", true).Error
+	err := ps.db.Model(&User{}).Where("Email = ?", email).Update("is_activated", true).Error
 	if err != nil {
-		ps.l.Println("Error updating user " + user.Email)
-		return QueryError("Error updating user " + user.Email)
+		return QueryError("Error updating user " + email)
+	}
+	return err
+}
+func (ps *AuthRepoPostgres) ChangePassword(email, password string) error {
+	ps.l.Println("{AuthRepoPostgres} - Change password")
+	err := ps.db.Model(&User{}).Where("Email = ?", email).Update("password", password).Error
+	if err != nil {
+		return QueryError("Error changing password")
 	}
 	return err
 }

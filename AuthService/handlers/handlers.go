@@ -67,7 +67,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 	}
 	foundUser.Password = string(pass)
 
-	err3 := a.repo.Edit(foundUser.Email)
+	err3 := a.repo.ChangePassword(foundUser.Email, foundUser.Password)
 	if err3 != nil {
 		a.l.Println("Error Updating existing User (Password)")
 		return &auth.ChangePasswordResponse{
