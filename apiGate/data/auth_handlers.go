@@ -55,6 +55,13 @@ type ChangePass struct {
 	NewPassword      string `json:"new_password"`
 	RepeatedPassword string `json:"repeated_password"`
 }
+type Email struct {
+	Email string `json:"email"`
+}
+type RecoverProfile struct {
+	NewPassword      string `json:"new_password"`
+	RepeatedPassword string `json:"repeated_password"`
+}
 
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{l, pr}
@@ -88,6 +95,56 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 	json.NewEncoder(w).Encode(token.Status)
 }
+func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request) {
+	ah.l.Println("API - Gate -Send Recovery Email")
+	email := Email{}
+	err := FromJSON(&email, r.Body)
+	if err != nil {
+		ah.l.Println("Cannot unmarshal json")
+		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		return
+	}
+	res, err := ah.pr.SendRecoveryEmail(context.Background(), &auth.SendRecoveryEmailRequest{
+		RecoveryEmail: email.Email,
+	})
+	if err != nil {
+		ah.l.Println("Cannot recover profile")
+		http.Error(w, "Cannot Recover profile. Error occurred", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(res.Status)
+}
+func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
+	ah.l.Println("API-Gate - Recover profile")
+	recProfil := RecoverProfile{}
+	err := FromJSON(&recProfil, r.Body)
+	if err != nil {
+		ah.l.Println("Cannot unmarshal json")
+		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		return
+	}
+	err3 := ValidatePassword(recProfil.NewPassword)
+	if err3 != nil {
+		ah.l.Println("Wrong password format")
+		http.Error(w, "Password must be at least 8 characters long, with at least"+
+			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		return
+	}
+	if recProfil.NewPassword != recProfil.RepeatedPassword {
+		ah.l.Println("Passwords do NOT match")
+		return
+	}
+	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
+		NewPassword:      recProfil.NewPassword,
+		RepeatedPassword: recProfil.RepeatedPassword,
+	})
+	if err != nil {
+		ah.l.Println("Cannot recover profile")
+		http.Error(w, "Cannot Recover profile. Error occurred", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(res.Status)
+}
 
 func (ah *AuthHandler) ActivateProfile(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Activate profile")
@@ -100,7 +157,7 @@ func (ah *AuthHandler) ActivateProfile(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		ah.l.Println("Cannot activate profile")
-		http.Error(w, "Cannot activate profile. Error occurred", http.StatusBadRequest)
+		http.Error(w, "Cannot activate profile. Error occurred", http.StatusInternalServerError)
 		return
 	}
 	json.NewEncoder(w).Encode(res.Status)
@@ -124,7 +181,7 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	if pass.NewPassword != pass.RepeatedPassword {
 		ah.l.Println("Passwords do NOT match")
-
+		return
 	}
 	c, err := r.Cookie("token")
 	if err != nil {

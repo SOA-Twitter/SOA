@@ -45,8 +45,9 @@ func ValidateJwt(tokenString string) error {
 	return nil
 }
 
-func SendAccountActivationEmail(providedEmail string) (string, error) {
+func SendEmail(providedEmail string, intention string) (string, error) {
 	const accountActivationPath = "https://localhost:8081/auth/activate/"
+	const accountRecoveryPath = "https://localhost:8081/auth/recover/"
 	// Sender data
 	from := os.Getenv("MAIL_ADDRESS")
 
@@ -62,13 +63,21 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 	smtpPort := "587"
 	address := smtpHost + ":" + smtpPort
 	activationUUID := generateActivationUUID()
+	var subject string
+	var body string
 
+	if intention == "activation" {
+		subject = "Twitter clone account activation"
+		body = "Follow the verification link to activate your Twitterclone account: \n" + accountActivationPath + activationUUID
+	} else if intention == "recovery" {
+		subject = "Twitter clone password recovery"
+		body = "To reset your password, follow the recovery link: \n" + accountRecoveryPath + activationUUID
+	}
 	// Text
-	body := "Follow the verification link to activate your Twitterclone account: " + accountActivationPath + activationUUID
 	stringMsg :=
 		"From: " + from + "\n" +
 			"To: " + to[0] + "\n" +
-			"Subject: Twitter clone account activation\n\n" +
+			"Subject: " + subject + "\n\n" +
 			body
 
 	message := []byte(stringMsg)
@@ -86,7 +95,6 @@ func SendAccountActivationEmail(providedEmail string) (string, error) {
 }
 
 func generateActivationUUID() string {
-	// *TODO: Generate uuid
 	//requestUUID := uuid.NewUUID()
 	requestUUID := uuid.New().String()
 	return requestUUID

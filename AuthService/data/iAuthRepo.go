@@ -11,4 +11,7 @@ type AuthRepo interface {
 	SaveActivationRequest(activationUUID string, registeredEmail string) error
 	FindActivationRequest(activationUUID string) (*ActivationRequest, error)
 	DeleteActivationRequest(activationUUID string, email string) error
+	DeleteRecoveryRequest(recoveryUUID string, email string) error
+	FindRecoveryRequest(recoveryUUID string) (*RecoveryRequest, error)
+	SaveRecoveryRequest(recoveryUUID string, email string) error
 }

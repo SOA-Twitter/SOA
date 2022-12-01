@@ -103,7 +103,7 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 		ps.l.Println("Invalid Password")
 		return QueryError("Invalid credentials!!")
 	}
-	// *TODO:
+	// TODO
 	// if user.IsActivated != true {
 	// 	return errors.New("Account activation is needed before 1st login.")
 	// }
@@ -161,6 +161,46 @@ func (ps *AuthRepoPostgres) DeleteActivationRequest(activationUUID string, email
 		ps.l.Println("Error deleting Account Activation Request")
 		ps.l.Println(email)
 		return QueryError("Error deleting Account Activation Request")
+	}
+	return nil
+}
+
+func (ps *AuthRepoPostgres) SaveRecoveryRequest(recoveryUUID string, registeredEmail string) error {
+	ps.l.Println("{AuthRepoPostgres} - Save Password Recovery request")
+
+	recoveryRequest := &RecoveryRequest{
+		RecoveryUUID: recoveryUUID,
+		Email:        registeredEmail,
+	}
+	//*TODO: check if db.Create() makes another table for new Struct, or whether it tries saving in Users table
+	createdRequest := ps.db.Create(recoveryRequest)
+	var errMessage = createdRequest.Error
+	if createdRequest.Error != nil {
+		fmt.Println(errMessage)
+		ps.l.Println("Unable to Create Password Recovery Request.", errMessage)
+		return QueryError("Please try again later.")
+	}
+	return nil
+}
+
+func (ps *AuthRepoPostgres) FindRecoveryRequest(recoveryUUID string) (*RecoveryRequest, error) {
+	ps.l.Println("{AuthRepoPostgres} - Find Password Recovery Request")
+	recoveryRequest := &RecoveryRequest{}
+	ps.l.Println("--------------------------")
+	ps.l.Println(recoveryUUID)
+	ps.l.Println("--------------------------")
+	err := ps.db.Where("recovery_uuid = ?", recoveryUUID).First(recoveryRequest).Error
+	return recoveryRequest, err
+}
+
+func (ps *AuthRepoPostgres) DeleteRecoveryRequest(recoveryUUID string, email string) error {
+	ps.l.Println("{AuthRepoPostgres} - Delete Password Recovery Request")
+	recoveryReq := &RecoveryRequest{}
+	err := ps.db.Where("recovery_uuid = ? AND Email = ?", recoveryUUID, email).Delete(&recoveryReq).Error
+	if err != nil {
+		ps.l.Println("Error deleting Password Recovery Request")
+		ps.l.Println(email)
+		return QueryError("Error deleting Password Recovery Request")
 	}
 	return nil
 }

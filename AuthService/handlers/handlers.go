@@ -13,7 +13,11 @@ import (
 	"os"
 )
 
-//var db = data.ConnectToDB()
+// *Standardization of INTENTION towards func SendEmail
+const (
+	INTENTION_RECOVERY   = "recovery"
+	INTENTION_ACTIVATION = "activation"
+)
 
 type AuthHandler struct {
 	auth.UnimplementedAuthServiceServer
@@ -30,13 +34,82 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileService
 	}
 }
 
+func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecoveryEmailRequest) (*auth.RecoveryPasswordResponse, error) {
+	a.l.Println("{authService} Send Recovery Email Handler")
+
+	activationUUID, errEmailing := data.SendEmail(r.RecoveryEmail, INTENTION_RECOVERY)
+	if errEmailing != nil {
+		a.l.Println("RECOVERY Email delivery failed for: ", r.RecoveryEmail, errEmailing)
+		return &auth.RegisterResponse{
+			Status: http.StatusBadRequest,
+		}, errEmailing
+	}
+
+	errRecoveryReqSave := a.repo.SaveRecoveryRequest(activationUUID, r.RecoveryEmail)
+	if errRecoveryReqSave != nil {
+		a.l.Println("Error Writing Password Recovery Request to DB: ", errRecoveryReqSave)
+		return &auth.RegisterResponse{
+			Status: http.StatusInternalServerError,
+		}, errEmailing
+	}
+
+	return &auth.RegisterResponse{
+		Status: http.StatusOK,
+	}, nil
+}
+
 // *TODO: Handler for password recovery..
-//func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRequest) (*auth.ChangePasswordResponse, error) {
-//	//	*TODO  	Implement
-//}
+func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRequest) (*auth.ChangePasswordResponse, error) {
+
+	recoveryReq, errNotFound := a.repo.FindRecoveryRequest(r.RecoveryUUID)
+	if errNotFound != nil {
+		a.l.Println("Error Finding Password Recovery Request")
+		return &auth.ChangePasswordResponse{
+			Status: http.StatusNotFound,
+		}, errNotFound
+	}
+
+	foundUser, errUserNotFound := a.repo.FindUser(recoveryReq.Email)
+	if errUserNotFound != nil {
+		a.l.Println("Error Finding User for email " + recoveryReq.Email)
+		return &auth.ChangePasswordResponse{
+			Status: http.StatusNotFound,
+		}, errUserNotFound
+	}
+
+	// NEW PASSWORD GENERATING
+	pass, err2 := bcrypt.GenerateFromPassword([]byte(r.NewPassword), bcrypt.DefaultCost)
+	if err2 != nil {
+		a.l.Println("Encryption failed for new PW", err2)
+		return &auth.ChangePasswordResponse{
+			Status: http.StatusInternalServerError,
+		}, err2
+	}
+	foundUser.Password = string(pass)
+
+	errPassChangeDatabase := a.repo.ChangePassword(foundUser.Email, foundUser.Password)
+	if errPassChangeDatabase != nil {
+		a.l.Println("Error Updating existing User (Password)")
+		return &auth.ChangePasswordResponse{
+			Status: http.StatusInternalServerError,
+		}, errPassChangeDatabase
+	}
+	// NEW PASSWORD GENERATED
+
+	errDelRecoveryReq := a.repo.DeleteRecoveryRequest(recoveryReq.RecoveryUUID, recoveryReq.Email)
+	if errDelRecoveryReq != nil {
+		a.l.Println("Error Deleting Password Recovery Request")
+		//	*TODO: NEKAKAV ROLLBACK?
+	}
+
+	return &auth.ChangePasswordResponse{
+		Status: http.StatusOK,
+	}, nil
+
+}
 
 func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error) {
-	a.l.Println("Change password handler")
+	a.l.Println("{authService} - Change password handler")
 
 	// find user by email from Cookie->Jwt CLAIMS; hash New-come Password & Compare to Old-db password; Write new Password hashed
 	claims, err := data.GetFromClaims(r.Token)
@@ -46,7 +119,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 			Status: http.StatusNotFound,
 		}, err
 	}
-	foundUser, err := a.repo.FindUser(claims.Email)
+	foundUser, _ := a.repo.FindUser(claims.Email)
 
 	err1 := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(r.OldPassword))
 
@@ -98,17 +171,16 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 		}, errUserNotFound
 	}
 
-	errEditting := a.repo.Edit(foundUser.Email)
-	if errEditting != nil {
+	errActivating := a.repo.Edit(foundUser.Email)
+	if errActivating != nil {
 		a.l.Println("Error Editing User (Activating Account)")
 		return &auth.ActivationResponse{
 			Status: http.StatusInternalServerError,
-		}, errEditting
+		}, errActivating
 	}
 	errDelAccActReq := a.repo.DeleteActivationRequest(activationReq.ActivationUUID, activationReq.Email)
 	if errDelAccActReq != nil {
 		a.l.Println("Error Deleting Account Activation Request")
-
 		//	*TODO: NEKAKAV ROLLBACK?
 	}
 
@@ -200,9 +272,9 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	a.l.Println("______________________________")
 	a.l.Println(user.Role)
 
-	// *TODO:
-	activationUUID, errEmailing := data.SendAccountActivationEmail(user.Email)
+	activationUUID, errEmailing := data.SendEmail(user.Email, INTENTION_ACTIVATION)
 	if errEmailing != nil {
+		a.l.Println("ACTIVATION Email delivery failed for: ", r.Email, errEmailing)
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
 			a.l.Println("Error deleting user with email " + user.Email)
@@ -225,7 +297,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 				Status: http.StatusInternalServerError,
 			}, error1
 		}
-		a.l.Println("Error Writing Account Activation Request to DB")
+		a.l.Println("Error Writing Account Activation Request to DB: ", errActivationReqSave)
 		return &auth.RegisterResponse{
 			Status: http.StatusInternalServerError,
 		}, errActivationReqSave
