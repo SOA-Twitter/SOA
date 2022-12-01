@@ -46,7 +46,7 @@ func main() {
 	authRouter := r.PathPrefix("/auth").Subrouter()
 	authRouter.HandleFunc("/login", authHandler.Login).Methods(http.MethodPost)
 	authRouter.HandleFunc("/register", authHandler.Register).Methods(http.MethodPost)
-	authRouter.HandleFunc("/activate/{activationId}", authHandler.ActivateProfile).Methods(http.MethodPost)
+	authRouter.HandleFunc("/activate/{activationId}", authHandler.ActivateProfile).Methods(http.MethodGet)
 	authRouter.HandleFunc("/recoverEmail", authHandler.SendRecoveryEmail).Methods(http.MethodPost)
 	authRouter.HandleFunc("/recover/{recId}", authHandler.RecoverProfile).Methods(http.MethodPost)
 	//--------------------------------------------------------
