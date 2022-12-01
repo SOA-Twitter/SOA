@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -36,6 +37,7 @@ func setup(db *gorm.DB) {
 	db.AutoMigrate(&User{})
 	//	TODO* check db tables
 	db.AutoMigrate(&ActivationRequest{})
+	db.AutoMigrate(&RecoveryRequest{})
 }
 
 func QueryError(text string) error {
@@ -104,9 +106,9 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 		return QueryError("Invalid credentials!!")
 	}
 	// TODO
-	// if user.IsActivated != true {
-	// 	return errors.New("Account activation is needed before 1st login.")
-	// }
+	if user.IsActivated != true {
+		return errors.New("account activation is needed before 1st login")
+	}
 
 	return nil
 }
