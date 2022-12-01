@@ -1,0 +1,47 @@
+<div class="register-section">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div style="text-align: center" id="header">
+                <h4>Sign Up</h4>
+            </div>
+            <div class="card-body">
+                    <form id="form" [formGroup]="register" (ngSubmit)="submit()">
+
+                        <div>
+                            <input type="text" class="form-control" placeholder="Company name"  [formControlName] = "'companyName'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('email')?.valid && register.get('email')?.touched">Invalid company name</span>
+                        </div>
+
+                        <div>
+                            <input type="text" class="form-control" placeholder="Company website"  [formControlName] = "'companyWebsite'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('email')?.valid && register.get('email')?.touched">Invalid company web site</span>
+                        </div>
+
+                        <div>
+                            <input type="email" class="form-control" placeholder="Email"  [formControlName] = "'email'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('email')?.valid && register.get('email')?.touched">Invalid email</span>
+                        </div>
+
+                        <div>
+                            <input type="password" class="form-control" placeholder="Password" [formControlName] = "'password'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('password')?.valid && register.get('password')?.touched">Invalid password - password must contain at least eight characters, one uppercase and one lowercase letter, one number and one special character (#?!@$%^&*-)</span>
+                        </div>
+
+                        <div>
+                            <input type="text" class="form-control" placeholder="Username"  [formControlName] = "'username'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('username')?.valid && register.get('username')?.touched">Invalid username</span>
+                        </div>
+
+                        <div>
+                            <ngx-recaptcha2 #captchaElem [siteKey]="siteKey" class="form-group"></ngx-recaptcha2>
+                        </div>
+    
+                        <div>
+                            <button type="submit" class="btn btn-primary" >Sign up</button>
+                        </div>
+    
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
