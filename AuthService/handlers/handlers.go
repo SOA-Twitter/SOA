@@ -40,7 +40,7 @@ func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecover
 	activationUUID, errEmailing := data.SendEmail(r.RecoveryEmail, INTENTION_RECOVERY)
 	if errEmailing != nil {
 		a.l.Println("RECOVERY Email delivery failed for: ", r.RecoveryEmail, errEmailing)
-		return &auth.RegisterResponse{
+		return &auth.RecoveryPasswordResponse{
 			Status: http.StatusBadRequest,
 		}, errEmailing
 	}
@@ -48,17 +48,16 @@ func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecover
 	errRecoveryReqSave := a.repo.SaveRecoveryRequest(activationUUID, r.RecoveryEmail)
 	if errRecoveryReqSave != nil {
 		a.l.Println("Error Writing Password Recovery Request to DB: ", errRecoveryReqSave)
-		return &auth.RegisterResponse{
+		return &auth.RecoveryPasswordResponse{
 			Status: http.StatusInternalServerError,
 		}, errEmailing
 	}
 
-	return &auth.RegisterResponse{
+	return &auth.RecoveryPasswordResponse{
 		Status: http.StatusOK,
 	}, nil
 }
 
-// *TODO: Handler for password recovery..
 func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRequest) (*auth.ChangePasswordResponse, error) {
 
 	recoveryReq, errNotFound := a.repo.FindRecoveryRequest(r.RecoveryUUID)

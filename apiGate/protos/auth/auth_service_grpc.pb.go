@@ -28,6 +28,8 @@ type AuthServiceClient interface {
 	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 	ActivateProfile(ctx context.Context, in *ActivationRequest, opts ...grpc.CallOption) (*ActivationResponse, error)
+	SendRecoveryEmail(ctx context.Context, in *SendRecoveryEmailRequest, opts ...grpc.CallOption) (*RecoveryPasswordResponse, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 }
 
 type authServiceClient struct {
@@ -92,6 +94,24 @@ func (c *authServiceClient) ActivateProfile(ctx context.Context, in *ActivationR
 	return out, nil
 }
 
+func (c *authServiceClient) SendRecoveryEmail(ctx context.Context, in *SendRecoveryEmailRequest, opts ...grpc.CallOption) (*RecoveryPasswordResponse, error) {
+	out := new(RecoveryPasswordResponse)
+	err := c.cc.Invoke(ctx, "/AuthService/SendRecoveryEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+	out := new(ChangePasswordResponse)
+	err := c.cc.Invoke(ctx, "/AuthService/ResetPassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -102,6 +122,8 @@ type AuthServiceServer interface {
 	GetUser(context.Context, *UserRequest) (*UserResponse, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	ActivateProfile(context.Context, *ActivationRequest) (*ActivationResponse, error)
+	SendRecoveryEmail(context.Context, *SendRecoveryEmailRequest) (*RecoveryPasswordResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ChangePasswordResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -126,6 +148,12 @@ func (UnimplementedAuthServiceServer) ChangePassword(context.Context, *ChangePas
 }
 func (UnimplementedAuthServiceServer) ActivateProfile(context.Context, *ActivationRequest) (*ActivationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActivateProfile not implemented")
+}
+func (UnimplementedAuthServiceServer) SendRecoveryEmail(context.Context, *SendRecoveryEmailRequest) (*RecoveryPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendRecoveryEmail not implemented")
+}
+func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ChangePasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -248,6 +276,42 @@ func _AuthService_ActivateProfile_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_SendRecoveryEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendRecoveryEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SendRecoveryEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AuthService/SendRecoveryEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SendRecoveryEmail(ctx, req.(*SendRecoveryEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/AuthService/ResetPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -278,6 +342,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ActivateProfile",
 			Handler:    _AuthService_ActivateProfile_Handler,
+		},
+		{
+			MethodName: "SendRecoveryEmail",
+			Handler:    _AuthService_SendRecoveryEmail_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _AuthService_ResetPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

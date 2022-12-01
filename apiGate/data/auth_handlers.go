@@ -132,6 +132,7 @@ func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	if recProfil.NewPassword != recProfil.RepeatedPassword {
 		ah.l.Println("Passwords do NOT match")
+		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
 		return
 	}
 	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
@@ -181,6 +182,7 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	if pass.NewPassword != pass.RepeatedPassword {
 		ah.l.Println("Passwords do NOT match")
+		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
 		return
 	}
 	c, err := r.Cookie("token")
