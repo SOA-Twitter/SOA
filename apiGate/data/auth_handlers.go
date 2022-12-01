@@ -220,7 +220,8 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err1 := mail.ParseAddress(user.Email)
-	if err1 != nil {
+	_, err2 := regexp.MatchString("[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", user.Email)
+	if err1 != nil || err2 != nil {
 		ah.l.Println("Wrong email format")
 		http.Error(w, "Wrong email format!.", http.StatusBadRequest)
 		return
@@ -243,7 +244,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, error2 := regexp.MatchString("([a-zA-Z-']+)", user.CompanyWebsite)
+		_, error2 := regexp.MatchString("([a-zA-Z-'_./]+)", user.CompanyWebsite)
 		if error2 != nil {
 			ah.l.Println("Company website must not be empty")
 			http.Error(w, "Company website must not be empty", http.StatusBadRequest)

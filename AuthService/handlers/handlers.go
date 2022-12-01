@@ -219,6 +219,7 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*auth.RegisterResponse, error) {
 	a.l.Println("Register handler")
 	user := &data.User{
+		Username:    r.Username,
 		Email:       r.Email,
 		Password:    r.Password,
 		Role:        r.Role,
@@ -231,6 +232,15 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusBadRequest,
 		}, err
 	}
+
+	usernameError := a.repo.FindUserByUsername(user.Username)
+	if usernameError == nil {
+		a.l.Println("Username already exists")
+		return &auth.RegisterResponse{
+			Status: http.StatusBadRequest,
+		}, usernameError
+	}
+
 	file, err1 := os.Open("10k-most-common.txt")
 	if err1 != nil {
 		a.l.Println("Error opening 10k-most-common.txt file")

@@ -14,4 +14,5 @@ type AuthRepo interface {
 	DeleteRecoveryRequest(recoveryUUID string, email string) error
 	FindRecoveryRequest(recoveryUUID string) (*RecoveryRequest, error)
 	SaveRecoveryRequest(recoveryUUID string, email string) error
+	FindUserByUsername(username string) error
 }

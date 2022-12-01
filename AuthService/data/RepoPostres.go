@@ -188,9 +188,6 @@ func (ps *AuthRepoPostgres) SaveRecoveryRequest(recoveryUUID string, registeredE
 func (ps *AuthRepoPostgres) FindRecoveryRequest(recoveryUUID string) (*RecoveryRequest, error) {
 	ps.l.Println("{AuthRepoPostgres} - Find Password Recovery Request")
 	recoveryRequest := &RecoveryRequest{}
-	ps.l.Println("--------------------------")
-	ps.l.Println(recoveryUUID)
-	ps.l.Println("--------------------------")
 	err := ps.db.Where("recovery_uuid = ?", recoveryUUID).First(recoveryRequest).Error
 	return recoveryRequest, err
 }
@@ -205,4 +202,11 @@ func (ps *AuthRepoPostgres) DeleteRecoveryRequest(recoveryUUID string, email str
 		return QueryError("Error deleting Password Recovery Request")
 	}
 	return nil
+}
+
+func (ps *AuthRepoPostgres) FindUserByUsername(username string) error {
+	ps.l.Println("{AuthRepoPostgres} - Find User by Username")
+	user := &User{}
+	err := ps.db.Where("username = ?", username).First(user).Error
+	return err
 }
