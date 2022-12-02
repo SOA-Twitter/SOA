@@ -61,6 +61,7 @@ type Email struct {
 type RecoverProfile struct {
 	NewPassword      string `json:"new_password"`
 	RepeatedPassword string `json:"repeated_password"`
+	RecoveryUUID     string `json:"recovery_uuid"`
 }
 
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
@@ -93,7 +94,8 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 		Expires: expirationTime,
 	})
-	json.NewEncoder(w).Encode(token.Status)
+	ah.l.Println("\n\n" + token.Token + "----------------------\n")
+	json.NewEncoder(w).Encode(token.Token)
 }
 func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API - Gate -Send Recovery Email")
@@ -138,6 +140,9 @@ func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
 		NewPassword:      recProfil.NewPassword,
 		RepeatedPassword: recProfil.RepeatedPassword,
+		// TODO premestiti da se prima iz JSON body recoveryid?
+		//RecoveryUUID: mux.Vars(r)["recId"],
+		RecoveryUUID: recProfil.RecoveryUUID,
 	})
 	if err != nil {
 		ah.l.Println("Cannot recover profile")
@@ -204,8 +209,7 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to save new password", http.StatusBadRequest)
 		return
 	}
-	json.NewEncoder(w).Encode(res.Status)
-
+	json.NewEncoder(w).Encode(http.StatusOK)
 }
 
 func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -250,7 +254,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
+		res, err5 := ah.pr.Register(context.Background(), &auth.RegisterRequest{
 			Email:          user.Email,
 			Password:       user.Password,
 			Username:       user.Username,
@@ -259,12 +263,13 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Role:           string(BusinessUser),
 		})
 
-		if err != nil {
+		if err5 != nil {
 			json.NewEncoder(w).Encode(res.Status)
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
-		json.NewEncoder(w).Encode(res.Status)
+
+		json.NewEncoder(w).Encode(http.StatusOK)
 	} else {
 		_, error1 := regexp.MatchString("([a-zA-Z-']{2,})", user.FirstName)
 		if error1 != nil {
@@ -325,7 +330,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
-		json.NewEncoder(w).Encode(res.Status)
+		json.NewEncoder(w).Encode(http.StatusOK)
 	}
 }
 
