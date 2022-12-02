@@ -1,0 +1,28 @@
+.col-sm-8 {
+    border: 1px solid #dddddd;
+}
+.post-footer {
+  border-top: 1px solid #ddd;
+  padding: 15px;
+}
+
+.post{
+  margin: 10px;
+}
+
+.title{
+  font-weight: bold;
+  font-size: x-large;
+}
+
+.pull-left{
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.container{
+  margin-bottom: 10px;
+}
+.username{
+  font-style: italic;
+}

@@ -1,0 +1,35 @@
+<div class="register-section">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div style="text-align: center">
+                <h4>Log In</h4>
+            </div>
+            <div class="card-body">
+                <form id="form" [formGroup] = "loginForm" (ngSubmit)="submit()">
+
+                    <div>
+                        <input type="email" class="form-control" id="email" placeholder="Email" [formControlName] = "'email'">
+                        <span  id = "spanInvalid" *ngIf = "!loginForm.get('email')?.valid && loginForm.get('email')?.touched">Invalid email</span>
+
+                        <input type="password" class="form-control" id="password" placeholder="Password" [formControlName] = "'password'">
+                        <span  id = "spanInvalid" *ngIf = "!loginForm.get('password')?.valid && loginForm.get('password')?.touched">Invalid password</span>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary">Log In</button>
+                    </div>
+
+                    <div>
+                        <a href="/profile-recovery" class="form-group">Forgot your password?</a>
+                    </div>
+
+                    <div>
+                        <a href="/signup" class="form-group">Register profile</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</div>
