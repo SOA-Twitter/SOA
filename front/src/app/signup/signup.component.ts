@@ -1,5 +1,5 @@
 import { Component, OnInit, SecurityContext } from '@angular/core';
-import { UntypedFormGroup, UntypedFormControl, Validators, UntypedFormBuilder } from '@angular/forms';
+import {  Validators, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { User } from 'src/app/model/user';
 import { AuthService } from '../auth.service';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -13,24 +13,24 @@ import { Router } from '@angular/router';
 export class SignupComponent implements OnInit {
 
   user!: User;
-  register!: UntypedFormGroup;
+  register!: FormGroup;
   siteKey: string;
 
-  constructor(private fb: UntypedFormBuilder, private authService: AuthService, private sanitizer: DomSanitizer, private router: Router){
+  constructor(private fb: FormBuilder, private authService: AuthService, private sanitizer: DomSanitizer, private router: Router){
     this.createForm();
     this.siteKey = '6Lcq4CYjAAAAAC28ZFxmcXD5w-D7UxBpQalorlnJ';
   }
 
   createForm(){
     this.register = this.fb.group({
-      'email' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
-      'password' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')]),
-      'username' : new UntypedFormControl(null, [Validators.required, Validators.pattern('(?=.{2,})[a-zA-Z0-9._]$')]),
-      'firstName' : new UntypedFormControl(null, [Validators.required, Validators.pattern('(?=.{2,})[a-zA-Z]$')]),
-      'lastName' : new UntypedFormControl(null, [Validators.required, Validators.pattern('(?=.{2,})[a-zA-Z]$')]),
-      'gender' : new UntypedFormControl(null, [Validators.required, Validators.pattern('(?=.{4,})[a-zA-Z]$')]),
-      'country' : new UntypedFormControl(null, [Validators.required]),
-      'age' : new UntypedFormControl(null, [Validators.required, Validators.pattern('/^(?:1[8-9]|[2-9][0-9]|100)$$/')])
+      'email' : new FormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
+      'password' : new FormControl(null, [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')]),
+      'username' : new FormControl(null, [Validators.required, Validators.pattern('[a-zA-Z0-9._]{2,}$')]),
+      'first_name' : new FormControl(null, [Validators.required, Validators.pattern('[a-zA-Z-\']{2,}')]),
+      'last_name' : new FormControl(null, [Validators.required, Validators.pattern('[a-zA-Z-\']{2,}')]),
+      'gender' : new FormControl(null, [Validators.required]),
+      'country' : new FormControl(null, [Validators.required, Validators.pattern('[a-zA-Z-]{4,}')]),
+      'age' : new FormControl(null, [Validators.required, Validators.min(18), Validators.max(100)])
     });
   }
 
@@ -38,7 +38,16 @@ export class SignupComponent implements OnInit {
 
   submit(){
     this.user = new User(this.register.value); 
-    this.authService.signUp(this.user).subscribe(() => {this.router.navigateByUrl("/login");});
+    this.authService.signUp(this.user).subscribe((res) => 
+    {
+      if (res.toString() == 'Created' || res.toString() == '201' || res.toString() == 'Ok' || res.toString() == '200') {
+        this.router.navigateByUrl("/login");
+      }else{
+        alert("An error occurred while registrating. Please try again later!");
+      }
+      
+    
+    });
   }
 
 }

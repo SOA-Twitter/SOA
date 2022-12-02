@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+import { recoveryMail } from '../model/recoveryMail';
 
 @Component({
   selector: 'app-profile-recovery',
@@ -8,9 +11,14 @@ import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms
 })
 export class ProfileRecoveryComponent implements OnInit {
 
-  form!: UntypedFormGroup;
+  form!: FormGroup;
+  recoveryMail!: recoveryMail;
 
-  constructor() { 
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) { 
     this.createForm();
   }
 
@@ -18,9 +26,14 @@ export class ProfileRecoveryComponent implements OnInit {
   }
 
   createForm(){
-    this.form = new UntypedFormGroup({
-      'email' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
+    this.form = this.fb.group({
+      'email' : new FormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
     });
   }
 
+
+  onSubmit(){
+    this.recoveryMail = new recoveryMail(this.form.value);
+    this.authService.recoveryMail(this.recoveryMail).subscribe( () => this.router.navigateByUrl("/login"))
+  }
 }

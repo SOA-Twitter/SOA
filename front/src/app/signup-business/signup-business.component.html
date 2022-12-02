@@ -8,13 +8,13 @@
                     <form id="form" [formGroup]="register" (ngSubmit)="submit()">
 
                         <div>
-                            <input type="text" class="form-control" placeholder="Company name"  [formControlName] = "'companyName'">
-                            <span  id = "spanInvalid" *ngIf = "!register.get('email')?.valid && register.get('email')?.touched">Invalid company name</span>
+                            <input type="text" class="form-control" placeholder="Company name"  [formControlName] = "'company_name'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('company_name')?.valid && register.get('company_name')?.touched">Invalid company name</span>
                         </div>
 
                         <div>
-                            <input type="text" class="form-control" placeholder="Company website"  [formControlName] = "'companyWebsite'">
-                            <span  id = "spanInvalid" *ngIf = "!register.get('email')?.valid && register.get('email')?.touched">Invalid company web site</span>
+                            <input type="text" class="form-control" placeholder="Company website"  [formControlName] = "'company_website'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('company_website')?.valid && register.get('company_website')?.touched">Invalid company web site</span>
                         </div>
 
                         <div>

@@ -10,18 +10,21 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { SignupBusinessComponent } from './signup-business/signup-business.component';
 import { MyProfileBusinessComponent } from './my-profile-business/my-profile-business.component';
 import { ProfileRecoveryComponent } from './profile-recovery/profile-recovery.component';
+import { RecoverAccountComponent } from './recover-account/recover-account.component';
+import { Guard } from './guard/guard';
 
 const routes: Routes = [
     {path:'unlogged-home', component:UnloggedHomeComponent},
     {path:'login', component:LoginComponent},
     {path:'signup', component:SignupComponent},
-    {path:'logged-home', component:LoggedHomeComponent},
-    {path:'create-post', component:CreatePostComponent},
-    {path:'my-profile', component:MyProfileComponent},
-    {path:'change-password', component:ChangePasswordComponent},
+    {path:'logged-home', component:LoggedHomeComponent, canActivate: [Guard]},
+    {path:'create-post', component:CreatePostComponent, canActivate: [Guard]},
+    {path:'my-profile', component:MyProfileComponent, canActivate: [Guard]},
+    {path:'change-password', component:ChangePasswordComponent,canActivate: [Guard]},
     {path:'signup-business', component:SignupBusinessComponent},
-    {path:'my-profile-business', component:MyProfileBusinessComponent},
-    {path:'profile-recovery', component:ProfileRecoveryComponent}
+    {path:'my-profile-business', component:MyProfileBusinessComponent,canActivate: [Guard]},
+    {path:'profile-recovery', component:ProfileRecoveryComponent},
+    {path:'recover-account', component:RecoverAccountComponent}
 ];
 
 @NgModule({

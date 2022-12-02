@@ -5,11 +5,11 @@
                 <h4>Change password</h4>
             </div>
             <div class="card-body">
-                <form id="form" [formGroup] = "form">
+                <form id="form" [formGroup] = "form" (ngSubmit)="onSubmit()">
 
                     <div class="form-group">
-                        <input type="email" class="form-control" id="password" placeholder="Current password" [formControlName] = "'password'">
-                        <span  id = "spanInvalid" *ngIf = "!form.get('currPass')?.valid && form.get('currPass')?.touched">Invalid current password</span>
+                        <input type="email" class="form-control" id="email" placeholder="Your email" [formControlName] = "'email'">
+                        <span  id = "spanInvalid" *ngIf = "!form.get('email')?.valid && form.get('email')?.touched">Invalid mail</span>
                     </div>
 
                     <div class="form-group">

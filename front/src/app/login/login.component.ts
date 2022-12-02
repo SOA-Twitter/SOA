@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
 
   createForm(){
     this.loginForm = this.fb.group({
-      'email': new UntypedFormControl('', Validators.required),
+      'email' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
       'password': new UntypedFormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')])
     });
   }
@@ -35,7 +35,12 @@ export class LoginComponent implements OnInit {
 
   submit(){
     this.userLogin = new UserLogin(this.loginForm.value);
-    this.authService.login(this.userLogin).subscribe((token) => {this.router.navigateByUrl("/logged-home"); localStorage.setItem('token', token)},
+    this.authService.login(this.userLogin).subscribe((token) => 
+    {
+      this.router.navigateByUrl("/logged-home"); 
+      localStorage.setItem('token', token);
+      this.authService.setCookieToken(token);
+    },
     () => {window.alert('Invalid credentials!')});
   }
   

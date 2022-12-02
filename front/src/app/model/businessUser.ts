@@ -1,23 +1,15 @@
 export class BuisnessUser{
-    firstName:string;
-    lastName:string;
-    age:string;
-    country:string;
     email:string;
     password:string;
-    gender:string;
-    companyName:string;
-    companyWebsite:string;
+    company_name:string;
+    company_website:string;
+    username:string;
 
     constructor(obj?: any){
-        this.firstName = obj && obj.firstName || null;
-        this.lastName = obj && obj.lastName || null;
-        this.age = obj && obj.age || null;
-        this.country = obj && obj.country || null;
         this.email = obj && obj.email || null;
         this.password = obj && obj.password || null;
-        this.gender = obj && obj.gender || null;
-        this.companyName = obj && obj.companyName || null;
-        this.companyWebsite = obj && obj.companyWebsite || null;
+        this.company_name = obj && obj.company_name || null;
+        this.company_website = obj && obj.company_website || null;
+        this.username = obj && obj.username || null;
     }
 }

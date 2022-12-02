@@ -23,13 +23,13 @@
                         </div>
 
                         <div>
-                            <input type="text" class="form-control" placeholder="First name"  [formControlName] = "'firstName'">
-                            <span  id = "spanInvalid" *ngIf = "!register.get('firstName')?.valid && register.get('firstName')?.touched">Invalid first name</span>
+                            <input type="text" class="form-control" placeholder="First name"  [formControlName] = "'first_name'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('first_name')?.valid && register.get('first_name')?.touched">Invalid first name</span>
                         </div>
 
                         <div>
-                            <input type="text" class="form-control" placeholder="Last name"  [formControlName] = "'lastName'">
-                            <span  id = "spanInvalid" *ngIf = "!register.get('lastName')?.valid && register.get('lastName')?.touched">Invalid last name</span>
+                            <input type="text" class="form-control" placeholder="Last name"  [formControlName] = "'last_name'">
+                            <span  id = "spanInvalid" *ngIf = "!register.get('last_name')?.valid && register.get('last_name')?.touched">Invalid last name</span>
                         </div>
 
                         <div>
@@ -39,14 +39,14 @@
 
                         <div>
                             <select [formControlName]="'gender'" class="form-group">
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                             <span  id = "spanInvalid" *ngIf = "!register.get('gender')?.valid && register.get('gender')?.touched">Choose gender</span>
                         </div>
 
                         <div>
-                            <input type="text" class="form-control" placeholder="Your age"  [formControlName] = "'age'">
+                            <input type="number" min="18" max="100" class="form-control" placeholder="Your age"  [formControlName] = "'age'">
                             <span  id = "spanInvalid" *ngIf = "!register.get('age')?.valid && register.get('age')?.touched">Invalid age</span>
                         </div>
 

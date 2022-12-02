@@ -23,11 +23,11 @@ export class SignupBusinessComponent implements OnInit {
 
   createForm(){
     this.register = this.fb.group({
-      'companyName' : new UntypedFormControl(null, [Validators.required, Validators.pattern('[a-zA-Z]$')]),
-      'companyWebsite' : new UntypedFormControl(null, [Validators.required, Validators.pattern('[a-zA-Z]$')]),
+      'company_name' : new UntypedFormControl(null, [Validators.required, Validators.pattern('[a-zA-Z-\']+')]),
+      'company_website' : new UntypedFormControl(null, [Validators.required, Validators.pattern('[a-zA-Z-\'_./]+')]),
       'email' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
       'password' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')]),
-      'username' : new UntypedFormControl(null, [Validators.required, Validators.pattern('(?=.{2,})[a-zA-Z0-9._]$')])
+      'username' : new UntypedFormControl(null, [Validators.required, Validators.pattern('[a-zA-Z0-9._]{2,}$')])
     });
   }
 

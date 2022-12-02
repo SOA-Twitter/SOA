@@ -1,0 +1,34 @@
+<div class="register-section">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div style="text-align: center">
+                <h4>Change password</h4>
+            </div>
+            <div class="card-body">
+                <form id="form" [formGroup] = "form" (ngSubmit)="onSubmit()">
+
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="new_password" placeholder="New password" [formControlName] = "'new_password'">
+                        <span  id = "spanInvalid" *ngIf = "!form.get('new_password')?.valid && form.get('new_password')?.touched">Invalid password - password must contain at least eight characters, one uppercase and one lowercase letter, one number and one special character (#?!@$%^&*-)</span>
+                    </div>
+                    <div class="form-group">
+                        <input [formControlName]="'repeated_password'" type="password" class="form-control" name="confirm" id="confirm" placeholder="Confirm your Password" />
+                        <span  id = "spanInvalid" *ngIf = "!form.get('repeated_password')?.valid && form.get('repeated_password')?.touched">Password does not match</span>
+                    </div>
+                    <div class="form-group">
+
+                        <input [formControlName]="'recovery_uuid'" type="text" class="form-control" name="recovery_uuid" id="recovery_uuid" placeholder="Enter your code" />
+                        <span  id = "spanInvalid" *ngIf = "!form.get('recovery_uuid')?.valid && form.get('recovery_uuid')?.touched">Invalid code</span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Change password</button>
+                    </div>
+
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    
+</div>
