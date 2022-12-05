@@ -57,7 +57,7 @@ export class AuthService {
 
     logout() {
         localStorage.removeItem('token');
-        // document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
         this.router.navigateByUrl('/login');
     }
@@ -100,7 +100,7 @@ export class AuthService {
     
     tokenIsPresent(): Boolean {
       let token = this.getToken()
-      return token != null || token != "" || token != undefined;
+      return token != null && token != "" && token != undefined;
     }
     
     // TODO check if it takes token from cookie & if guards work consequently as expected
@@ -112,7 +112,7 @@ export class AuthService {
     }
 
     getCookieToken() {
-      alert("cookie value: " + document.cookie);
+      // alert("cookie value: " + document.cookie);
 
       let name = "token" + "=";
       let decodedCookie = decodeURIComponent(document.cookie);
@@ -123,7 +123,9 @@ export class AuthService {
           c = c.substring(1);
         }
         if (c.indexOf(name) == 0) {
-          return c.substring(name.length, c.length);
+          // alert("C var/ cookie whole: " + c);
+          // return c.substring(name.length, c.length);
+          return c;
         }
       }
       // DELETE THIS alert

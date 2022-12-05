@@ -35,8 +35,10 @@ export class LoginComponent implements OnInit {
 
   submit(){
     this.userLogin = new UserLogin(this.loginForm.value);
-    this.authService.login(this.userLogin).subscribe((token) => 
+    this.authService.login(this.userLogin).subscribe((token: string) => 
     {
+      token = token.replace("\"", "");
+      token = token.replace("\"", "");
       this.router.navigateByUrl("/logged-home"); 
       localStorage.setItem('token', token);
       this.authService.setCookieToken(token);

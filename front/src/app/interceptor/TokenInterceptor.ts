@@ -13,12 +13,15 @@ import { AuthService } from '../auth.service';
 export class TokenInterceptor implements HttpInterceptor {
   constructor(public user: AuthService) { }
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log("Cookie: " + this.user.getCookieToken());
 
     if (this.user.tokenIsPresent()) {
       request = request.clone({
         setHeaders: {
-          Authorization: `${this.user.getCookieToken()}` 
+          'Authorization': `${this.user.getCookieToken()}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+          'Access-Control-Allow-Origin': '*'
         }
       });
     }
