@@ -47,7 +47,7 @@ func ValidateJwt(tokenString string) error {
 
 func SendEmail(providedEmail string, intention string) (string, error) {
 	const accountActivationPath = "https://localhost:8081/auth/activate/"
-	const accountRecoveryPath = "https://localhost:8081/auth/recover/"
+	const accountRecoveryPath = "https://localhost:4200/recover-account"
 	// Sender data
 	from := os.Getenv("MAIL_ADDRESS")
 
@@ -71,7 +71,7 @@ func SendEmail(providedEmail string, intention string) (string, error) {
 		body = "Follow the verification link to activate your Twitterclone account: \n" + accountActivationPath + activationUUID
 	} else if intention == "recovery" {
 		subject = "Twitter clone password recovery"
-		body = "To reset your password, follow the recovery link: \n" + accountRecoveryPath + activationUUID
+		body = "To reset your password, copy the given code & then follow the recovery link: \n" + activationUUID + "\n" + accountRecoveryPath
 	}
 	// Text
 	stringMsg :=

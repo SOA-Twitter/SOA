@@ -48,7 +48,7 @@ func main() {
 	authRouter.HandleFunc("/register", authHandler.Register).Methods(http.MethodPost)
 	authRouter.HandleFunc("/activate/{activationId}", authHandler.ActivateProfile).Methods(http.MethodGet)
 	authRouter.HandleFunc("/recoverEmail", authHandler.SendRecoveryEmail).Methods(http.MethodPost)
-	authRouter.HandleFunc("/recover/{recId}", authHandler.RecoverProfile).Methods(http.MethodPost)
+	authRouter.HandleFunc("/recover", authHandler.RecoverProfile).Methods(http.MethodPost)
 	//--------------------------------------------------------
 
 	tweetPort := os.Getenv("TWEET_PORT")

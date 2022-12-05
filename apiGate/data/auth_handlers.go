@@ -64,6 +64,7 @@ type Email struct {
 type RecoverProfile struct {
 	NewPassword      string `json:"new_password"`
 	RepeatedPassword string `json:"repeated_password"`
+	RecoveryUUID     string `json:"recovery_uuid"`
 }
 
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
@@ -96,7 +97,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 		Expires: expirationTime,
 	})
-	json.NewEncoder(w).Encode(token.Status)
+	json.NewEncoder(w).Encode(token.Token)
 }
 
 func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +145,7 @@ func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
 		NewPassword:      recProfil.NewPassword,
 		RepeatedPassword: recProfil.RepeatedPassword,
-		RecoveryUUID:     mux.Vars(r)["recId"],
+		RecoveryUUID:     recProfil.RecoveryUUID,
 	})
 	if err != nil {
 		ah.l.Println("Cannot recover profile")
@@ -207,7 +208,7 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		Token:       c.Value,
 	})
 	if err != nil {
-		json.NewEncoder(w).Encode(res.Status)
+		json.NewEncoder(w).Encode(http.StatusOK)
 		http.Error(w, "Unable to save new password", http.StatusBadRequest)
 		return
 	}
@@ -258,7 +259,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := ah.pr.Register(context.Background(), &auth.RegisterRequest{
+		res, err5 := ah.pr.Register(context.Background(), &auth.RegisterRequest{
 			Email:          user.Email,
 			Password:       user.Password,
 			Username:       user.Username,
@@ -267,8 +268,8 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Role:           string(BusinessUser),
 		})
 
-		if err != nil {
-			json.NewEncoder(w).Encode(res.Status)
+		if err5 != nil {
+			json.NewEncoder(w).Encode(http.StatusOK)
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
@@ -329,7 +330,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
-			json.NewEncoder(w).Encode(res.Status)
+			json.NewEncoder(w).Encode(http.StatusOK)
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
@@ -350,6 +351,8 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
 		ah.l.Println(r.Method, r.URL.Path)
 		c, err := r.Cookie("token")
+		ah.l.Println(c)
+		ah.l.Println("--------------------")
 		if err != nil {
 			if err == http.ErrNoCookie {
 				http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
