@@ -93,9 +93,9 @@ func main() {
 	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
 	profileRouter.HandleFunc("/changePassword", authHandler.ChangePassword).Methods(http.MethodPost)
 
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"https://localhost:4200"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
-		gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"}),
+		gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
 		gorillaHandlers.AllowCredentials())
 
 	s := &http.Server{

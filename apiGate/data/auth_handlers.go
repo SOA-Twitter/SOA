@@ -74,7 +74,7 @@ func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
 func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Login")
 
-	var expirationTime = time.Now().Add(time.Second * 1200)
+	var expirationTime = time.Now().Add(time.Minute * 120)
 	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
@@ -193,19 +193,15 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
 		return
 	}
-	c, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-			return
-		}
-		http.Error(w, "Bad request!", http.StatusBadRequest)
+	c := r.Header.Get("Authorization")
+	if c == "" {
+		http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
 		return
 	}
 	res, err := ah.pr.ChangePassword(context.Background(), &auth.ChangePasswordRequest{
 		OldPassword: pass.OldPassword,
 		NewPassword: pass.NewPassword,
-		Token:       c.Value,
+		Token:       c,
 	})
 	if err != nil {
 		json.NewEncoder(w).Encode(http.StatusOK)
@@ -350,18 +346,14 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
 		ah.l.Println(r.Method, r.URL.Path)
-		c, err := r.Cookie("token")
+		c := r.Header.Get("Authorization")
 		ah.l.Println(c)
 		ah.l.Println("--------------------")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-				return
-			}
-			http.Error(w, "Bad request!", http.StatusBadRequest)
+		if c == "" {
+			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
 			return
 		}
-		tokenString := c.Value
+		tokenString := c
 		resp, err := ah.pr.VerifyJwt(context.Background(), &auth.VerifyRequest{
 			Token: tokenString,
 		})

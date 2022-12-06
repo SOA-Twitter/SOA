@@ -16,7 +16,7 @@ func CreateJwt(email string, role string) (string, error) {
 		Role:  role,
 		Email: email,
 		StandardClaims: &jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Second * 1200).Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * 120).Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
