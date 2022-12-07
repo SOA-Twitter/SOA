@@ -37,36 +37,6 @@ func (gender Gender) IsValid() error {
 	return fmt.Errorf("invalid gender")
 }
 
-type User struct {
-	Username       string `json:"username"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
-	Gender         Gender `json:"gender"`
-	Country        string `json:"country"`
-	Age            int    `json:"age"`
-	CompanyName    string `json:"company_name"`
-	CompanyWebsite string `json:"company_website"`
-	Role           Role   `json:"role"`
-}
-
-type ChangePass struct {
-	OldPassword      string `json:"old_password"`
-	NewPassword      string `json:"new_password"`
-	RepeatedPassword string `json:"repeated_password"`
-}
-
-type Email struct {
-	Email string `json:"email"`
-}
-
-type RecoverProfile struct {
-	NewPassword      string `json:"new_password"`
-	RepeatedPassword string `json:"repeated_password"`
-	RecoveryUUID     string `json:"recovery_uuid"`
-}
-
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{l, pr}
 }
@@ -262,6 +232,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			CompanyName:    user.CompanyName,
 			CompanyWebsite: user.CompanyWebsite,
 			Role:           string(BusinessUser),
+			Private:        true,
 		})
 
 		if err5 != nil {
@@ -323,6 +294,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Country:   user.Country,
 			Age:       int32(user.Age),
 			Role:      string(RegularUser),
+			Private:   true,
 		})
 
 		if err != nil {
@@ -347,13 +319,22 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
 		ah.l.Println(r.Method, r.URL.Path)
 		c := r.Header.Get("Authorization")
-		ah.l.Println(c)
-		ah.l.Println("--------------------")
+		tokenString := c
+
 		if c == "" {
 			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-			return
+		} else {
+			c, err := r.Cookie("token")
+			if err != nil {
+				if err == http.ErrNoCookie {
+					http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+					return
+				}
+				http.Error(w, "Bad request!", http.StatusBadRequest)
+				return
+			}
+			tokenString = c.Value
 		}
-		tokenString := c
 		resp, err := ah.pr.VerifyJwt(context.Background(), &auth.VerifyRequest{
 			Token: tokenString,
 		})
@@ -361,12 +342,11 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized!", http.StatusUnauthorized)
 			return
 		}
-		if !HasPermission(resp.UserRole, r.URL.Path, r.Method) {
-			ah.l.Printf("User '%s' is not allowed to '%s' resource '%s'", resp.UserRole, r.Method, r.URL.Path)
-			w.WriteHeader(http.StatusForbidden)
-			return
-		}
+		//if !HasPermission(resp.UserRole, r.URL.Path, r.Method) {
+		//	ah.l.Printf("User '%s' is not allowed to '%s' resource '%s'", resp.UserRole, r.Method, r.URL.Path)
+		//	w.WriteHeader(http.StatusForbidden)
+		//	return
+		//}
 		next.ServeHTTP(w, r)
-
 	})
 }

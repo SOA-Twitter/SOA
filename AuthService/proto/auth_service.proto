@@ -31,6 +31,7 @@ message RegisterRequest{
   string companyName = 9;
   string companyWebsite = 10;
   string role = 11;
+  bool private = 12;
 }
 
 message RegisterResponse{

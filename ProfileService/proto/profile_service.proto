@@ -17,11 +17,15 @@ message ProfileRegisterRequest{
   int32 age = 7;
   string companyName = 8;
   string companyWebsite = 9;
+  bool private = 10;
 }
 message ProfileRegisterResponse{
 
 }
 message UserProfRequest{
+  string Username = 1;
+}
+message UserProfResponse{
   string username = 1;
   string firstName = 2;
   string lastName = 3;
@@ -31,7 +35,5 @@ message UserProfRequest{
   int32 age = 7;
   string companyName = 8;
   string companyWebsite = 9;
-}
-message UserProfResponse{
-
+  bool private = 10;
 }

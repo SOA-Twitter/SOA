@@ -34,6 +34,7 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 		Age:            int(r.Age),
 		CompanyName:    r.CompanyName,
 		CompanyWebsite: r.CompanyWebsite,
+		Private:        r.Private,
 	}
 	err := pr.repo.Register(user)
 	if err != nil {
@@ -45,10 +46,23 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 }
 
 func (pr *ProfileHandler) GetUserProfile(ctx context.Context, r *profile.UserProfRequest) (*profile.UserProfResponse, error) {
-	pr.l.Println("Register handler")
-
-	//TODO USERPROFILE HANDLER
-
-	return &profile.UserProfResponse{}, nil
+	pr.l.Println("Get User profile handler")
+	user, err := pr.repo.GetByUsername(r.Username)
+	if err != nil {
+		pr.l.Println("Cannot find user")
+		return nil, err
+	}
+	return &profile.UserProfResponse{
+		Username:       user.Username,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		Email:          user.Email,
+		Gender:         user.Gender,
+		Country:        user.Country,
+		Age:            int32(user.Age),
+		CompanyName:    user.CompanyName,
+		CompanyWebsite: user.CompanyWebsite,
+		Private:        user.Private,
+	}, nil
 
 }

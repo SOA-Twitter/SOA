@@ -200,15 +200,14 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 			Status: http.StatusNotFound,
 		}, err
 	}
-	email, role, err2 := a.repo.FindUserEmail(res.Email)
+	user, err2 := a.repo.FindUser(res.Email)
 	if err2 != nil {
 		a.l.Println("Cannot find user")
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
 		}, err2
 	}
-	a.l.Println(role)
-	tokenString, _ := data.CreateJwt(email, role)
+	tokenString, _ := data.CreateJwt(user.Email, user.Role, user.Username)
 	return &auth.LoginResponse{
 		Token:  tokenString,
 		Status: http.StatusOK,
@@ -360,7 +359,7 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 		a.l.Println("JWT expired")
 		return &auth.VerifyResponse{
 			Status: http.StatusUnauthorized,
-		}, nil
+		}, err
 	}
 	claims := &data.Claims{}
 	_, err = jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {

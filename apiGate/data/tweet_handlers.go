@@ -11,10 +11,6 @@ type TweetHandler struct {
 	l  *log.Logger
 	pr tweet.TweetServiceClient
 }
-type TweetDAO struct {
-	Text    string `json:"text"`
-	Picture string `json:"picture"`
-}
 
 func NewTweetHandler(l *log.Logger, pr tweet.TweetServiceClient) *TweetHandler {
 	return &TweetHandler{l, pr}
@@ -32,7 +28,7 @@ func (tw *TweetHandler) GetTweets(w http.ResponseWriter, r *http.Request) {
 func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
 	tw.l.Println("Api-gate - Create tweet")
 
-	dao := TweetDAO{}
+	dao := Tweet{}
 	err := FromJSON(&dao, r.Body)
 	if err != nil {
 		tw.l.Println("Cannot unmarshal json")

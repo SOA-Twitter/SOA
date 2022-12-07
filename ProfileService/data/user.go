@@ -10,4 +10,5 @@ type User struct {
 	Age            int    `json:"age"`
 	CompanyName    string `json:"company_name"`
 	CompanyWebsite string `json:"company_website"`
+	Private        bool   `json:"private"`
 }

@@ -90,7 +90,7 @@ func main() {
 
 	profileRouter := r.PathPrefix("/profile").Subrouter()
 	profileRouter.Use(authHandler.Authorize)
-	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
+	profileRouter.HandleFunc("/{username}", profileHandler.UserProfile).Methods(http.MethodGet)
 	profileRouter.HandleFunc("/changePassword", authHandler.ChangePassword).Methods(http.MethodPost)
 
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"https://localhost:4200"}),

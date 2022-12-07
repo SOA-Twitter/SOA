@@ -11,10 +11,11 @@ import (
 
 var SampleSecretKey = []byte("SecretYouShouldHide")
 
-func CreateJwt(email string, role string) (string, error) {
+func CreateJwt(email string, role string, username string) (string, error) {
 	claims := &Claims{
-		Role:  role,
-		Email: email,
+		Role:     role,
+		Email:    email,
+		Username: username,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 120).Unix(),
 		},
