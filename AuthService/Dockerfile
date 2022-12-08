@@ -9,5 +9,6 @@ FROM alpine
 WORKDIR /root/
 
 COPY --from=builder /app/main .
+COPY ./10k-most-common.txt .
 EXPOSE 8001
 CMD ["./main"]

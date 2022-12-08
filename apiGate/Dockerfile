@@ -10,5 +10,8 @@ FROM alpine
 WORKDIR /root/
 
 COPY --from=builder /app/main .
+COPY ./certificates ./certificates
+COPY ./data/policy.csv ./data/policy.csv
+COPY ./data/rbac_model.conf ./data/rbac_model.conf
 EXPOSE 8081
 CMD ["./main"]

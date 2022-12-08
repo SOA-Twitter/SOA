@@ -4,30 +4,68 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4cf7e4bb-675c-4024-bba3-5af5e0467a23" name="Changes" comment="">
+    <list default="true" id="70a0eac2-3774-4a3a-b1a4-3bd76e74d01c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/SOA-remote.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/data/helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/data/helper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/handlers/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/handlers/handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/proto/auth/auth_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/proto/auth/auth_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/proto/auth/auth_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/proto/auth/auth_service_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthService/proto/auth_service.proto" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/proto/auth_service.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProfileService/proto/auth/auth_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/ProfileService/proto/auth/auth_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProfileService/proto/auth/auth_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/ProfileService/proto/auth/auth_service_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TweetService/proto/auth/auth_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/TweetService/proto/auth/auth_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TweetService/proto/auth/auth_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/TweetService/proto/auth/auth_service_grpc.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apiGate/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/apiGate/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apiGate/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/apiGate/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apiGate/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/apiGate/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apiGate/protos/auth/auth_service.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/apiGate/protos/auth/auth_service.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apiGate/protos/auth/auth_service_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/apiGate/protos/auth/auth_service_grpc.pb.go" afterDir="false" />
+    </list>
+    <list id="05d59e8e-94b6-41db-a479-d51de6b2b076" name="Changes by bukvic" comment="">
+      <change beforePath="$PROJECT_DIR$/AuthService/data/helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/AuthService/data/helper.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../Program Files/Go" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$USER_HOME$/go/go1.19.3" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/AuthService/data/helper.go">
+      <ranges>
+        <range start1="49" end1="50" start2="49" end2="50" changelist="70a0eac2-3774-4a3a-b1a4-3bd76e74d01c" />
+        <range start1="65" end1="65" start2="65" end2="66" changelist="05d59e8e-94b6-41db-a479-d51de6b2b076" />
+        <range start1="73" end1="73" start2="74" end2="75" changelist="05d59e8e-94b6-41db-a479-d51de6b2b076" />
+        <range start1="75" end1="75" start2="77" end2="78" changelist="05d59e8e-94b6-41db-a479-d51de6b2b076" />
+      </ranges>
+    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2Hgxl7DJXzCWRkTo6wmXIxIO5Lo" />
+  <component name="ProjectId" id="2IDVFxOC5kw0gIM5UFAMBuiGwGE" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
@@ -36,11 +74,39 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
     "WebServerToolWindowFactoryState": "false",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
     "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/Todor"
+    "last_opened_file_path": "D:/FTN/Predmeti/SOA/SOA"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\FTN\Predmeti\SOA\SOA-remote\apiGate\protos\auth" />
+      <recent name="D:\FTN\Predmeti\SOA\SOA-remote\TweetService\proto" />
+      <recent name="D:\FTN\Predmeti\SOA\SOA-remote\ProfileService\proto" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="SOA" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="SOA" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />

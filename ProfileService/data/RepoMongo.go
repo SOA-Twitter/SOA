@@ -2,7 +2,7 @@ package data
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -44,7 +44,7 @@ func (pr *ProfileRepo) Disconnect(ctx context.Context) error {
 	return nil
 }
 
-func (pr *ProfileRepo) Register(user *User) (string, error) {
+func (pr *ProfileRepo) Register(user *User) error {
 	pr.l.Println("RepoMongo - Register")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -55,8 +55,25 @@ func (pr *ProfileRepo) Register(user *User) (string, error) {
 	}
 	pr.l.Printf("User ID: %v\n", result.InsertedID)
 
-	useId := result.InsertedID.(primitive.ObjectID)
+	//useId := result.InsertedID.(primitive.ObjectID)
+	//useId.Hex()
 
-	return useId.Hex(), nil
+	return nil
+
+}
+
+func (pr *ProfileRepo) GetByUsername(username string) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	defer cancel()
+	userCollection := pr.getCollection()
+	var user User
+
+	// M type should be used when the order of the elements does not matter
+	err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		pr.l.Println(err)
+		return nil, err
+	}
+	return &user, nil
 
 }

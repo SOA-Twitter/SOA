@@ -37,30 +37,25 @@ func (t *TweetHandler) GetTweets(ctx context.Context, r *tweet.GetTweetRequest) 
 }
 func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest) (*tweet.PostTweetResponse, error) {
 	t.l.Println("Handle POST tweet")
-	//resp, err := t.ac.GetUserId(context.Background(), &auth.UserIdRequest{
-	//	Token: r.Token,
-	//})
-	UserId := "hjsfhjh"
-	//if err != nil {
-	//	t.l.Println("Error creating tweet")
-	//	t.l.Println(err)
-	//}
-	res := &data.Tweet{
-		Text:    r.Text,
-		Picture: r.Picture,
-		UserId:  UserId,
-	}
-
-	// data.CreateTweet(tweet)
-	err := t.repoImpl.CreateTweet(res)
+	resp, err := t.ac.GetUser(context.Background(), &auth.UserRequest{
+		Token: r.Token,
+	})
 	if err != nil {
-		t.l.Println("Error occurred during tweet creation")
+		t.l.Println("Error creating tweet")
+		t.l.Println(err)
 		return nil, err
 	}
-	return &tweet.PostTweetResponse{
-		Id:     res.Id,
-		Status: http.StatusCreated,
-	}, nil
+	res := &data.Tweet{
+		Text:      r.Text,
+		Picture:   r.Picture,
+		UserEmail: resp.UserEmail,
+	}
+	errorcic := t.repoImpl.CreateTweet(res)
+	if errorcic != nil {
+		t.l.Println("Error occurred during tweet creation")
+		return nil, errorcic
+	}
+	return &tweet.PostTweetResponse{}, nil
 	//data.RenderJson(w, tweet)
 }
 

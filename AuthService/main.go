@@ -4,6 +4,7 @@ import (
 	"AuthService/data"
 	"AuthService/handlers"
 	"AuthService/proto/auth"
+	"AuthService/proto/profile"
 	"fmt"
 	"log"
 	"net"
@@ -27,11 +28,21 @@ func main() {
 	if err != nil {
 		l.Println("Error connecting to postgres...")
 	}
+	profilePort := os.Getenv("PROFILE_PORT")
+	profileHost := os.Getenv("PROFILE_HOST")
+
+	conn, err := grpc.Dial(profileHost+":"+profilePort, grpc.WithInsecure())
+	if err != nil {
+		l.Println("error connecting to profile service")
+	}
+	defer conn.Close()
+	ps := profile.NewProfileServiceClient(conn)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}
-	authHandler := handlers.NewAuthHandler(l, authRepo)
+	authHandler := handlers.NewAuthHandler(l, authRepo, ps)
 	auth.RegisterAuthServiceServer(grpcServer, authHandler)
 	reflection.Register(grpcServer)
 

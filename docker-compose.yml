@@ -13,6 +13,8 @@ services:
       AUTH_PORT: ${AUTH_PORT}
       TWEET_HOST: ${TWEET_HOST}
       TWEET_PORT: ${TWEET_PORT}
+      PROFILE_HOST: ${PROFILE_HOST}
+      PROFILE_PORT: ${PROFILE_PORT}
     ports:
       - '8081:8081'
 
@@ -22,11 +24,16 @@ services:
       dockerfile: Dockerfile
     environment:
       AUTH_PORT: ${AUTH_PORT}
+      PROFILE_PORT: ${PROFILE_PORT}
+      PROFILE_HOST: ${PROFILE_HOST}
       USER: ${AUTH_DB_USER}
       PASSWORD: ${AUTH_DB_PASS}
       DB: ${AUTH_DB}
       HOST: ${AUTH_DB_HOST}
       PORT: ${AUTH_DB_PORT}
+      SECRET: ${SECRET}
+      MAIL_ADDRESS: ${MAIL_ADDRESS}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
     depends_on:
@@ -35,7 +42,7 @@ services:
   postgres:
     image: postgres
     volumes:
-      - /home/GolandProjects/posgres/:/posgres/data
+      - postgres:/postgres/data
     container_name: user_db
     restart: on-failure
     environment:
@@ -53,6 +60,8 @@ services:
       context: ./TweetService/
       dockerfile: Dockerfile
     environment:
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
       TWEET_PORT: ${TWEET_PORT}
       CASS_URI: ${CASS_URI}
     ports:
@@ -68,9 +77,65 @@ services:
     ports:
       - '9042:9042'
     volumes:
-      - /home/GolandProjects/cass/:/cass/data
+      - cassandra:/cass/data
     healthcheck:
       test: ["CMD-SHELL", "cqlsh -e ' describe cluster'"]
       interval: 10s
       timeout: 10s
       retries: 20
+
+
+  profile_service:
+    build:
+      context: ./ProfileService/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - ${PROFILE_PORT}:${PROFILE_PORT}
+    environment:
+      PORT: ${PROFILE_PORT}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
+      MONGO_DB_URI: mongodb://root:pass@mongo:27017
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: mongoDemo
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mongo:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongo
+    ports:
+      - "8085:8085"
+    volumes:
+      - mongo_express_data:/data/db
+
+volumes:
+  mongo:
+  mongo_express_data:
+  cassandra:
+  postgres:

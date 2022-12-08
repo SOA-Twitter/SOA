@@ -1,0 +1,4 @@
+p, RegularUser, /profile/changePassword, POST
+p, BusinessUser, /profile/changePassword, POST
+p, RegularUser, /tweet/postTweets, POST
+p, BusinessUser, /tweet/postTweets, POST

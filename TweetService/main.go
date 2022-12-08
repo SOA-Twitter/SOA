@@ -32,8 +32,6 @@ func main() {
 	conn, err := grpc.Dial(authHost+":"+authPort, grpc.WithInsecure())
 	if err != nil {
 		l.Println("error connecting to auth service")
-		l.Println(err)
-		l.Println(conn)
 	}
 	//conn, err := grpc.DialContext(
 	//	context.Background(),
@@ -49,7 +47,6 @@ func main() {
 	defer conn.Close()
 	ac := auth.NewAuthServiceClient(conn)
 
-	//PORT FIXED FOR NOW
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)

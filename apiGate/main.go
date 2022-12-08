@@ -3,6 +3,7 @@ package main
 import (
 	"apiGate/data"
 	"apiGate/protos/auth"
+	"apiGate/protos/profile"
 	"apiGate/protos/tweet"
 	"context"
 	gorillaHandlers "github.com/gorilla/handlers"
@@ -45,7 +46,9 @@ func main() {
 	authRouter := r.PathPrefix("/auth").Subrouter()
 	authRouter.HandleFunc("/login", authHandler.Login).Methods(http.MethodPost)
 	authRouter.HandleFunc("/register", authHandler.Register).Methods(http.MethodPost)
-
+	authRouter.HandleFunc("/activate/{activationId}", authHandler.ActivateProfile).Methods(http.MethodGet)
+	authRouter.HandleFunc("/recoverEmail", authHandler.SendRecoveryEmail).Methods(http.MethodPost)
+	authRouter.HandleFunc("/recover", authHandler.RecoverProfile).Methods(http.MethodPost)
 	//--------------------------------------------------------
 
 	tweetPort := os.Getenv("TWEET_PORT")
@@ -64,26 +67,48 @@ func main() {
 	tweetHandler := data.NewTweetHandler(l, tweetClient)
 
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
-	tweetRouter.Use(authHandler.VerifyJwt)
+	tweetRouter.Use(authHandler.Authorize)
 	tweetRouter.HandleFunc("/getTweets", tweetHandler.GetTweets).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
+	//----------------------------------------------------------
+	profileHost := os.Getenv("PROFILE_HOST")
+	profilePort := os.Getenv("PROFILE_PORT")
+	profileConn, err := grpc.DialContext(
+		context.Background(),
+		profileHost+":"+profilePort,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		l.Fatalf("Error connecting to Profile_service: %v\n", err)
+	}
+	defer profileConn.Close()
+
+	profileClient := profile.NewProfileServiceClient(profileConn)
+	profileHandler := data.NewProfileHandler(l, profileClient)
+
+	profileRouter := r.PathPrefix("/profile").Subrouter()
+	profileRouter.Use(authHandler.Authorize)
+	profileRouter.HandleFunc("/{username}", profileHandler.UserProfile).Methods(http.MethodGet)
+	profileRouter.HandleFunc("/changePassword", authHandler.ChangePassword).Methods(http.MethodPost)
+
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"https://localhost:4200"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
-		gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"}),
+		gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
 		gorillaHandlers.AllowCredentials())
 
 	s := &http.Server{
 		Addr:         port,
 		Handler:      cors(r),
 		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+		ReadTimeout:  4 * time.Second,
+		WriteTimeout: 4 * time.Second,
 	}
 	l.Println("Server listening on port" + port)
 
 	go func() {
-		err := s.ListenAndServe()
+		err := s.ListenAndServeTLS("certificates/cert.crt", "certificates/cert.key")
 		if err != nil {
 			l.Fatal(err)
 		}
