@@ -174,12 +174,11 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		Token:       c,
 	})
 	if err != nil {
-		json.NewEncoder(w).Encode(http.StatusOK)
+		json.NewEncoder(w).Encode(res.Status)
 		http.Error(w, "Unable to save new password", http.StatusBadRequest)
 		return
 	}
 	json.NewEncoder(w).Encode(res.Status)
-
 }
 
 func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -236,11 +235,12 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err5 != nil {
-			json.NewEncoder(w).Encode(http.StatusOK)
+			json.NewEncoder(w).Encode(res.Status)
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
-		json.NewEncoder(w).Encode(res.Status)
+
+		json.NewEncoder(w).Encode(http.StatusOK)
 	} else {
 		_, error1 := regexp.MatchString("([a-zA-Z-']{2,})", user.FirstName)
 		if error1 != nil {
@@ -298,7 +298,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
-			json.NewEncoder(w).Encode(http.StatusOK)
+			json.NewEncoder(w).Encode(res.Status)
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
