@@ -207,6 +207,6 @@ func (ps *AuthRepoPostgres) DeleteRecoveryRequest(recoveryUUID string, email str
 func (ps *AuthRepoPostgres) FindUserByUsername(username string) error {
 	ps.l.Println("{AuthRepoPostgres} - Find User by Username")
 	user := &User{}
-	err := ps.db.Where("username = ?", username).First(user).Error
+	err := ps.db.Where("username = ?", username).First(&user).Error
 	return err
 }

@@ -319,22 +319,24 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
 		ah.l.Println(r.Method, r.URL.Path)
 		c := r.Header.Get("Authorization")
-		tokenString := c
 
 		if c == "" {
 			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-		} else {
-			c, err := r.Cookie("token")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-					return
-				}
-				http.Error(w, "Bad request!", http.StatusBadRequest)
-				return
-			}
-			tokenString = c.Value
+			return
 		}
+		//} else {
+		//	c, err := r.Cookie("token")
+		//	if err != nil {
+		//		if err == http.ErrNoCookie {
+		//			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		//			return
+		//		}
+		//		http.Error(w, "Bad request!", http.StatusBadRequest)
+		//		return
+		//	}
+		//	tokenString = c.Value
+		//}
+		tokenString := c
 		resp, err := ah.pr.VerifyJwt(context.Background(), &auth.VerifyRequest{
 			Token: tokenString,
 		})

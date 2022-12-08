@@ -34,7 +34,7 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 		Age:            int(r.Age),
 		CompanyName:    r.CompanyName,
 		CompanyWebsite: r.CompanyWebsite,
-		Private:        r.Private,
+		Private:        true,
 	}
 	err := pr.repo.Register(user)
 	if err != nil {
