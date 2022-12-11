@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"io"
 )
 
@@ -47,9 +48,16 @@ type RecoverProfile struct {
 	RepeatedPassword string `json:"repeated_password"`
 	RecoveryUUID     string `json:"recovery_uuid"`
 }
+
 type Tweet struct {
-	Text    string `json:"text"`
-	Picture string `json:"picture"`
+	Id           string              `json:"id"`
+	Text         string              `json:"text" validate:"required"`
+	Username     string              `json:"username"`
+	CreationDate timestamp.Timestamp `json:"creationDate"`
+}
+
+type Tweets struct {
+	Tweets []*Tweet
 }
 
 func ToJSON(i interface{}, w io.Writer) error {
