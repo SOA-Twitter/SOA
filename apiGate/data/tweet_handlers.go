@@ -3,6 +3,7 @@ package data
 import (
 	"apiGate/protos/tweet"
 	"context"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -17,12 +18,17 @@ func NewTweetHandler(l *log.Logger, pr tweet.TweetServiceClient) *TweetHandler {
 }
 func (tw *TweetHandler) GetTweets(w http.ResponseWriter, r *http.Request) {
 	tw.l.Println("Api-gate - Get tweets")
-	resp, err := tw.pr.GetTweets(context.Background(), &tweet.GetTweetRequest{})
+	username := mux.Vars(r)["username"]
+	resp, err := tw.pr.GetTweets(context.Background(), &tweet.GetTweetRequest{
+		Username: username,
+	})
 	if err != nil {
 		tw.l.Println("Error getting tweets")
 		http.Error(w, "Error getting tweets", http.StatusNotFound)
 		return
 	}
+
+	err = ToJSON(resp.TweetList, w)
 	tw.l.Println("Resp", resp)
 }
 func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
@@ -40,12 +46,10 @@ func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
 		return
 	}
-	tw.l.Println(dao.Text + dao.Picture + c)
 
 	_, err = tw.pr.PostTweet(context.Background(), &tweet.PostTweetRequest{
-		Text:    dao.Text,
-		Picture: dao.Picture,
-		Token:   c,
+		Text:  dao.Text,
+		Token: c,
 	})
 	if err != nil {
 		tw.l.Println("Error occurred during creating tweet")

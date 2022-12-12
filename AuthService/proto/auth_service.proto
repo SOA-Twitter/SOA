@@ -51,6 +51,7 @@ message UserRequest{
 message UserResponse {
   string userRole = 1;
   string userEmail = 2;
+  string username = 3;
 }
 message ChangePasswordRequest{
   string token = 1;

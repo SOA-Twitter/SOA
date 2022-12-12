@@ -380,5 +380,6 @@ func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.U
 	return &auth.UserResponse{
 		UserEmail: claims.Email,
 		UserRole:  claims.Role,
+		Username:  claims.Username,
 	}, nil
 }
