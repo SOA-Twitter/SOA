@@ -46,3 +46,40 @@ func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (ah *ProfileHandler) ManagePrivacy(w http.ResponseWriter, req *http.Request) {
+	ah.l.Println("Api-gate - Manage Account Privacy")
+
+	privacy := ManagePrivacy{}
+
+	err1 := FromJSON(&privacy, req.Body)
+	if err1 != nil {
+		ah.l.Println("Unable to convert to json")
+		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
+		return
+	}
+
+	c := req.Header.Get("Authorization")
+	if c == "" {
+		http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+	response, err2 := ah.pr.ManagePrivacy(context.Background(), &profile.ManagePrivacyRequest{
+		Token:   c,
+		Privacy: privacy.Private,
+	})
+
+	if err2 != nil {
+		ah.l.Println("Cannot change account privacy!")
+		http.Error(w, "Cannot change your account privacy!", http.StatusInternalServerError)
+		return
+	}
+
+	err3 := ToJSON(response, w)
+	if err3 != nil {
+		ah.l.Println("Unable to convert to json")
+		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
+		return
+	}
+
+}

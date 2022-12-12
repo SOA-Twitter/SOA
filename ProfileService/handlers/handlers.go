@@ -6,6 +6,7 @@ import (
 	"ProfileService/proto/profile"
 	"context"
 	"log"
+	"net/http"
 )
 
 type ProfileHandler struct {
@@ -65,4 +66,26 @@ func (pr *ProfileHandler) GetUserProfile(ctx context.Context, r *profile.UserPro
 		Private:        user.Private,
 	}, nil
 
+}
+
+func (pr *ProfileHandler) ManagePrivacy(ctx context.Context, r *profile.ManagePrivacyRequest) (*profile.ManagePrivacyResponse, error) {
+	pr.l.Println("Manage account privacy handler")
+	claims, err := data.GetFromClaims(r.Token)
+	if err != nil {
+		pr.l.Println("Error getting claims")
+		return &profile.ManagePrivacyResponse{
+			Status: http.StatusNotFound,
+		}, err
+	}
+
+	err1 := pr.repo.ChangePrivacy(claims.Username, r.Privacy)
+
+	if err1 != nil {
+		pr.l.Println("Cannot update account privacy for not-found user " + claims.Username)
+		return nil, err1
+	}
+	return &profile.ManagePrivacyResponse{
+		Privacy: r.Privacy,
+		Status:  http.StatusOK,
+	}, nil
 }

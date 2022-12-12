@@ -38,6 +38,10 @@ type ChangePass struct {
 	RepeatedPassword string `json:"repeated_password"`
 }
 
+type ManagePrivacy struct {
+	Private bool `json:"private"`
+}
+
 type Email struct {
 	Email string `json:"email"`
 }
