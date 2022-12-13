@@ -18,7 +18,7 @@ func NewProfileHandler(l *log.Logger, pr profile.ProfileServiceClient) *ProfileH
 }
 
 func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
-	ah.l.Println("Api-gate - Get User Info")
+	ah.l.Println("Api-gate - User Profile")
 	username := mux.Vars(r)["username"]
 	response, err := ah.pr.GetUserProfile(context.Background(), &profile.UserProfRequest{
 		Username: username,
@@ -48,7 +48,7 @@ func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *ProfileHandler) ManagePrivacy(w http.ResponseWriter, req *http.Request) {
-	ah.l.Println("Api-gate - Manage Account Privacy")
+	ah.l.Println("Api-gate - Manage Privacy")
 
 	privacy := ManagePrivacy{}
 

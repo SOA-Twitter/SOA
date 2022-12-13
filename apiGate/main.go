@@ -68,8 +68,9 @@ func main() {
 
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
 	tweetRouter.Use(authHandler.Authorize)
-	tweetRouter.HandleFunc("/getTweets/{username}", tweetHandler.GetTweets).Methods(http.MethodGet)
+	tweetRouter.HandleFunc("/getTweets/{username}", tweetHandler.GetTweetsByUsername).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
+	tweetRouter.HandleFunc("/like/{id}", tweetHandler.LikeTweet).Methods(http.MethodPost)
 
 	//----------------------------------------------------------
 	profileHost := os.Getenv("PROFILE_HOST")

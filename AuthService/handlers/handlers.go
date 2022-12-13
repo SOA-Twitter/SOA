@@ -35,7 +35,7 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileService
 }
 
 func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecoveryEmailRequest) (*auth.RecoveryPasswordResponse, error) {
-	a.l.Println("{authService} Send Recovery Email Handler")
+	a.l.Println("Auth Service - Send Recovery Email")
 
 	activationUUID, errEmailing := data.SendEmail(r.RecoveryEmail, INTENTION_RECOVERY)
 	if errEmailing != nil {
@@ -59,6 +59,7 @@ func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecover
 }
 
 func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRequest) (*auth.ChangePasswordResponse, error) {
+	a.l.Println("Auth Service - Reset password")
 
 	recoveryReq, errNotFound := a.repo.FindRecoveryRequest(r.RecoveryUUID)
 	if errNotFound != nil {
@@ -108,7 +109,7 @@ func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRe
 }
 
 func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error) {
-	a.l.Println("{authService} - Change password handler")
+	a.l.Println("Auth Service - Change password")
 
 	// find user by email from Cookie->Jwt CLAIMS; hash New-come Password & Compare to Old-db password; Write new Password hashed
 	claims, err := data.GetFromClaims(r.Token)
@@ -152,7 +153,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationRequest) (*auth.ActivationResponse, error) {
 	// Find {{KEY}} in DB, that equals to URL final section (activationUUID); Then set user.IsActivated = true, for user.Email == value of {{KEY}}
 	// Finally delete the used acc. activation request from db
-	a.l.Println("{authService} ActivateProfile Handler")
+	a.l.Println("Auth Service - Activate Profile")
 
 	activationReq, errNotFound := a.repo.FindActivationRequest(r.ActivationUUID)
 	if errNotFound != nil {
@@ -189,7 +190,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 }
 
 func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginResponse, error) {
-	a.l.Println("Login handler")
+	a.l.Println("Auth Service - Login")
 	res := &data.User{
 		Email:    r.Email,
 		Password: r.Password,
@@ -216,7 +217,7 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 }
 
 func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*auth.RegisterResponse, error) {
-	a.l.Println("Register handler")
+	a.l.Println("Auth Service - Register")
 	user := &data.User{
 		Username:    r.Username,
 		Email:       r.Email,
@@ -277,8 +278,6 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusInternalServerError,
 		}, err3
 	}
-	a.l.Println("______________________________")
-	a.l.Println(user.Role)
 
 	activationUUID, errEmailing := data.SendEmail(user.Email, INTENTION_ACTIVATION)
 	if errEmailing != nil {
@@ -353,7 +352,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 }
 
 func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*auth.VerifyResponse, error) {
-	a.l.Println("Verify JWT")
+	a.l.Println("Auth Service - Verify JWT")
 	err := data.ValidateJwt(r.Token)
 	if err != nil {
 		a.l.Println("JWT expired")
@@ -372,7 +371,7 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 }
 
 func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.UserResponse, error) {
-	a.l.Println("Get User from JWT")
+	a.l.Println("Auth Service - Get User")
 	claims, err := data.GetFromClaims(r.Token)
 	if err != nil {
 		return nil, err

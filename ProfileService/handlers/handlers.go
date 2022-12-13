@@ -24,7 +24,7 @@ func NewProfileHandler(l *log.Logger, repo *data.ProfileRepo, as auth.AuthServic
 	}
 }
 func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegisterRequest) (*profile.ProfileRegisterResponse, error) {
-	pr.l.Println("Register handler")
+	pr.l.Println("Profile service - Register")
 	user := &data.User{
 		Username:       r.Username,
 		FirstName:      r.FirstName,
@@ -47,7 +47,7 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 }
 
 func (pr *ProfileHandler) GetUserProfile(ctx context.Context, r *profile.UserProfRequest) (*profile.UserProfResponse, error) {
-	pr.l.Println("Get User profile handler")
+	pr.l.Println("Profile service - Get User Profile")
 	user, err := pr.repo.GetByUsername(r.Username)
 	if err != nil {
 		pr.l.Println("Cannot find user")
@@ -69,7 +69,7 @@ func (pr *ProfileHandler) GetUserProfile(ctx context.Context, r *profile.UserPro
 }
 
 func (pr *ProfileHandler) ManagePrivacy(ctx context.Context, r *profile.ManagePrivacyRequest) (*profile.ManagePrivacyResponse, error) {
-	pr.l.Println("Manage account privacy handler")
+	pr.l.Println("Profile service - Manage privacy")
 	claims, err := data.GetFromClaims(r.Token)
 	if err != nil {
 		pr.l.Println("Error getting claims")

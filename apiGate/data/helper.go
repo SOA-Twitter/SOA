@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"io"
 )
 
@@ -43,6 +42,10 @@ type ManagePrivacy struct {
 	Private bool `json:"private"`
 }
 
+type LikedTweet struct {
+	Liked bool `json:"liked"`
+}
+
 type Email struct {
 	Email string `json:"email"`
 }
@@ -54,10 +57,9 @@ type RecoverProfile struct {
 }
 
 type Tweet struct {
-	Id           string              `json:"id"`
-	Text         string              `json:"text" validate:"required"`
-	Username     string              `json:"username"`
-	CreationDate timestamp.Timestamp `json:"creationDate"`
+	Id       string `json:"id"`
+	Text     string `json:"text" validate:"required"`
+	Username string `json:"username"`
 }
 
 type Tweets struct {

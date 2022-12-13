@@ -53,7 +53,7 @@ func (e *errorString) Error() string {
 }
 
 func (ps *AuthRepoPostgres) Register(user *User) error {
-	ps.l.Println("{AuthRepoPostgres} - Creating user")
+	ps.l.Println("AuthRepoPostgres - Register")
 	createdUser := ps.db.Create(user)
 	var errMessage = createdUser.Error
 	if createdUser.Error != nil {
@@ -65,7 +65,7 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 }
 
 func (ps *AuthRepoPostgres) Edit(email string) error {
-	ps.l.Println("{AuthRepoPostgres} - Editing user")
+	ps.l.Println("AuthRepoPostgres - Edit")
 	err := ps.db.Model(&User{}).Where("Email = ?", email).Update("is_activated", true).Error
 	if err != nil {
 		return QueryError("Error updating user " + email)
@@ -73,7 +73,7 @@ func (ps *AuthRepoPostgres) Edit(email string) error {
 	return err
 }
 func (ps *AuthRepoPostgres) ChangePassword(email, password string) error {
-	ps.l.Println("{AuthRepoPostgres} - Change password")
+	ps.l.Println("AuthRepoPostgres - Change password")
 	err := ps.db.Model(&User{}).Where("Email = ?", email).Update("password", password).Error
 	if err != nil {
 		return QueryError("Error changing password")
@@ -82,7 +82,7 @@ func (ps *AuthRepoPostgres) ChangePassword(email, password string) error {
 }
 
 func (ps *AuthRepoPostgres) Delete(email string) error {
-	ps.l.Println("{AuthRepoPostgres} - Delete user")
+	ps.l.Println("AuthRepoPostgres - Delete")
 	user := &User{}
 	err := ps.db.Where("Email = ?", email).Delete(&user).Error
 	if err != nil {
@@ -94,18 +94,20 @@ func (ps *AuthRepoPostgres) Delete(email string) error {
 }
 
 func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) error {
-	ps.l.Println("{AuthRepoPostgres} - Check if credentials are valid")
+	ps.l.Println("AuthRepoPostgres - Check credentials")
 	user := &User{}
+
 	if err := ps.db.Where("Email = ?", email).First(user).Error; err != nil {
 		ps.l.Println("Invalid Email")
 		return QueryError("Invalid credentials!!")
 	}
+
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		ps.l.Println("Invalid Password")
 		return QueryError("Invalid credentials!!")
 	}
-	// TODO
+
 	if user.IsActivated != true {
 		return errors.New("account activation is needed before 1st login")
 	}
@@ -114,21 +116,21 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 }
 
 func (ps *AuthRepoPostgres) FindUserEmail(email string) (string, string, error) {
-	ps.l.Println("{AuthRepoPostgres} - Find User Email")
+	ps.l.Println("AuthRepoPostgres - Find User Email")
 	user := &User{}
 	err := ps.db.Where("Email = ?", email).First(user).Error
 	return user.Email, user.Role, err
 }
 
 func (ps *AuthRepoPostgres) FindUser(email string) (*User, error) {
-	ps.l.Println("{AuthRepoPostgres} - Find Whole User")
+	ps.l.Println("AuthRepoPostgres - Find User")
 	user := &User{}
 	err := ps.db.Where("Email = ?", email).First(user).Error
 	return user, err
 }
 
 func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registeredEmail string) error {
-	ps.l.Println("{AuthRepoPostgres} - Save acc. activation request")
+	ps.l.Println("AuthRepoPostgres - Save activation request")
 
 	activationRequest := &ActivationRequest{
 		ActivationUUID: activationUUID,
@@ -146,29 +148,25 @@ func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registe
 }
 
 func (ps *AuthRepoPostgres) FindActivationRequest(activationUUID string) (*ActivationRequest, error) {
-	ps.l.Println("{AuthRepoPostgres} - Find Account Activation Request")
+	ps.l.Println("AuthRepoPostgres - Find Activation Request")
 	activationReq := &ActivationRequest{}
-	ps.l.Println("--------------------------")
-	ps.l.Println(activationUUID)
-	ps.l.Println("--------------------------")
 	err := ps.db.Where("activation_uuid = ?", activationUUID).First(activationReq).Error
 	return activationReq, err
 }
 
 func (ps *AuthRepoPostgres) DeleteActivationRequest(activationUUID string, email string) error {
-	ps.l.Println("{AuthRepoPostgres} - Delete Account Activation Request")
+	ps.l.Println("AuthRepoPostgres - Delete Activation Request")
 	activationReq := &ActivationRequest{}
 	err := ps.db.Where("activation_uuid = ? AND Email = ?", activationUUID, email).Delete(&activationReq).Error
 	if err != nil {
 		ps.l.Println("Error deleting Account Activation Request")
-		ps.l.Println(email)
 		return QueryError("Error deleting Account Activation Request")
 	}
 	return nil
 }
 
 func (ps *AuthRepoPostgres) SaveRecoveryRequest(recoveryUUID string, registeredEmail string) error {
-	ps.l.Println("{AuthRepoPostgres} - Save Password Recovery request")
+	ps.l.Println("AuthRepoPostgres - Save Recovery request")
 
 	recoveryRequest := &RecoveryRequest{
 		RecoveryUUID: recoveryUUID,
@@ -186,14 +184,14 @@ func (ps *AuthRepoPostgres) SaveRecoveryRequest(recoveryUUID string, registeredE
 }
 
 func (ps *AuthRepoPostgres) FindRecoveryRequest(recoveryUUID string) (*RecoveryRequest, error) {
-	ps.l.Println("{AuthRepoPostgres} - Find Password Recovery Request")
+	ps.l.Println("AuthRepoPostgres - Find Recovery Request")
 	recoveryRequest := &RecoveryRequest{}
 	err := ps.db.Where("recovery_uuid = ?", recoveryUUID).First(recoveryRequest).Error
 	return recoveryRequest, err
 }
 
 func (ps *AuthRepoPostgres) DeleteRecoveryRequest(recoveryUUID string, email string) error {
-	ps.l.Println("{AuthRepoPostgres} - Delete Password Recovery Request")
+	ps.l.Println("AuthRepoPostgres - Delete Recovery Request")
 	recoveryReq := &RecoveryRequest{}
 	err := ps.db.Where("recovery_uuid = ? AND Email = ?", recoveryUUID, email).Delete(&recoveryReq).Error
 	if err != nil {
@@ -205,7 +203,7 @@ func (ps *AuthRepoPostgres) DeleteRecoveryRequest(recoveryUUID string, email str
 }
 
 func (ps *AuthRepoPostgres) FindUserByUsername(username string) error {
-	ps.l.Println("{AuthRepoPostgres} - Find User by Username")
+	ps.l.Println("AuthRepoPostgres - Find User by Username")
 	user := &User{}
 	err := ps.db.Where("username = ?", username).First(&user).Error
 	return err

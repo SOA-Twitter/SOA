@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 option go_package = "proto/tweet";
 service TweetService {
   rpc GetTweets(GetTweetRequest) returns(GetTweetResponse){}
@@ -9,6 +10,7 @@ message Tweet{
   string id = 1;
   string username = 2;
   string text = 3;
+  google.protobuf.Timestamp creationDate =4;
 }
 message GetTweetRequest{
   string username = 1;
