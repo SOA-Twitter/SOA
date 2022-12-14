@@ -78,5 +78,6 @@ func (t *TweetHandler) LikeTweet(ctx context.Context, r *tweet.LikeTweetRequest)
 		t.l.Println("Error occurred during liking tweet")
 		return nil, err1
 	}
+	return &tweet.LikeTweetResponse{}, nil
 
 }

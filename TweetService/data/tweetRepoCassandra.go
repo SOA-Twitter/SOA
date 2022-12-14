@@ -4,9 +4,9 @@ import (
 	"TweetService/proto/tweet"
 	"fmt"
 	"github.com/gocql/gocql"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"os"
+	"time"
 )
 
 type TweetRepoCassandra struct {
@@ -49,7 +49,7 @@ func CassandraConnection(log *log.Logger) (*TweetRepoCassandra, error) {
 func (t *TweetRepoCassandra) CreateTable() {
 	err := t.session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(id UUID, text text, username text, creationDate timestamp,
+					(id UUID, text text, username text, creationdate timestamp,
 					PRIMARY KEY ((username), id))`,
 			"tweets_by_username")).Exec()
 	if err != nil {
@@ -93,7 +93,7 @@ func (t *TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("TweetRepoCassandra - Create tweet")
 	id, _ := gocql.RandomUUID()
 
-	err := t.session.Query(`INSERT INTO tweets_by_username(id, text, username, creationDate) VALUES(?, ?, ?, ?)`, id, tw.Text, tw.Username, timestamppb.Now()).Exec()
+	err := t.session.Query(`INSERT INTO tweets_by_username(id, text, username, creationdate) VALUES(?, ?, ?, ?)`, id, tw.Text, tw.Username, time.Now()).Exec()
 	if err != nil {
 		t.log.Println("Error happened during Querying")
 		return err

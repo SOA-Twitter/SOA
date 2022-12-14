@@ -18,6 +18,8 @@ srusi kontejner, pokrenes program i iskucas kod iznad
 ---------------------------------------------------------------------------
 Create proto:
 
+$ export PATH="$PATH:$(go env GOPATH)/bin"
+
 protoc --go_out=./tweet --go_opt=paths=source_relative --go-grpc_out=./tweet --go-grpc_opt=paths=source_relative tweet_service.proto
 
 ---------------------------------------------------------------------------

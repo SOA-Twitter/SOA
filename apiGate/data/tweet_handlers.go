@@ -81,12 +81,11 @@ func (tw *TweetHandler) LikeTweet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = tw.pr.LikeTweet(context.Background(), &tweet.LikeTweetRequest{
-		Like: like,
+	_, err := tw.pr.LikeTweet(context.Background(), &tweet.LikeTweetRequest{
+		Like:    like.Liked,
 		TweetID: tweetID,
-		Token: c,
-	}
-
+		Token:   c,
+	})
 	if err != nil {
 		tw.l.Println("Error occurred during liking tweet")
 		return

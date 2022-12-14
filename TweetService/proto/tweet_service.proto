@@ -5,6 +5,7 @@ option go_package = "proto/tweet";
 service TweetService {
   rpc GetTweets(GetTweetRequest) returns(GetTweetResponse){}
   rpc PostTweet(PostTweetRequest) returns(PostTweetResponse){}
+  rpc LikeTweet(LikeTweetRequest) returns(LikeTweetResponse){}
 }
 message Tweet{
   string id = 1;
@@ -23,4 +24,13 @@ message PostTweetRequest{
   string token = 2;
 }
 message PostTweetResponse{
+}
+message LikeTweetRequest{
+  bool like = 1;
+  string token = 2;
+  string tweetID = 3;
+
+}
+message LikeTweetResponse{
+
 }
