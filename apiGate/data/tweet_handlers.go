@@ -104,8 +104,8 @@ func (tw *TweetHandler) GetLikesByTweetId(w http.ResponseWriter, r *http.Request
 	})
 
 	if err != nil {
-		tw.l.Println("Error getting tweets")
-		http.Error(w, "Error getting tweets", http.StatusNotFound)
+		tw.l.Println("Error getting like by tweet id")
+		http.Error(w, "Error getting like by tweet id", http.StatusNotFound)
 		return
 	}
 
@@ -114,15 +114,15 @@ func (tw *TweetHandler) GetLikesByTweetId(w http.ResponseWriter, r *http.Request
 }
 
 func (tw *TweetHandler) GetLikesByUser(w http.ResponseWriter, r *http.Request) {
-	tw.l.Println("Api-gate - Get likes by tweet id")
+	tw.l.Println("Api-gate - Get likes by user")
 	username := mux.Vars(r)["username"]
 	resp, err := tw.pr.GetLikesByUser(context.Background(), &tweet.GetLikesByUserRequest{
 		Username: username,
 	})
 
 	if err != nil {
-		tw.l.Println("Error getting tweets")
-		http.Error(w, "Error getting tweets", http.StatusNotFound)
+		tw.l.Println("Error getting likes by user")
+		http.Error(w, "Error getting likes by user", http.StatusNotFound)
 		return
 	}
 

@@ -137,7 +137,7 @@ func (t *TweetRepoCassandra) GetLikesByTweetId(id string) ([]*tweet.Like, error)
 func (t *TweetRepoCassandra) GetLikesByUser(username string) ([]*tweet.Like, error) {
 	t.log.Println("TweetRepoCassandra - Get Likes From User")
 
-	scanner := t.session.Query(`SELECT * FROM likes_by_tweet WHERE username = ? and liked = true`, username).Iter().Scanner()
+	scanner := t.session.Query(`SELECT * FROM likes_by_tweet WHERE username = ? and liked = true ALLOW FILTERING`, username).Iter().Scanner()
 
 	var likes []*tweet.Like
 	for scanner.Next() {
