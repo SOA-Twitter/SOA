@@ -6,31 +6,61 @@ service TweetService {
   rpc GetTweets(GetTweetRequest) returns(GetTweetResponse){}
   rpc PostTweet(PostTweetRequest) returns(PostTweetResponse){}
   rpc LikeTweet(LikeTweetRequest) returns(LikeTweetResponse){}
+  rpc GetLikes(GetLikesByTweetIdRequest) returns(GetLikesByTweetIdResponse){}
+  rpc GetLikesByUser(GetLikesByUserRequest) returns(GetLikesByUserResponse){}
 }
+
 message Tweet{
   string id = 1;
   string username = 2;
   string text = 3;
-  google.protobuf.Timestamp creationDate =4;
+  google.protobuf.Timestamp creationDate = 4;
 }
+
 message GetTweetRequest{
   string username = 1;
 }
+
 message GetTweetResponse{
-  repeated  Tweet tweet_list = 1;
+  repeated Tweet tweet_list = 1;
 }
+
+message Like{
+    string tweetId = 1;
+    string username = 2;
+    bool liked = 3;
+}
+
+message GetLikesByTweetIdRequest{
+  string id = 1;
+}
+
+message GetLikesByTweetIdResponse{
+  repeated Like like_list = 1;
+}
+
+message GetLikesByUserRequest{
+  string username = 1;
+}
+
+message GetLikesByUserResponse{
+  repeated Like like_list = 1;
+}
+
 message PostTweetRequest{
   string text = 1;
   string token = 2;
 }
+
 message PostTweetResponse{
 }
+
 message LikeTweetRequest{
   bool like = 1;
   string token = 2;
   string tweetID = 3;
-
 }
+
 message LikeTweetResponse{
 
 }

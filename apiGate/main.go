@@ -69,6 +69,8 @@ func main() {
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
 	tweetRouter.Use(authHandler.Authorize)
 	tweetRouter.HandleFunc("/getTweets/{username}", tweetHandler.GetTweetsByUsername).Methods(http.MethodGet)
+	tweetRouter.HandleFunc("/getLikes/{id}", tweetHandler.GetLikesByTweetId).Methods(http.MethodGet)
+	tweetRouter.HandleFunc("/getLikes/{username}", tweetHandler.GetLikesByUser).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 	tweetRouter.HandleFunc("/like/{id}", tweetHandler.LikeTweet).Methods(http.MethodPut)
 

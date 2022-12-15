@@ -9,6 +9,12 @@ type Tweet struct {
 	CreationDate timestamppb.Timestamp `json:"creationDate"`
 }
 
+type Like struct {
+	TweetId  string `json:"tweetId"`
+	Username string `json:"username"`
+	Liked    bool   `json:"liked"`
+}
+
 type TokenStr struct {
 	Token string `json:"token"`
 }

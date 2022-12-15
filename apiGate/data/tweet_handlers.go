@@ -95,3 +95,37 @@ func (tw *TweetHandler) LikeTweet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Liked tweet with id " + tweetID))
 
 }
+
+func (tw *TweetHandler) GetLikesByTweetId(w http.ResponseWriter, r *http.Request) {
+	tw.l.Println("Api-gate - Get likes by tweet id")
+	tweetID := mux.Vars(r)["id"]
+	resp, err := tw.pr.GetLikesByTweetId(context.Background(), &tweet.GetLikesByTweetIdRequest{
+		TweetId: tweetID,
+	})
+
+	if err != nil {
+		tw.l.Println("Error getting tweets")
+		http.Error(w, "Error getting tweets", http.StatusNotFound)
+		return
+	}
+
+	err = ToJSON(resp.TweetList, w)
+	tw.l.Println("Resp", resp)
+}
+
+func (tw *TweetHandler) GetLikesByUser(w http.ResponseWriter, r *http.Request) {
+	tw.l.Println("Api-gate - Get likes by tweet id")
+	username := mux.Vars(r)["username"]
+	resp, err := tw.pr.GetLikesByUser(context.Background(), &tweet.GetLikesByUserRequest{
+		Username: username,
+	})
+
+	if err != nil {
+		tw.l.Println("Error getting tweets")
+		http.Error(w, "Error getting tweets", http.StatusNotFound)
+		return
+	}
+
+	err = ToJSON(resp.LikeList, w)
+	tw.l.Println("Resp", resp)
+}
