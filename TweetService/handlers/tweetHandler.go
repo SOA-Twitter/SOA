@@ -85,7 +85,7 @@ func (t *TweetHandler) LikeTweet(ctx context.Context, r *tweet.LikeTweetRequest)
 func (t *TweetHandler) GetLikesByTweetId(ctx context.Context, r *tweet.GetLikesByTweetIdRequest) (*tweet.GetLikesByTweetIdResponse, error) {
 	t.l.Println("Tweet service - Get likes by tweet id")
 
-	likes, err := t.repoImpl.GetLikesByTweetId(r.tweetId)
+	likes, err := t.repoImpl.GetLikesByTweetId(r.Id)
 	if err != nil {
 		t.l.Println("Error getting likes")
 		return nil, err

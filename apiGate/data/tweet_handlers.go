@@ -99,8 +99,8 @@ func (tw *TweetHandler) LikeTweet(w http.ResponseWriter, r *http.Request) {
 func (tw *TweetHandler) GetLikesByTweetId(w http.ResponseWriter, r *http.Request) {
 	tw.l.Println("Api-gate - Get likes by tweet id")
 	tweetID := mux.Vars(r)["id"]
-	resp, err := tw.pr.GetLikesByTweetId(context.Background(), &tweet.GetLikesByTweetIdRequest{
-		TweetId: tweetID,
+	resp, err := tw.pr.GetLikes(context.Background(), &tweet.GetLikesByTweetIdRequest{
+		Id: tweetID,
 	})
 
 	if err != nil {
@@ -109,7 +109,7 @@ func (tw *TweetHandler) GetLikesByTweetId(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = ToJSON(resp.TweetList, w)
+	err = ToJSON(resp.LikeList, w)
 	tw.l.Println("Resp", resp)
 }
 
