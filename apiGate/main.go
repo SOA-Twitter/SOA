@@ -70,7 +70,6 @@ func main() {
 	tweetRouter.Use(authHandler.Authorize)
 	tweetRouter.HandleFunc("/getTweets/{username}", tweetHandler.GetTweetsByUsername).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/getTweetLikes/{id}", tweetHandler.GetLikesByTweetId).Methods(http.MethodGet)
-	tweetRouter.HandleFunc("/getUserLikes/{username}", tweetHandler.GetLikesByUser).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 	tweetRouter.HandleFunc("/like/{id}", tweetHandler.LikeTweet).Methods(http.MethodPut)
 

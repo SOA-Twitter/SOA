@@ -112,20 +112,3 @@ func (tw *TweetHandler) GetLikesByTweetId(w http.ResponseWriter, r *http.Request
 	err = ToJSON(resp.LikeList, w)
 	tw.l.Println("Resp", resp)
 }
-
-func (tw *TweetHandler) GetLikesByUser(w http.ResponseWriter, r *http.Request) {
-	tw.l.Println("Api-gate - Get likes by user")
-	username := mux.Vars(r)["username"]
-	resp, err := tw.pr.GetLikesByUser(context.Background(), &tweet.GetLikesByUserRequest{
-		Username: username,
-	})
-
-	if err != nil {
-		tw.l.Println("Error getting likes by user")
-		http.Error(w, "Error getting likes by user", http.StatusNotFound)
-		return
-	}
-
-	err = ToJSON(resp.LikeList, w)
-	tw.l.Println("Resp", resp)
-}

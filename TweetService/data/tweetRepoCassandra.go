@@ -115,34 +115,12 @@ func (t *TweetRepoCassandra) LikeTweet(id string, username string, like bool) er
 func (t *TweetRepoCassandra) GetLikesByTweetId(id string) ([]*tweet.Like, error) {
 	t.log.Println("TweetRepoCassandra - Get Likes By Tweet Id")
 
-	scanner := t.session.Query(`SELECT username FROM likes_by_tweet WHERE id = ?`, id).Iter().Scanner()
+	scanner := t.session.Query(`SELECT username, liked FROM likes_by_tweet WHERE tweet_id = ?`, id).Iter().Scanner()
 
 	var likes []*tweet.Like
 	for scanner.Next() {
 		var like tweet.Like
-		err := scanner.Scan(&like.Username)
-		if err != nil {
-			t.log.Println(err)
-			return likes, err
-		}
-		likes = append(likes, &like)
-	}
-	if err := scanner.Err(); err != nil {
-		t.log.Println(err)
-		return likes, err
-	}
-	return likes, nil
-}
-
-func (t *TweetRepoCassandra) GetLikesByUser(username string) ([]*tweet.Like, error) {
-	t.log.Println("TweetRepoCassandra - Get Likes From User")
-
-	scanner := t.session.Query(`SELECT * FROM likes_by_tweet WHERE username = ? and liked = true ALLOW FILTERING`, username).Iter().Scanner()
-
-	var likes []*tweet.Like
-	for scanner.Next() {
-		var like tweet.Like
-		err := scanner.Scan(&like.TweetId, &like.Username, &like.Liked)
+		err := scanner.Scan(&like.Username, &like.Liked)
 		if err != nil {
 			t.log.Println(err)
 			return likes, err

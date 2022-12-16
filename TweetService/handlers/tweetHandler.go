@@ -82,7 +82,7 @@ func (t *TweetHandler) LikeTweet(ctx context.Context, r *tweet.LikeTweetRequest)
 
 }
 
-func (t *TweetHandler) GetLikesByTweetId(ctx context.Context, r *tweet.GetLikesByTweetIdRequest) (*tweet.GetLikesByTweetIdResponse, error) {
+func (t *TweetHandler) GetLikes(ctx context.Context, r *tweet.GetLikesByTweetIdRequest) (*tweet.GetLikesByTweetIdResponse, error) {
 	t.l.Println("Tweet service - Get likes by tweet id")
 
 	likes, err := t.repoImpl.GetLikesByTweetId(r.Id)
@@ -92,20 +92,6 @@ func (t *TweetHandler) GetLikesByTweetId(ctx context.Context, r *tweet.GetLikesB
 	}
 
 	return &tweet.GetLikesByTweetIdResponse{
-		LikeList: likes,
-	}, nil
-}
-
-func (t *TweetHandler) GetLikesByUser(ctx context.Context, r *tweet.GetLikesByUserRequest) (*tweet.GetLikesByUserResponse, error) {
-	t.l.Println("Tweet service - Get likes by user")
-
-	likes, err := t.repoImpl.GetLikesByUser(r.Username)
-	if err != nil {
-		t.l.Println("Error getting likes by user")
-		return nil, err
-	}
-
-	return &tweet.GetLikesByUserResponse{
 		LikeList: likes,
 	}, nil
 }
