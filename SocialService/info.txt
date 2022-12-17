@@ -1,0 +1,1 @@
+protoc --go_out=./social --go_opt=paths=source_relative --go-grpc_out=./social --go-grpc_opt=paths=source_relative social_service.proto
