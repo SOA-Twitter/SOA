@@ -5,6 +5,7 @@ import (
 	"SocialService/handlers"
 	"SocialService/proto/auth"
 	"SocialService/proto/social"
+	"context"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -13,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -20,11 +22,15 @@ func main() {
 	if len(port) == 0 {
 		port = "8083"
 	}
+	timeoutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	l := log.New(os.Stdout, "[Social_Api] ", log.LstdFlags)
 	socialRepoImpl, err := data.Neo4JConnection(l)
 	if err != nil {
 		l.Println("Error connecting to Neo4J")
 	}
+	defer socialRepoImpl.CloseDriverConnection(timeoutContext)
+	socialRepoImpl.CheckConnection()
 	////CONNECTION WITH AUTH SERVICE
 
 	authPort := os.Getenv("AUTH_PORT")
@@ -41,6 +47,7 @@ func main() {
 	}
 	defer conn.Close()
 	ac := auth.NewAuthServiceClient(conn)
+	//-------------------------------------------------------------------
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {

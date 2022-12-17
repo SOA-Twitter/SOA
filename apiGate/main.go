@@ -4,6 +4,7 @@ import (
 	"apiGate/data"
 	"apiGate/protos/auth"
 	"apiGate/protos/profile"
+	"apiGate/protos/social"
 	"apiGate/protos/tweet"
 	"context"
 	gorillaHandlers "github.com/gorilla/handlers"
@@ -86,12 +87,15 @@ func main() {
 	if err != nil {
 		l.Fatalf("Error connecting to Social_Service: %v\n", err)
 	}
+	defer socialConn.Close()
+	socialClient := social.NewSocialServiceClient(socialConn)
+	socialHandler := data.NewSocialHandler(l, socialClient)
 
 	socialRouter := r.PathPrefix("/social").Subrouter()
-	socialRouter.HandleFunc("/", authHandler.Register).Methods(http.MethodPost) //Napraviti metodu register
+	tweetRouter.Use(authHandler.Authorize)
+	socialRouter.HandleFunc("/", socialHandler.Follow).Methods(http.MethodPost)
 
 	defer socialConn.Close()
-	// OVDE TREBA NASTAVITI
 
 	//----------------------------------------------------------
 	profileHost := os.Getenv("PROFILE_HOST")

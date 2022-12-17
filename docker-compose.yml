@@ -146,6 +146,8 @@ services:
       NEO4J_DB: ${NEO4J_DB}
       NEO4J_USERNAME: ${NEO4J_USERNAME}
       NEO4J_PASS: ${NEO4J_PASS}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
     depends_on:
       neo4j:
         condition: service_healthy
@@ -167,7 +169,7 @@ services:
       retries: 10
     environment:
 #      NEO4J_dbms_security_auth__minimum__password__length: 4      nece ovo ili ne moze samo broj da se napise idkg
-      NEO4J_AUTH: ${NEO4J_AUTH}
+      - NEO4J_AUTH=none
     volumes:
       - neo4j_data:/data
 
