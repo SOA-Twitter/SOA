@@ -140,7 +140,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - &{SOCIAL_PORT}:&{SOCIAL_PORT}
+      - ${SOCIAL_PORT}:${SOCIAL_PORT}
     environment:
       PORT: ${SOCIAL_PORT}
       NEO4J_DB: ${NEO4J_DB}
@@ -166,6 +166,7 @@ services:
       timeout: 5s
       retries: 10
     environment:
+#      NEO4J_dbms_security_auth__minimum__password__length: 4      nece ovo ili ne moze samo broj da se napise idkg
       NEO4J_AUTH: ${NEO4J_AUTH}
     volumes:
       - neo4j_data:/data

@@ -72,7 +72,9 @@ func main() {
 	tweetRouter.HandleFunc("/getTweetLikes/{id}", tweetHandler.GetLikesByTweetId).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
 	tweetRouter.HandleFunc("/like/{id}", tweetHandler.LikeTweet).Methods(http.MethodPut)
+
 	//----------------------------------------------------------SOCIAL SERVICE
+
 	socialPort := os.Getenv("SOCIAL_PORT")
 	socialHost := os.Getenv("SOCIAL_HOST")
 	socialConn, err := grpc.DialContext(
@@ -84,9 +86,13 @@ func main() {
 	if err != nil {
 		l.Fatalf("Error connecting to Social_Service: %v\n", err)
 	}
-	defer tweetConn.Close()
+
+	socialRouter := r.PathPrefix("/social").Subrouter()
+	socialRouter.HandleFunc("/", authHandler.Register).Methods(http.MethodPost) //Napraviti metodu register
+
+	defer socialConn.Close()
 	// OVDE TREBA NASTAVITI
-	
+
 	//----------------------------------------------------------
 	profileHost := os.Getenv("PROFILE_HOST")
 	profilePort := os.Getenv("PROFILE_PORT")

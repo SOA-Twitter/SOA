@@ -9,5 +9,5 @@ FROM alpine
 WORKDIR /root/
 
 COPY --from=builder /app/main .
-EXPOSE 9099
+EXPOSE 8083
 CMD ["./main"]
