@@ -4,6 +4,7 @@ import (
 	"AuthService/data"
 	"AuthService/proto/auth"
 	"AuthService/proto/profile"
+	"AuthService/proto/social"
 	"bufio"
 	"context"
 	"github.com/golang-jwt/jwt/v4"
@@ -24,13 +25,15 @@ type AuthHandler struct {
 	l    *log.Logger
 	repo data.AuthRepo
 	ps   profile.ProfileServiceClient
+	ss   social.SocialServiceClient
 }
 
-func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileServiceClient) *AuthHandler {
+func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileServiceClient, ss social.SocialServiceClient) *AuthHandler {
 	return &AuthHandler{
 		l:    l,
 		repo: repo,
 		ps:   ps,
+		ss:   ss,
 	}
 }
 
@@ -309,7 +312,19 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusInternalServerError,
 		}, errActivationReqSave
 	}
-
+	_, err6 := a.ss.RegUser(context.Background(), &social.RegUserRequest{
+		Username: r.Username,
+	})
+	if err6 != nil {
+		error1 := a.repo.Delete(r.Email)
+		if error1 != nil {
+			a.l.Println("Error deleting user with email " + user.Email)
+			return &auth.RegisterResponse{
+				Status: http.StatusInternalServerError,
+			}, error1
+		}
+		return nil, err6
+	}
 	_, err4 := a.ps.Register(context.Background(), &profile.ProfileRegisterRequest{
 		Email:          r.Email,
 		Username:       r.Username,

@@ -5,6 +5,7 @@ import (
 	"AuthService/handlers"
 	"AuthService/proto/auth"
 	"AuthService/proto/profile"
+	"AuthService/proto/social"
 	"fmt"
 	"log"
 	"net"
@@ -28,6 +29,8 @@ func main() {
 	if err != nil {
 		l.Println("Error connecting to postgres...")
 	}
+	//--------------------Connection with profile service
+
 	profilePort := os.Getenv("PROFILE_PORT")
 	profileHost := os.Getenv("PROFILE_HOST")
 
@@ -37,12 +40,22 @@ func main() {
 	}
 	defer conn.Close()
 	ps := profile.NewProfileServiceClient(conn)
+	//--------------------Connection with social service
+
+	socialPort := os.Getenv("SOCIAL_PORT")
+	socialHost := os.Getenv("SOCIAL_HOST")
+	sCon, err := grpc.Dial(socialHost+":"+socialPort, grpc.WithInsecure())
+	if err != nil {
+		l.Println("Error connecting to social service")
+	}
+	defer sCon.Close()
+	ss := social.NewSocialServiceClient(sCon)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}
-	authHandler := handlers.NewAuthHandler(l, authRepo, ps)
+	authHandler := handlers.NewAuthHandler(l, authRepo, ps, ss)
 	auth.RegisterAuthServiceServer(grpcServer, authHandler)
 	reflection.Register(grpcServer)
 

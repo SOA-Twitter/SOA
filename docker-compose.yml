@@ -34,6 +34,8 @@ services:
       SECRET: ${SECRET}
       MAIL_ADDRESS: ${MAIL_ADDRESS}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SOCIAL_HOST: ${SOCIAL_HOST}
+      SOCIAL_PORT: ${SOCIAL_PORT}
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
     depends_on:
