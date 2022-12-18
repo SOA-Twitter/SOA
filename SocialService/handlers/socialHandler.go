@@ -22,10 +22,13 @@ func NewSocialHandler(l *log.Logger, repoImpl data.SocialRepo, ac auth.AuthServi
 		ac:       ac,
 	}
 }
-func (s *SocialHandler) AddUser(ctx context.Context, r *social.RegUserRequest) (*social.RegUserResponse, error) {
-	s.l.Println("Social service - Add user node to neo4J")
 
-	//TODO
+func (s *SocialHandler) RegUser(ctx context.Context, r *social.RegUserRequest) (*social.RegUserResponse, error) {
+	s.l.Println("Social service - Register User")
 
+	err := s.repoImpl.RegUser(r.Username)
+	if err != nil {
+		return &social.RegUserResponse{}, err
+	}
 	return &social.RegUserResponse{}, nil
 }

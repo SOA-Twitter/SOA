@@ -4,6 +4,7 @@ import (
 	"ProfileService/data"
 	"ProfileService/proto/auth"
 	"ProfileService/proto/profile"
+	social "ProfileService/proto/social"
 	"context"
 	"log"
 	"net/http"
@@ -14,13 +15,15 @@ type ProfileHandler struct {
 	l    *log.Logger
 	repo *data.ProfileRepo
 	as   auth.AuthServiceClient
+	ss   social.SocialServiceClient
 }
 
-func NewProfileHandler(l *log.Logger, repo *data.ProfileRepo, as auth.AuthServiceClient) *ProfileHandler {
+func NewProfileHandler(l *log.Logger, repo *data.ProfileRepo, as auth.AuthServiceClient, ss social.SocialServiceClient) *ProfileHandler {
 	return &ProfileHandler{
 		l:    l,
 		repo: repo,
 		as:   as,
+		ss:   ss,
 	}
 }
 func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegisterRequest) (*profile.ProfileRegisterResponse, error) {
@@ -41,6 +44,13 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 	if err != nil {
 		pr.l.Println("Error inserting user into db")
 		return nil, err
+	}
+
+	_, err6 := pr.ss.RegUser(context.Background(), &social.RegUserRequest{
+		Username: r.Username,
+	})
+	if err6 != nil {
+		return nil, err6
 	}
 
 	return &profile.ProfileRegisterResponse{}, nil

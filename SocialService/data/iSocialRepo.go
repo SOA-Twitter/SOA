@@ -1,5 +1,5 @@
 package data
 
 type SocialRepo interface {
-	AddUser(username string) error
+	RegUser(username string) error
 }

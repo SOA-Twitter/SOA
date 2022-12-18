@@ -15,6 +15,8 @@ services:
       TWEET_PORT: ${TWEET_PORT}
       PROFILE_HOST: ${PROFILE_HOST}
       PROFILE_PORT: ${PROFILE_PORT}
+      SOCIAL_HOST: ${SOCIAL_HOST}
+      SOCIAL_PORT: ${SOCIAL_PORT}
     ports:
       - '8081:8081'
 
@@ -98,6 +100,8 @@ services:
       PORT: ${PROFILE_PORT}
       AUTH_HOST: ${AUTH_HOST}
       AUTH_PORT: ${AUTH_PORT}
+      SOCIAL_HOST: ${SOCIAL_HOST}
+      SOCIAL_PORT: ${SOCIAL_PORT}
       MONGO_DB_URI: mongodb://root:pass@mongo:27017
     depends_on:
       mongo:
@@ -170,7 +174,7 @@ services:
       timeout: 5s
       retries: 10
     environment:
-#      NEO4J_dbms_security_auth__minimum__password__length: 4      nece ovo ili ne moze samo broj da se napise idkg
+#      NEO4J_dbms_security_auth__minimum__password__length: 4      nece ovo ili ne moze samo broj da se napise idk
       - NEO4J_AUTH=none
     volumes:
       - neo4j_data:/data
