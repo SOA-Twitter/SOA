@@ -1,28 +1,47 @@
-<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-<div class="container bootstrap snippets bootdey">
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<div *ngIf="post1" class="container bootstrap snippets bootdey">
     <div class="col-sm-8">
         <div class="post">
             <div class="pull-left">
-                Name
+                Datum
+                <!-- {{post1.creationDate | date:"hh:mm:ss dd.MM.yy"}} -->
             </div>
             <div class="username">
-                @username
+                {{post1.username}}
             </div>
             &nbsp;
             <div class="text ">
-                Text posta
+                {{post1.text}}
             </div>
         </div>
         <div class="post-footer">
             <div class="d-inline-flex">
-                <a class="btn">
-                    <i class="fa-light fa-heart"></i>
-                </a>
-                <ng-container class = "row" id ="number"><span class = "p"></span></ng-container>
-                <a class="btn">
-                    <i class="fa-light fa-comment"></i>
-                </a>
+                <div class="heart">
+                    <input [id]="post1.id" name="heart" type="checkbox" [checked]="isLikedByMe()" (click)="like(post1.id)"/>
+                    <label [htmlFor]="post.id">♡</label>
+                </div>
+                <div class="likes">
+                    <button type="button" class="float-right mr-2 likes" (click)="showModal()">All Likes</button>
+                </div>
             </div>
         </div>
         
     </div>
+</div>
+
+
+<div class="modal fade" id="allLikesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">People who like this post</h5>
+        </div>
+        <div class="modal-body" *ngFor="let like of result">
+          <app-likes [l]="like"></app-likes>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+</div>

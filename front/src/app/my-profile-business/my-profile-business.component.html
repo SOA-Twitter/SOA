@@ -10,37 +10,10 @@
                 <div class="card-body">
                   <div class="row">
                     <div class="col-sm-3">
-                      <h6 class="mb-0">First Name</h6>
+                      <h6 class="mb-0">Username</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Last Name</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Age</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Country</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
+                      {{currentUser.username}}
                     </div>
                   </div>
                   <hr>
@@ -49,16 +22,7 @@
                       <h6 class="mb-0">Email</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      fip@jukmuh.al
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Gender</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
+                      {{currentUser.email}}
                     </div>
                   </div>
                   <hr>
@@ -67,7 +31,7 @@
                       <h6 class="mb-0">Company name</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
+                      {{currentUser.company_name}}
                     </div>
                   </div>
                   <hr>
@@ -76,7 +40,17 @@
                       <h6 class="mb-0">Company website</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      Kenneth Valdez
+                      {{currentUser.company_website}}
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Private</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      <!-- {{currentUser.private}} -->
+                      <input type="checkbox" name="private" id="privacy-checkbox" [disabled]="!canEditPrivacy()" [checked]="currentUser.private" (click)="changePrivacy()">
                     </div>
                   </div>
                   <hr>
@@ -87,6 +61,8 @@
                   </div>
                 </div>
             </div>
-
+            <div class="post" *ngFor="let post of posts">
+              <app-post-component [post]="post"></app-post-component>
+            </div>
         </div>
     </div>

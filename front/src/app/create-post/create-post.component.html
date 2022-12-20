@@ -5,16 +5,11 @@
                 <h4>Create post</h4>
             </div>
             <div class="card-body">
-                    <form id="form" [formGroup]="postForm">
+                    <form id="form" [formGroup]="postForm" (ngSubmit)="createPost()">
 
                         <div class="form-group">
                             <textarea id="textPost" class="form-control" rows="4" cols="78" placeholder="Text" [formControlName] = "'text'"></textarea>
                             <span  id = "spanInvalid" *ngIf = "!postForm.get('text')?.valid && postForm.get('text')?.touched">Invalid text</span>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="file" style="display: none;" #file>
-                            <button (click)="file.click()" class="btn btn-primary photo">Add Photo</button>
                         </div>
 
                         <div class="form-group">

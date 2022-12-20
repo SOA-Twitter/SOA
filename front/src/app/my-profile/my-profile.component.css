@@ -13,12 +13,12 @@ body{
 
 .card {
     position: relative;
-    display: flex;
     flex-direction: column;
-    background-color: #fff;
-    background-clip: border-box;
     border: 0 solid rgba(0,0,0,.125);
-    border-radius: .25rem;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: 270px;
+    width: 105%;
 }
 
 .changePass{

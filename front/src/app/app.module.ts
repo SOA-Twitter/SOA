@@ -23,33 +23,35 @@ import { ProfileRecoveryComponent } from './profile-recovery/profile-recovery.co
 import { RecoverAccountComponent } from './recover-account/recover-account.component';
 import { Guard } from './guard/guard';
 import { httpInterceptorProviders } from 'src';
+import { LikesComponent } from "./post/likes/likes.component";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavbarComponent,
-    UnloggedHomeComponent,
-    LoginComponent,
-    SignupComponent,
-    PostComponentComponent,
-    LoggedHomeComponent,
-    LoggedNavbarComponent,
-    CreatePostComponent,
-    MyProfileComponent,
-    ChangePasswordComponent,
-    SignupBusinessComponent,
-    MyProfileBusinessComponent,
-    ProfileRecoveryComponent,
-    RecoverAccountComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    NgxCaptchaModule
-  ],
-  providers: [httpInterceptorProviders, Guard],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        NavbarComponent,
+        UnloggedHomeComponent,
+        LoginComponent,
+        SignupComponent,
+        PostComponentComponent,
+        LoggedHomeComponent,
+        LoggedNavbarComponent,
+        CreatePostComponent,
+        MyProfileComponent,
+        ChangePasswordComponent,
+        SignupBusinessComponent,
+        MyProfileBusinessComponent,
+        ProfileRecoveryComponent,
+        RecoverAccountComponent,
+        LikesComponent
+    ],
+    providers: [httpInterceptorProviders, Guard],
+    bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        NgxCaptchaModule,
+    ]
 })
 export class AppModule { }
