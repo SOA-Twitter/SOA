@@ -4,6 +4,7 @@ import (
 	"SocialService/data"
 	"SocialService/handlers"
 	"SocialService/proto/auth"
+	"SocialService/proto/profile"
 	"SocialService/proto/social"
 	"context"
 	"fmt"
@@ -54,7 +55,8 @@ func main() {
 		l.Fatalf("Failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	socialHandler := handlers.NewSocialHandler(l, socialRepoImpl, ac)
+	ps := profile.NewProfileServiceClient(conn)
+	socialHandler := handlers.NewSocialHandler(l, socialRepoImpl, ac, ps)
 	social.RegisterSocialServiceServer(grpcServer, socialHandler)
 	reflection.Register(grpcServer)
 	go func() {

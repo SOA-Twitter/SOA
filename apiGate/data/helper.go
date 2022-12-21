@@ -31,6 +31,9 @@ type UserInfo struct {
 	CompanyWebsite string `json:"company_website"`
 	Private        bool   `json:"private"`
 }
+type UserNode struct {
+	Username string `json:"username"`
+}
 
 type ChangePass struct {
 	OldPassword      string `json:"old_password"`
