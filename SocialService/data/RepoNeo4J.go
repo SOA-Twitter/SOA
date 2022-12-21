@@ -97,3 +97,13 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 	// Final return after no errors:
 	return status, nil
 }
+
+func (nr *Neo4JRepo) Unfollow(usernameOfRequester string, usernameToUnfollow string) error {
+	nr.log.Println("RepoNeo4j - Unfollow User")
+
+	// TODO db delete relationship query
+	// return err
+
+	// Final return after no errors:
+	return nil
+}

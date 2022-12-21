@@ -93,7 +93,8 @@ func main() {
 
 	socialRouter := r.PathPrefix("/social").Subrouter()
 	tweetRouter.Use(authHandler.Authorize)
-	socialRouter.HandleFunc("/", socialHandler.Follow).Methods(http.MethodPost)
+	socialRouter.HandleFunc("/follow", socialHandler.Follow).Methods(http.MethodPost)
+	socialRouter.HandleFunc("/unfollow", socialHandler.Unfollow).Methods(http.MethodDelete)
 
 	defer socialConn.Close()
 

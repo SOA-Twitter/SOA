@@ -60,3 +60,31 @@ func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request
 		return
 	}
 }
+
+func (h *SocialHandler) Unfollow(writer http.ResponseWriter, request *http.Request) {
+	h.l.Println("Social - Unfollow Handler")
+
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
+	userToUnfollow := UserNode{}
+	err := FromJSON(&userToUnfollow, request.Body)
+	if err != nil {
+		h.l.Println(unMarshall)
+		http.Error(writer, invalidJson, http.StatusBadRequest)
+		return
+	}
+
+	_, errSocial := h.pr.Unfollow(context.Background(), &social.FollowRequest{
+		Username: userToUnfollow.Username,
+		Token:    c,
+	})
+	if errSocial != nil {
+		h.l.Println("Unable to Unfollow that user: ")
+		http.Error(writer, "Cannot unfollow that user", http.StatusNotFound)
+		return
+	}
+}

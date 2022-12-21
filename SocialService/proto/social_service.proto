@@ -4,6 +4,7 @@ option go_package = "proto/social";
 service SocialService {
   rpc RegUser(RegUserRequest) returns(RegUserResponse){}
   rpc RequestToFollow(FollowRequest) returns(FollowIntentResponse){}
+  rpc Unfollow(FollowRequest) returns(UnfollowResponse){}
 }
 message RegUserRequest{
   string username = 1;
@@ -17,4 +18,6 @@ message FollowRequest{
 }
 message FollowIntentResponse{
   string status = 1;
+}
+message UnfollowResponse{
 }

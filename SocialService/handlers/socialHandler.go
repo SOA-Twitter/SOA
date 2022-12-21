@@ -63,3 +63,20 @@ func (s *SocialHandler) RequestToFollow(ctx context.Context, r *social.FollowReq
 		Status: followReqStatus,
 	}, nil
 }
+
+func (s *SocialHandler) Unfollow(ctx context.Context, r *social.FollowRequest) (*social.UnfollowResponse, error) {
+	s.l.Println("Social service - Unfollow user")
+
+	claims, err := data.GetFromClaims(r.Token)
+	if err != nil {
+		s.l.Println("Error getting claims")
+		return &social.UnfollowResponse{}, err
+	}
+
+	err1 := s.repoImpl.Unfollow(claims.Username, r.Username)
+	if err1 != nil {
+		s.l.Println("Cannot unfollow ", r.Username)
+		return &social.UnfollowResponse{}, err1
+	}
+	return &social.UnfollowResponse{}, nil
+}
