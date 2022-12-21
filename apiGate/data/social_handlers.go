@@ -20,6 +20,12 @@ func NewSocialHandler(l *log.Logger, pr social.SocialServiceClient) *SocialHandl
 func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request) {
 	h.l.Println("Social - Follow Handler")
 
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
 	userToFollow := UserNode{}
 	err := FromJSON(&userToFollow, request.Body)
 	if err != nil {
@@ -28,8 +34,9 @@ func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request
 		return
 	}
 
-	response, errSocial := h.pr.RequestToFollow(context.Background(), &social.FollowIntentRequest{
+	response, errSocial := h.pr.RequestToFollow(context.Background(), &social.FollowRequest{
 		Username: userToFollow.Username,
+		Token:    c,
 	})
 	if errSocial != nil {
 		h.l.Println("Unable to Follow that user: ")

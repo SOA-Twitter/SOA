@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SocialServiceClient interface {
 	RegUser(ctx context.Context, in *RegUserRequest, opts ...grpc.CallOption) (*RegUserResponse, error)
-	RequestToFollow(ctx context.Context, in *FollowIntentRequest, opts ...grpc.CallOption) (*FollowIntentResponse, error)
+	RequestToFollow(ctx context.Context, in *FollowRequest, opts ...grpc.CallOption) (*FollowIntentResponse, error)
 }
 
 type socialServiceClient struct {
@@ -43,7 +43,7 @@ func (c *socialServiceClient) RegUser(ctx context.Context, in *RegUserRequest, o
 	return out, nil
 }
 
-func (c *socialServiceClient) RequestToFollow(ctx context.Context, in *FollowIntentRequest, opts ...grpc.CallOption) (*FollowIntentResponse, error) {
+func (c *socialServiceClient) RequestToFollow(ctx context.Context, in *FollowRequest, opts ...grpc.CallOption) (*FollowIntentResponse, error) {
 	out := new(FollowIntentResponse)
 	err := c.cc.Invoke(ctx, "/SocialService/RequestToFollow", in, out, opts...)
 	if err != nil {
@@ -57,7 +57,7 @@ func (c *socialServiceClient) RequestToFollow(ctx context.Context, in *FollowInt
 // for forward compatibility
 type SocialServiceServer interface {
 	RegUser(context.Context, *RegUserRequest) (*RegUserResponse, error)
-	RequestToFollow(context.Context, *FollowIntentRequest) (*FollowIntentResponse, error)
+	RequestToFollow(context.Context, *FollowRequest) (*FollowIntentResponse, error)
 	mustEmbedUnimplementedSocialServiceServer()
 }
 
@@ -68,7 +68,7 @@ type UnimplementedSocialServiceServer struct {
 func (UnimplementedSocialServiceServer) RegUser(context.Context, *RegUserRequest) (*RegUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegUser not implemented")
 }
-func (UnimplementedSocialServiceServer) RequestToFollow(context.Context, *FollowIntentRequest) (*FollowIntentResponse, error) {
+func (UnimplementedSocialServiceServer) RequestToFollow(context.Context, *FollowRequest) (*FollowIntentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestToFollow not implemented")
 }
 func (UnimplementedSocialServiceServer) mustEmbedUnimplementedSocialServiceServer() {}
@@ -103,7 +103,7 @@ func _SocialService_RegUser_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _SocialService_RequestToFollow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FollowIntentRequest)
+	in := new(FollowRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func _SocialService_RequestToFollow_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/SocialService/RequestToFollow",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SocialServiceServer).RequestToFollow(ctx, req.(*FollowIntentRequest))
+		return srv.(SocialServiceServer).RequestToFollow(ctx, req.(*FollowRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

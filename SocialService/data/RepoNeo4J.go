@@ -75,17 +75,17 @@ func (nr *Neo4JRepo) RegUser(username string) error {
 }
 
 // *TODO: db Find & Create Relationship Call
-func (nr *Neo4JRepo) Follow(username string, isPrivate bool) (string, error) {
-	nr.log.Println("RepoNeo4j - Follow User Intent")
+func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, isPrivate bool) (string, error) {
+	nr.log.Println("RepoNeo4j - Follow User")
 
-	// TODO status = property of "follows" relationship ( awaiting, accepted, denied? )
+	// TODO status = property of "follows" relationship ( pending, follows )
 	var status string = ""
 
 	//	TODO db call to find if relationship exists - return relationship status
 	//	...
 
 	//	TODO if relationship doesn't exist - create "follows" relationship between 2 User Nodes,
-	//	 with property status = accepted (if not "isPrivate") / awaiting (if "isPrivate")
+	//	 with property status = follows (if not "isPrivate") / pending (if "isPrivate")
 	//	 + return relationship status
 	//	...
 
