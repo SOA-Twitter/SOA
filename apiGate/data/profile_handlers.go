@@ -13,6 +13,10 @@ type ProfileHandler struct {
 	pr profile.ProfileServiceClient
 }
 
+const (
+	jsonErrMsg = "Unable to convert to json"
+)
+
 func NewProfileHandler(l *log.Logger, pr profile.ProfileServiceClient) *ProfileHandler {
 	return &ProfileHandler{l, pr}
 }
@@ -41,8 +45,8 @@ func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	err = ToJSON(userProfile, w)
 	if err != nil {
-		ah.l.Println("Unable to convert to json")
-		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
+		ah.l.Println(jsonErrMsg)
+		http.Error(w, jsonErrMsg, http.StatusInternalServerError)
 		return
 	}
 }
@@ -54,8 +58,8 @@ func (ah *ProfileHandler) ManagePrivacy(w http.ResponseWriter, req *http.Request
 
 	err1 := FromJSON(&privacy, req.Body)
 	if err1 != nil {
-		ah.l.Println("Unable to convert to json")
-		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
+		ah.l.Println(jsonErrMsg)
+		http.Error(w, jsonErrMsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -77,8 +81,8 @@ func (ah *ProfileHandler) ManagePrivacy(w http.ResponseWriter, req *http.Request
 
 	err3 := ToJSON(response, w)
 	if err3 != nil {
-		ah.l.Println("Unable to convert to json")
-		http.Error(w, "Unable to convert to json", http.StatusInternalServerError)
+		ah.l.Println(jsonErrMsg)
+		http.Error(w, jsonErrMsg, http.StatusInternalServerError)
 		return
 	}
 

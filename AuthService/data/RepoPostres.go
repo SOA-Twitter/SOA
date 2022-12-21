@@ -16,14 +16,19 @@ type AuthRepoPostgres struct {
 	db *gorm.DB
 }
 
+const (
+	errorMsg   = "Please try again later."
+	emailQuery = "Email = ?"
+)
+
 func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
 	USERNAME := os.Getenv("USER")
-	DB_HOST := os.Getenv("HOST")
+	dbHost := os.Getenv("HOST")
 	PASSWORD := os.Getenv("PASSWORD")
-	DB_NAME := os.Getenv("DB")
+	dbName := os.Getenv("DB")
 	PORT := os.Getenv("PORT")
-	l.Println("\n" + USERNAME + DB_HOST + PASSWORD + DB_NAME + PORT + "\n")
-	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", DB_HOST, USERNAME, DB_NAME, PASSWORD, PORT)
+	l.Println("\n" + USERNAME + dbHost + PASSWORD + dbName + PORT + "\n")
+	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", dbHost, USERNAME, dbName, PASSWORD, PORT)
 	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 	if err != nil {
 		l.Println("Error establishing a database connection")
@@ -35,7 +40,6 @@ func PostgresConnection(l *log.Logger) (*AuthRepoPostgres, error) {
 }
 func setup(db *gorm.DB) {
 	db.AutoMigrate(&User{})
-	//	TODO* check db tables
 	db.AutoMigrate(&ActivationRequest{})
 	db.AutoMigrate(&RecoveryRequest{})
 }
@@ -59,14 +63,14 @@ func (ps *AuthRepoPostgres) Register(user *User) error {
 	if createdUser.Error != nil {
 		fmt.Println(errMessage)
 		ps.l.Println("Unable to Create user.", errMessage)
-		return QueryError("Please try again later.")
+		return QueryError(errorMsg)
 	}
 	return nil
 }
 
 func (ps *AuthRepoPostgres) Edit(email string) error {
 	ps.l.Println("AuthRepoPostgres - Edit")
-	err := ps.db.Model(&User{}).Where("Email = ?", email).Update("is_activated", true).Error
+	err := ps.db.Model(&User{}).Where(emailQuery, email).Update("is_activated", true).Error
 	if err != nil {
 		return QueryError("Error updating user " + email)
 	}
@@ -74,7 +78,7 @@ func (ps *AuthRepoPostgres) Edit(email string) error {
 }
 func (ps *AuthRepoPostgres) ChangePassword(email, password string) error {
 	ps.l.Println("AuthRepoPostgres - Change password")
-	err := ps.db.Model(&User{}).Where("Email = ?", email).Update("password", password).Error
+	err := ps.db.Model(&User{}).Where(emailQuery, email).Update("password", password).Error
 	if err != nil {
 		return QueryError("Error changing password")
 	}
@@ -84,7 +88,7 @@ func (ps *AuthRepoPostgres) ChangePassword(email, password string) error {
 func (ps *AuthRepoPostgres) Delete(email string) error {
 	ps.l.Println("AuthRepoPostgres - Delete")
 	user := &User{}
-	err := ps.db.Where("Email = ?", email).Delete(&user).Error
+	err := ps.db.Where(emailQuery, email).Delete(&user).Error
 	if err != nil {
 		ps.l.Println("Error deleting user with email ")
 		ps.l.Println(email)
@@ -97,7 +101,7 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 	ps.l.Println("AuthRepoPostgres - Check credentials")
 	user := &User{}
 
-	if err := ps.db.Where("Email = ?", email).First(user).Error; err != nil {
+	if err := ps.db.Where(emailQuery, email).First(user).Error; err != nil {
 		ps.l.Println("Invalid Email")
 		return QueryError("Invalid credentials!!")
 	}
@@ -118,14 +122,14 @@ func (ps *AuthRepoPostgres) CheckCredentials(email string, password string) erro
 func (ps *AuthRepoPostgres) FindUserEmail(email string) (string, string, error) {
 	ps.l.Println("AuthRepoPostgres - Find User Email")
 	user := &User{}
-	err := ps.db.Where("Email = ?", email).First(user).Error
+	err := ps.db.Where(emailQuery, email).First(user).Error
 	return user.Email, user.Role, err
 }
 
 func (ps *AuthRepoPostgres) FindUser(email string) (*User, error) {
 	ps.l.Println("AuthRepoPostgres - Find User")
 	user := &User{}
-	err := ps.db.Where("Email = ?", email).First(user).Error
+	err := ps.db.Where(emailQuery, email).First(user).Error
 	return user, err
 }
 
@@ -142,7 +146,7 @@ func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registe
 	if createdRequest.Error != nil {
 		fmt.Println(errMessage)
 		ps.l.Println("Unable to Create Account Activation Request.", errMessage)
-		return QueryError("Please try again later.")
+		return QueryError(errorMsg)
 	}
 	return nil
 }
@@ -178,7 +182,7 @@ func (ps *AuthRepoPostgres) SaveRecoveryRequest(recoveryUUID string, registeredE
 	if createdRequest.Error != nil {
 		fmt.Println(errMessage)
 		ps.l.Println("Unable to Create Password Recovery Request.", errMessage)
-		return QueryError("Please try again later.")
+		return QueryError(errorMsg)
 	}
 	return nil
 }

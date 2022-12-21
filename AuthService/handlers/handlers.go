@@ -17,6 +17,7 @@ import (
 const (
 	INTENTION_RECOVERY   = "recovery"
 	INTENTION_ACTIVATION = "activation"
+	errorDeletingUser    = "Error deleting user with email "
 )
 
 type AuthHandler struct {
@@ -284,7 +285,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		a.l.Println("ACTIVATION Email delivery failed for: ", r.Email, errEmailing)
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
-			a.l.Println("Error deleting user with email " + user.Email)
+			a.l.Println(errorDeletingUser + user.Email)
 			return &auth.RegisterResponse{
 				Status: http.StatusInternalServerError,
 			}, error1
@@ -299,7 +300,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	if errActivationReqSave != nil {
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
-			a.l.Println("Error deleting user with email " + user.Email)
+			a.l.Println(errorDeletingUser + user.Email)
 			return &auth.RegisterResponse{
 				Status: http.StatusInternalServerError,
 			}, error1
@@ -323,9 +324,6 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	})
 
 	if err4 != nil {
-		a.l.Println("-------------------------")
-		a.l.Println(err4)
-		a.l.Println("-------------------------")
 		// Also Deleting the account Activation combination (activationuuid + email) from DB, since profileSvc failed
 
 		errDelAccActReq := a.repo.DeleteActivationRequest(activationUUID, user.Email)
@@ -338,7 +336,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
-			a.l.Println("Error deleting user with email " + user.Email)
+			a.l.Println(errorDeletingUser + user.Email)
 			return &auth.RegisterResponse{
 				Status: http.StatusInternalServerError,
 			}, error1

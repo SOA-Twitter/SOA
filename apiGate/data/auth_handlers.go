@@ -23,10 +23,15 @@ type Gender string
 type Role string
 
 const (
-	Male         Gender = "Male"
-	Female       Gender = "Female"
-	RegularUser  Role   = "RegularUser"
-	BusinessUser Role   = "BusinessUser"
+	Male                Gender = "Male"
+	Female              Gender = "Female"
+	RegularUser         Role   = "RegularUser"
+	BusinessUser        Role   = "BusinessUser"
+	unMarshall                 = "Cannot unmarshal json"
+	invalidJson                = "Invalid JSON format"
+	wrongPasswordFormat        = "Wrong password format"
+	passwordRegexErrMsg        = "Password must be at least 8 characters long, with at least one upper and one lower case letter, one special character and one number."
+	passwrodMatchErrMsg        = "Passwords do NOT match"
 )
 
 func (gender Gender) IsValid() error {
@@ -48,8 +53,8 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 
@@ -75,8 +80,8 @@ func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request)
 	email := Email{}
 	err := FromJSON(&email, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 
@@ -96,20 +101,19 @@ func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	recProfil := RecoverProfile{}
 	err := FromJSON(&recProfil, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 	err3 := ValidatePassword(recProfil.NewPassword)
 	if err3 != nil {
-		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 8 characters long, with at least"+
-			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		ah.l.Println(wrongPasswordFormat)
+		http.Error(w, passwordRegexErrMsg, http.StatusBadRequest)
 		return
 	}
 	if recProfil.NewPassword != recProfil.RepeatedPassword {
-		ah.l.Println("Passwords do NOT match")
-		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
+		ah.l.Println(passwrodMatchErrMsg)
+		http.Error(w, passwrodMatchErrMsg, http.StatusBadRequest)
 		return
 	}
 	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
@@ -147,20 +151,19 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	pass := ChangePass{}
 	err := FromJSON(&pass, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 	err3 := ValidatePassword(pass.NewPassword)
 	if err3 != nil {
-		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 8 characters long, with at least"+
-			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		ah.l.Println(wrongPasswordFormat)
+		http.Error(w, passwordRegexErrMsg, http.StatusBadRequest)
 		return
 	}
 	if pass.NewPassword != pass.RepeatedPassword {
-		ah.l.Println("Passwords do NOT match")
-		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
+		ah.l.Println(passwrodMatchErrMsg)
+		http.Error(w, passwrodMatchErrMsg, http.StatusBadRequest)
 		return
 	}
 	c := r.Header.Get("Authorization")
@@ -187,8 +190,8 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 
@@ -202,9 +205,8 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err3 := ValidatePassword(user.Password)
 	if err3 != nil {
-		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 8 characters long, with at least"+
-			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		ah.l.Println(wrongPasswordFormat)
+		http.Error(w, passwordRegexErrMsg, http.StatusBadRequest)
 		return
 	}
 
