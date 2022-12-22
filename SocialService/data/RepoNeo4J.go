@@ -75,28 +75,68 @@ func (nr *Neo4JRepo) RegUser(username string) error {
 	return nil
 }
 
-// *TODO: db Find & Create Relationship Call
-func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, isPrivate bool) (string, error) {
+func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, isPrivate bool) error {
 	nr.log.Println("RepoNeo4j - Follow User")
 
-	// TODO status = property of "follows" relationship ( pending, follows )
-	var status string = ""
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
 
-	//	TODO db call to find if relationship exists - return relationship status
-	//	...
+	if isPrivate {
+		createdRelationship, err1 := session.ExecuteWrite(ctx,
+			func(tx neo4j.ManagedTransaction) (any, error) {
+				var result, err = tx.Run(ctx,
+					"MATCH (user1:User {username: \"$usernameOfFollower\"}) "+
+						"MATCH (user2:User {username: \"$usernameToFollow\"}) "+
+						"CREATE (user1)-[r:FOLLOWS {status: \"PENDING\"}]->(user2) "+
+						"RETURN r.status",
+					map[string]any{"usernameOfFollower": usernameOfFollower, "usernameToFollow": usernameToFollow})
 
-	//	TODO if relationship doesn't exist - create "follows" relationship between 2 User Nodes,
-	//	 with property status = follows (if not "isPrivate") / pending (if "isPrivate")
-	//	 + return relationship status
-	//	...
+				if err != nil {
+					nr.log.Println(err)
+					return nil, err
+				}
 
-	//
+				if result.Next(ctx) {
+					return result.Record().Values[0], nil
+				}
 
-	// TODO on db functions error:
-	// return status, err
+				return nil, result.Err()
+			})
+		if err1 != nil {
+			nr.log.Println(err1)
+			return err1
+		}
+		nr.log.Println(createdRelationship)
+		return nil
+	} else {
+		createdRelationship, err1 := session.ExecuteWrite(ctx,
+			func(tx neo4j.ManagedTransaction) (any, error) {
+				var result, err = tx.Run(ctx,
+					"MATCH (user1:User {username: \"$usernameOfFollower\"}) "+
+						"MATCH (user2:User {username: \"$usernameToFollow\"}) "+
+						"CREATE (user1)-[r:FOLLOWS {status: \"FOLLOWS\"}]->(user2) "+
+						"RETURN r.status",
+					map[string]any{"usernameOfFollower": usernameOfFollower, "usernameToFollow": usernameToFollow})
 
-	// Final return after no errors:
-	return status, nil
+				if err != nil {
+					nr.log.Println(err)
+					return nil, err
+				}
+				if result.Next(ctx) {
+					return result.Record().Values[0], nil
+				}
+
+				return nil, result.Err()
+			})
+		if err1 != nil {
+			nr.log.Println(err1)
+			return err1
+		}
+		nr.log.Println(createdRelationship)
+		return nil
+	}
+	return nil
 }
 
 // *TODO: db delete relationship query
@@ -114,16 +154,35 @@ func (nr *Neo4JRepo) Unfollow(usernameOfRequester string, usernameToUnfollow str
 // *TODO: db get username of Nodes whose relationship Status towards "usernameOfRequester" == pending
 func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.PendingFollower, error) {
 	nr.log.Println("RepoNeo4j - Get Pending Followers")
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
 
-	result := []*social.PendingFollower{}
-	//result, err := query()
+	pendingRequests, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				`MATCH (u:User {username: $username }) -[:PENDING]-> (u:User)
+				RETURN u.username as username`,
+				map[string]any{"username": usernameOfRequester})
+			if err != nil {
+				return nil, err
+			}
 
-	//	TODO get all "follows" relationships w/ status property == pending
-	//if err != nil {
-	//	nr.log.Println("RepoNeo4j - Error Getting Pending Followers: ", err)
-	//	return nil, err
-	//}
-	return result, nil
+			var pendingList []*social.PendingFollower
+			for result.Next(ctx) {
+				record := result.Record()
+				username, _ := record.Get("username")
+				pendingList = append(pendingList, &social.PendingFollower{
+					Username: username.(string),
+				})
+			}
+			return pendingList, nil
+		})
+	if err != nil {
+		nr.log.Println("Error querying search:", err)
+		return nil, err
+	}
+	return pendingRequests.([]*social.PendingFollower), nil
 }
 
 func (nr *Neo4JRepo) IsFollowed(requesterUsername string, targetUsername string) (bool, error) {

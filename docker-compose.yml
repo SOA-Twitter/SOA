@@ -154,6 +154,8 @@ services:
       NEO4J_PASS: ${NEO4J_PASS}
       AUTH_HOST: ${AUTH_HOST}
       AUTH_PORT: ${AUTH_PORT}
+      PROFILE_PORT: ${PROFILE_PORT}
+      PROFILE_HOST: ${PROFILE_HOST}
     depends_on:
       neo4j:
         condition: service_healthy

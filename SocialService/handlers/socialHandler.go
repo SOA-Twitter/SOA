@@ -53,14 +53,14 @@ func (s *SocialHandler) RequestToFollow(ctx context.Context, r *social.FollowReq
 		return &social.FollowIntentResponse{}, err
 	}
 
-	followReqStatus, err := s.repoImpl.Follow(claims.Username, r.Username, foundUser.Private)
+	err = s.repoImpl.Follow(claims.Username, r.Username, foundUser.Private)
 	if err != nil {
 		return &social.FollowIntentResponse{
-			Status: followReqStatus,
+			//Status: followReqStatus,
 		}, err
 	}
 	return &social.FollowIntentResponse{
-		Status: followReqStatus,
+		//Status: followReqStatus,
 	}, nil
 }
 

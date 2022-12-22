@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -50,12 +51,25 @@ func main() {
 	ac := auth.NewAuthServiceClient(conn)
 	//-------------------------------------------------------------------
 
+	profileHost := os.Getenv("PROFILE_HOST")
+	profilePort := os.Getenv("PROFILE_PORT")
+	profileConn, err := grpc.DialContext(
+		context.Background(),
+		profileHost+":"+profilePort,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		l.Fatalf("Error connecting to Profile_service: %v\n", err)
+	}
+	defer profileConn.Close()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	ps := profile.NewProfileServiceClient(conn)
+	ps := profile.NewProfileServiceClient(profileConn)
 	socialHandler := handlers.NewSocialHandler(l, socialRepoImpl, ac, ps)
 	social.RegisterSocialServiceServer(grpcServer, socialHandler)
 	reflection.Register(grpcServer)
