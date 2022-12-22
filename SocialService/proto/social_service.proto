@@ -5,6 +5,7 @@ service SocialService {
   rpc RegUser(RegUserRequest) returns(RegUserResponse){}
   rpc RequestToFollow(FollowRequest) returns(FollowIntentResponse){}
   rpc Unfollow(FollowRequest) returns(UnfollowResponse){}
+  rpc GetPendingFollowRequests(GetPendingRequest) returns(PendingFollowerResponse){}
 }
 message RegUserRequest{
   string username = 1;
@@ -20,4 +21,14 @@ message FollowIntentResponse{
   string status = 1;
 }
 message UnfollowResponse{
+}
+
+message GetPendingRequest{
+  string token = 1;
+}
+message PendingFollower{
+  string username = 1;
+}
+message PendingFollowerResponse{
+  repeated PendingFollower pending_followers = 1;
 }

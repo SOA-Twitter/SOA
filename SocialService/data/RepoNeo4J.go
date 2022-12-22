@@ -1,6 +1,7 @@
 package data
 
 import (
+	"SocialService/proto/social"
 	"context"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"log"
@@ -98,12 +99,29 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 	return status, nil
 }
 
+// *TODO: db delete relationship query
 func (nr *Neo4JRepo) Unfollow(usernameOfRequester string, usernameToUnfollow string) error {
 	nr.log.Println("RepoNeo4j - Unfollow User")
 
-	// TODO db delete relationship query
+	// TODO db delete relationship query:
+	// ...
 	// return err
 
 	// Final return after no errors:
 	return nil
+}
+
+// *TODO: db get username of Nodes whose relationship Status towards "usernameOfRequester" == pending
+func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.PendingFollower, error) {
+	nr.log.Println("RepoNeo4j - Get Pending Followers")
+
+	result := []*social.PendingFollower{}
+	//result, err := query()
+
+	//	TODO get all "follows" relationships w/ status property == pending
+	//if err != nil {
+	//	nr.log.Println("RepoNeo4j - Error Getting Pending Followers: ", err)
+	//	return nil, err
+	//}
+	return result, nil
 }

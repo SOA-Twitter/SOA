@@ -83,8 +83,33 @@ func (h *SocialHandler) Unfollow(writer http.ResponseWriter, request *http.Reque
 		Token:    c,
 	})
 	if errSocial != nil {
-		h.l.Println("Unable to Unfollow that user: ")
+		h.l.Println("Unable to Unfollow that user")
 		http.Error(writer, "Cannot unfollow that user", http.StatusNotFound)
+		return
+	}
+}
+
+func (h *SocialHandler) GetPendingFollowRequests(writer http.ResponseWriter, request *http.Request) {
+	h.l.Println("Social - Get Pending Follow Requests Handler")
+
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
+	response, errSocial := h.pr.GetPendingFollowRequests(context.Background(), &social.GetPendingRequest{
+		Token: c,
+	})
+	if errSocial != nil {
+		h.l.Println("Unable to get pending follow requests")
+		http.Error(writer, "Cannot get pending follow requests", http.StatusNotFound)
+		return
+	}
+	err := ToJSON(response.PendingFollowers, writer)
+	if err != nil {
+		h.l.Println(jsonErrMsg)
+		http.Error(writer, jsonErrMsg, http.StatusInternalServerError)
 		return
 	}
 }

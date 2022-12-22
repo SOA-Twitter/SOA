@@ -95,6 +95,7 @@ func main() {
 	tweetRouter.Use(authHandler.Authorize)
 	socialRouter.HandleFunc("/follow", socialHandler.Follow).Methods(http.MethodPost)
 	socialRouter.HandleFunc("/unfollow", socialHandler.Unfollow).Methods(http.MethodDelete)
+	socialRouter.HandleFunc("/pending", socialHandler.GetPendingFollowRequests).Methods(http.MethodGet)
 
 	defer socialConn.Close()
 

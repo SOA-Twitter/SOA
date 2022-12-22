@@ -80,3 +80,22 @@ func (s *SocialHandler) Unfollow(ctx context.Context, r *social.FollowRequest) (
 	}
 	return &social.UnfollowResponse{}, nil
 }
+
+func (s *SocialHandler) GetPendingFollowRequests(ctx context.Context, r *social.GetPendingRequest) (*social.PendingFollowerResponse, error) {
+	s.l.Println("Social service - Get pending follow requests")
+
+	claims, err := data.GetFromClaims(r.Token)
+	if err != nil {
+		s.l.Println("Error getting claims")
+		return &social.PendingFollowerResponse{}, err
+	}
+
+	result, err := s.repoImpl.GetPendingFollowers(claims.Username)
+	if err != nil {
+		s.l.Println("Cannot Get Pending Followers")
+		return &social.PendingFollowerResponse{}, err
+	}
+	return &social.PendingFollowerResponse{
+		PendingFollowers: result,
+	}, nil
+}

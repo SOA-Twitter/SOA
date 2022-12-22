@@ -25,6 +25,7 @@ type SocialServiceClient interface {
 	RegUser(ctx context.Context, in *RegUserRequest, opts ...grpc.CallOption) (*RegUserResponse, error)
 	RequestToFollow(ctx context.Context, in *FollowRequest, opts ...grpc.CallOption) (*FollowIntentResponse, error)
 	Unfollow(ctx context.Context, in *FollowRequest, opts ...grpc.CallOption) (*UnfollowResponse, error)
+	GetPendingFollowRequests(ctx context.Context, in *GetPendingRequest, opts ...grpc.CallOption) (*PendingFollowerResponse, error)
 }
 
 type socialServiceClient struct {
@@ -62,6 +63,15 @@ func (c *socialServiceClient) Unfollow(ctx context.Context, in *FollowRequest, o
 	return out, nil
 }
 
+func (c *socialServiceClient) GetPendingFollowRequests(ctx context.Context, in *GetPendingRequest, opts ...grpc.CallOption) (*PendingFollowerResponse, error) {
+	out := new(PendingFollowerResponse)
+	err := c.cc.Invoke(ctx, "/SocialService/GetPendingFollowRequests", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SocialServiceServer is the server API for SocialService service.
 // All implementations must embed UnimplementedSocialServiceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type SocialServiceServer interface {
 	RegUser(context.Context, *RegUserRequest) (*RegUserResponse, error)
 	RequestToFollow(context.Context, *FollowRequest) (*FollowIntentResponse, error)
 	Unfollow(context.Context, *FollowRequest) (*UnfollowResponse, error)
+	GetPendingFollowRequests(context.Context, *GetPendingRequest) (*PendingFollowerResponse, error)
 	mustEmbedUnimplementedSocialServiceServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedSocialServiceServer) RequestToFollow(context.Context, *Follow
 }
 func (UnimplementedSocialServiceServer) Unfollow(context.Context, *FollowRequest) (*UnfollowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unfollow not implemented")
+}
+func (UnimplementedSocialServiceServer) GetPendingFollowRequests(context.Context, *GetPendingRequest) (*PendingFollowerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPendingFollowRequests not implemented")
 }
 func (UnimplementedSocialServiceServer) mustEmbedUnimplementedSocialServiceServer() {}
 
@@ -152,6 +166,24 @@ func _SocialService_Unfollow_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SocialService_GetPendingFollowRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPendingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).GetPendingFollowRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SocialService/GetPendingFollowRequests",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).GetPendingFollowRequests(ctx, req.(*GetPendingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SocialService_ServiceDesc is the grpc.ServiceDesc for SocialService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var SocialService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Unfollow",
 			Handler:    _SocialService_Unfollow_Handler,
+		},
+		{
+			MethodName: "GetPendingFollowRequests",
+			Handler:    _SocialService_GetPendingFollowRequests_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
