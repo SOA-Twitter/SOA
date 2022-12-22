@@ -125,3 +125,16 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 	//}
 	return result, nil
 }
+
+func (nr *Neo4JRepo) IsFollowed(requesterUsername string, targetUsername string) (bool, error) {
+	nr.log.Println("RepoNeo4j - Is Followed")
+
+	follows := false
+	//	TODO db query requesterUsername-->follows (accepted)-->targetUsername
+	//   follows, errDB := query()
+	//	 if errDB != nil {
+	//		 nr.log.Println("RepoNeo4j - Error getting Is Followed info from db")
+	//		 return follows, errDB
+
+	return follows, nil
+}

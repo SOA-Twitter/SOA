@@ -99,3 +99,16 @@ func (s *SocialHandler) GetPendingFollowRequests(ctx context.Context, r *social.
 		PendingFollowers: result,
 	}, nil
 }
+
+func (s *SocialHandler) IsFollowed(ctx context.Context, r *social.IsFollowedRequest) (*social.IsFollowedResponse, error) {
+	s.l.Println("Social service - Is Followed by logged user")
+
+	result, err := s.repoImpl.IsFollowed(r.Requester, r.Target)
+	if err != nil {
+		s.l.Println("Error returning Is Followed info")
+		return &social.IsFollowedResponse{}, err
+	}
+	return &social.IsFollowedResponse{
+		IsFollowedByLogged: result,
+	}, nil
+}

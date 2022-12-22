@@ -24,6 +24,7 @@ message ProfileRegisterResponse{
 }
 message UserProfRequest{
   string Username = 1;
+  string Token = 2;
 }
 message UserProfResponse{
   string username = 1;
@@ -36,6 +37,7 @@ message UserProfResponse{
   string companyName = 8;
   string companyWebsite = 9;
   bool private = 10;
+  bool followedByLogged = 11;
 }
 message ManagePrivacyRequest{
   string Token = 1;

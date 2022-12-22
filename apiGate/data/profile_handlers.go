@@ -24,8 +24,16 @@ func NewProfileHandler(l *log.Logger, pr profile.ProfileServiceClient) *ProfileH
 func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("Api-gate - User Profile")
 	username := mux.Vars(r)["username"]
+
+	c := r.Header.Get("Authorization")
+	if c == "" {
+		http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
 	response, err := ah.pr.GetUserProfile(context.Background(), &profile.UserProfRequest{
 		Username: username,
+		Token:    c,
 	})
 	if err != nil {
 		ah.l.Println("Error occurred. Cannot get user infos!")
