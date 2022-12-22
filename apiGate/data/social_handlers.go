@@ -18,7 +18,7 @@ func NewSocialHandler(l *log.Logger, pr social.SocialServiceClient) *SocialHandl
 }
 
 func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request) {
-	h.l.Println("Social - Follow Handler")
+	h.l.Println("apiGate - Follow Handler")
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
@@ -62,7 +62,7 @@ func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request
 }
 
 func (h *SocialHandler) Unfollow(writer http.ResponseWriter, request *http.Request) {
-	h.l.Println("Social - Unfollow Handler")
+	h.l.Println("apiGate - Unfollow Handler")
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
@@ -90,7 +90,7 @@ func (h *SocialHandler) Unfollow(writer http.ResponseWriter, request *http.Reque
 }
 
 func (h *SocialHandler) GetPendingFollowRequests(writer http.ResponseWriter, request *http.Request) {
-	h.l.Println("Social - Get Pending Follow Requests Handler")
+	h.l.Println("apiGate - Get Pending Follow Requests Handler")
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
@@ -108,6 +108,40 @@ func (h *SocialHandler) GetPendingFollowRequests(writer http.ResponseWriter, req
 	}
 	err := ToJSON(response.PendingFollowers, writer)
 	if err != nil {
+		h.l.Println(jsonErrMsg)
+		http.Error(writer, jsonErrMsg, http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *SocialHandler) IsFollowed(writer http.ResponseWriter, request *http.Request) {
+	h.l.Println("apiGate - Is Followed Handler")
+
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
+	userTarget := UserNode{}
+	err := FromJSON(&userTarget, request.Body)
+	if err != nil {
+		h.l.Println(unMarshall)
+		http.Error(writer, invalidJson, http.StatusBadRequest)
+		return
+	}
+
+	response, errSocial := h.pr.IsFollowed(context.Background(), &social.IsFollowedRequest{
+		Requester: c,
+		Target:    userTarget.Username,
+	})
+	if errSocial != nil {
+		h.l.Println("Unable to get IsFollowed info")
+		http.Error(writer, "Cannot get IsFollowed info", http.StatusNotFound)
+		return
+	}
+	err1 := ToJSON(response.IsFollowedByLogged, writer)
+	if err1 != nil {
 		h.l.Println(jsonErrMsg)
 		http.Error(writer, jsonErrMsg, http.StatusInternalServerError)
 		return

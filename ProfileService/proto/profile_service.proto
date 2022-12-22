@@ -38,8 +38,7 @@ message UserProfResponse{
   string companyName = 8;
   string companyWebsite = 9;
   bool private = 10;
-  bool followedByLogged = 11;
-  string role = 12;
+  string role = 11;
 }
 message ManagePrivacyRequest{
   string Token = 1;

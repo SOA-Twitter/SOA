@@ -60,39 +60,24 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 func (pr *ProfileHandler) GetUserProfile(ctx context.Context, r *profile.UserProfRequest) (*profile.UserProfResponse, error) {
 	pr.l.Println("Profile service - Get User Profile")
 
-	claims, err := data.GetFromClaims(r.Token)
-	if err != nil {
-		pr.l.Println("Error getting claims")
-		return &profile.UserProfResponse{}, err
-	}
-
 	user, err1 := pr.repo.GetByUsername(r.Username)
 	if err1 != nil {
 		pr.l.Println("Cannot find user")
 		return nil, err1
 	}
-	response, err2 := pr.ss.IsFollowed(context.Background(), &social.IsFollowedRequest{
-		Requester: r.Username,
-		Target:    claims.Username,
-	})
-	if err2 != nil {
-		pr.l.Println("Error fetching account follow info from Social Service")
-		return nil, err2
-	}
 
 	return &profile.UserProfResponse{
-		Username:         user.Username,
-		FirstName:        user.FirstName,
-		LastName:         user.LastName,
-		Email:            user.Email,
-		Gender:           user.Gender,
-		Country:          user.Country,
-		Age:              int32(user.Age),
-		CompanyName:      user.CompanyName,
-		CompanyWebsite:   user.CompanyWebsite,
-		Private:          user.Private,
-		FollowedByLogged: response.IsFollowedByLogged,
-		Role:             user.Role,
+		Username:       user.Username,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		Email:          user.Email,
+		Gender:         user.Gender,
+		Country:        user.Country,
+		Age:            int32(user.Age),
+		CompanyName:    user.CompanyName,
+		CompanyWebsite: user.CompanyWebsite,
+		Private:        user.Private,
+		Role:           user.Role,
 	}, nil
 
 }

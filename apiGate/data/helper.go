@@ -30,7 +30,6 @@ type UserInfo struct {
 	CompanyName    string `json:"company_name"`
 	CompanyWebsite string `json:"company_website"`
 	Private        bool   `json:"private"`
-	IsFollowed     bool   `json:"is_followed"`
 	Role           string `json:"role"`
 }
 type UserNode struct {
