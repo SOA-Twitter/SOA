@@ -1,5 +1,5 @@
 <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer">
-<div *ngIf="post1" class="container bootstrap snippets bootdey">
+<div *ngIf="post1" class="container bootstrap snippets bootdey" >
     <div class="col-sm-8">
         <div class="post">
             <div class="pull-left">
@@ -27,21 +27,20 @@
         </div>
         
     </div>
-</div>
 
-
-<div class="modal fade" id="allLikesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">People who like this post</h5>
+    <div class="modal fade" [id]="post1.id + 1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">People who like this post</h5>
+            </div>
+            <div class="modal-body" *ngFor="let like of result">
+              <app-likes [l]="like"></app-likes>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+            </div>
+          </div>
         </div>
-        <div class="modal-body" *ngFor="let like of result">
-          <app-likes [l]="like"></app-likes>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
-        </div>
-      </div>
     </div>
 </div>

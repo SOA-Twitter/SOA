@@ -1,88 +1,117 @@
 <app-logged-navbar></app-logged-navbar>
 
-<div class="container"> 
-    <div class="main-body">
-    
-        <div class="row gutters-sm">
+<div class="container">
+  <div class="main-body">
 
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">First Name</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{currentUser.first_name}}
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Last Name</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{currentUser.last_name}}
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Age</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{currentUser.age}}
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Country</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{currentUser.country}}
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Email</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{currentUser.email}}
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Gender</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{currentUser.gender}}
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Private</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                      <!-- {{currentUser.private}} -->
-                      <input type="checkbox" name="private" id="privacy-checkbox" [disabled]="!canEditPrivacy()" [checked]="currentUser.private" (click)="changePrivacy()">
-                    </div>
-                  </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <a type="button" class="changePass" routerLink="/change-password">Change password</a>
-                    </div>
-                  </div>
-                </div>
+    <div class="row gutters-sm">
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Username</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.username}}
+              </div>
             </div>
-
+            <hr>
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">First Name</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.first_name}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Last Name</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.last_name}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Age</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.age}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Country</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.country}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Email</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.email}}
+              </div>
+            </div>
+            <hr>
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Gender</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.gender}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'BusinessUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Company name</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.company_name}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'BusinessUser'">
+            <div class="row" *ngIf="currentUser.role === 'BusinessUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Company website</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.company_website}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'BusinessUser'">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Private</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                <input type="checkbox" name="private" id="privacy-checkbox" [disabled]="!canEditPrivacy()"
+                  [checked]="currentUser.private" (click)="changePrivacy()">
+              </div>
+            </div>
+            <hr [hidden]="!canEditPrivacy()">
+            <div class="row">
+              <div class="col-sm-12">
+                <input type="button" class="changePass" routerLink="/change-password" value="Change password" [hidden]="!canEditPrivacy()">
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="post" *ngFor="let post of posts">
-          <app-post-component [post]="post"></app-post-component>
-        </div>
+      </div>
+
+      <div class="post" *ngFor="let post of posts">
+        <app-post-component [post]="post"></app-post-component>
+      </div>
     </div>
+  </div>
+</div>

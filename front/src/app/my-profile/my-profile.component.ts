@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { Post } from '../model/post';
 
@@ -21,7 +21,10 @@ export class MyProfileComponent implements OnInit {
     "gender" : "",
     "country" : "",
     "age" : 0,
-    "private" : false
+    "company_name": "",
+    "company_website": "",
+    "private" : false,
+    "role": ""
   };
 
   constructor(
@@ -30,23 +33,34 @@ export class MyProfileComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
-    this.service.getProfileDetails(this.service.getUsername()).subscribe( (userDetails) => 
-    {
-      this.currentUser = {
-        "username" : userDetails.username,
-        "first_name" : userDetails.first_name,
-        "last_name" : userDetails.last_name,
-        "email" : userDetails.email,
-        "gender" : userDetails.gender,
-        "country" : userDetails.country,
-        "age" : userDetails.age,
-        "private" : userDetails.private
-      };
-      
-    },
-    (error) => {window.alert('Error: ' + error) });
     
-    this.service.getPostByLoggedUser(this.service.getUsername()).subscribe(posts => {this.posts = posts})
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let username = params.get('username') || ""
+
+      this.service.getProfileDetails((username)).subscribe((userDetails) => {
+        this.currentUser = {
+          "username": userDetails.username,
+          "first_name": userDetails.first_name,
+          "last_name": userDetails.last_name,
+          "email": userDetails.email,
+          "gender": userDetails.gender,
+          "country": userDetails.country,
+          "age": userDetails.age,
+          "company_name": userDetails.company_name,
+          "company_website": userDetails.company_website,
+          "private": userDetails.private,
+          "role": userDetails.role
+        };
+
+      },
+        (error) => { window.alert('Error: ' + error) });
+
+    })
+
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let username = params.get('username') || ""
+      this.service.getPostByLoggedUser((username)).subscribe(posts => { this.posts = posts })
+    });
   }
 
   protected canEditPrivacy() : boolean{

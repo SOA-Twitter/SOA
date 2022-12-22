@@ -6,6 +6,7 @@ export class User{
     email:string;
     password:string;
     gender:string;
+    role: string;
 
     constructor(obj?: any){
         this.first_name = obj && obj.first_name || null;
@@ -15,5 +16,6 @@ export class User{
         this.email = obj && obj.email || null;
         this.password = obj && obj.password || null;
         this.gender = obj && obj.gender || null;
+        this.role = obj && obj.role || null;
     }
 }

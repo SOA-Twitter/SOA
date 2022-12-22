@@ -26,9 +26,6 @@ export class PostComponentComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.getLikesByTweetId(this.post1.id).subscribe((likes)=>{this.likes = likes, console.log(JSON.stringify(this.likes))});
-    this.formModal = new window.bootstrap.Modal(
-      document.getElementById("allLikesModal")
-    );
   }
   
   isLikedByMe():boolean{
@@ -60,6 +57,10 @@ export class PostComponentComponent implements OnInit {
   }
 
   showModal(){
+    this.formModal = new window.bootstrap.Modal(
+      document.getElementById("allLikesModal")
+    );
+
     this.result = this.likes.filter(like => like.liked === true);
     console.log(this.result);
 
@@ -69,5 +70,4 @@ export class PostComponentComponent implements OnInit {
   closeModal(){
     this.formModal.hide();
   }
-
 }

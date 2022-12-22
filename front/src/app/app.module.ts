@@ -18,7 +18,6 @@ import { NgxCaptchaModule } from 'ngx-captcha';
 import { MyProfileComponent } from './my-profile/my-profile.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { SignupBusinessComponent } from './signup-business/signup-business.component';
-import { MyProfileBusinessComponent } from './my-profile-business/my-profile-business.component';
 import { ProfileRecoveryComponent } from './profile-recovery/profile-recovery.component';
 import { RecoverAccountComponent } from './recover-account/recover-account.component';
 import { Guard } from './guard/guard';
@@ -39,7 +38,6 @@ import { LikesComponent } from "./post/likes/likes.component";
         MyProfileComponent,
         ChangePasswordComponent,
         SignupBusinessComponent,
-        MyProfileBusinessComponent,
         ProfileRecoveryComponent,
         RecoverAccountComponent,
         LikesComponent

@@ -9,17 +9,17 @@ import { AuthService } from '../auth.service';
 })
 export class LoggedNavbarComponent implements OnInit {
 
+  username!: string;
+
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
   }
 
   profile(){
-    if(this.authService.getRoles() == "BusinessUser"){
-      this.router.navigateByUrl("/my-profile-business")
-    }else{
-      this.router.navigateByUrl("/my-profile")
-    }
+    this.username = this.authService.getUsername();
+
+    this.router.navigateByUrl("/profile/" + this.username);
   }
 
   logout() {
