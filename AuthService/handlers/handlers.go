@@ -321,6 +321,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Age:            r.Age,
 		CompanyWebsite: r.CompanyWebsite,
 		CompanyName:    r.CompanyName,
+		Role:           r.Role,
 	})
 
 	if err4 != nil {

@@ -51,6 +51,7 @@ func (ah *ProfileHandler) UserProfile(w http.ResponseWriter, r *http.Request) {
 		CompanyWebsite: response.CompanyWebsite,
 		Private:        response.Private,
 		IsFollowed:     response.FollowedByLogged,
+		Role:           response.Role,
 	}
 	err = ToJSON(userProfile, w)
 	if err != nil {

@@ -18,6 +18,7 @@ message ProfileRegisterRequest{
   string companyName = 8;
   string companyWebsite = 9;
   bool private = 10;
+  string role = 11;
 }
 message ProfileRegisterResponse{
 
@@ -38,6 +39,7 @@ message UserProfResponse{
   string companyWebsite = 9;
   bool private = 10;
   bool followedByLogged = 11;
+  string role = 12;
 }
 message ManagePrivacyRequest{
   string Token = 1;

@@ -39,6 +39,7 @@ func (pr *ProfileHandler) Register(ctx context.Context, r *profile.ProfileRegist
 		CompanyName:    r.CompanyName,
 		CompanyWebsite: r.CompanyWebsite,
 		Private:        true,
+		Role:           r.Role,
 	}
 	err := pr.repo.Register(user)
 	if err != nil {
@@ -91,6 +92,7 @@ func (pr *ProfileHandler) GetUserProfile(ctx context.Context, r *profile.UserPro
 		CompanyWebsite:   user.CompanyWebsite,
 		Private:          user.Private,
 		FollowedByLogged: response.IsFollowedByLogged,
+		Role:             user.Role,
 	}, nil
 
 }

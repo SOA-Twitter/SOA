@@ -11,4 +11,5 @@ type User struct {
 	CompanyName    string `bson:"company_name,omitempty" json:"company_name"`
 	CompanyWebsite string `bson:"company_website,omitempty" json:"company_website"`
 	Private        bool   `json:"private"`
+	Role           string `json:"role"`
 }
