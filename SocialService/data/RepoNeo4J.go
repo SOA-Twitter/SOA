@@ -155,8 +155,7 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 	pendingRequests, err := session.ExecuteRead(ctx,
 		func(transaction neo4j.ManagedTransaction) (any, error) {
 			result, err := transaction.Run(ctx,
-				`MATCH (u:User {username: $username }) -[:PENDING]-> (u:User)
-				RETURN u.username as username`,
+				`MATCH (u:User)-[r:FOLLOWS]->(u1:User) where u1.username = $username and r.status = "PENDING" RETURN u.username`,
 				map[string]any{"username": usernameOfRequester})
 			if err != nil {
 				return nil, err
@@ -176,6 +175,7 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 		nr.log.Println("Error querying search:", err)
 		return nil, err
 	}
+	nr.log.Println(pendingRequests)
 	return pendingRequests.([]*social.PendingFollower), nil
 }
 
