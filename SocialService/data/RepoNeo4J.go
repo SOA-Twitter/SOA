@@ -86,10 +86,7 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 		createdRelationship, err1 := session.ExecuteWrite(ctx,
 			func(tx neo4j.ManagedTransaction) (any, error) {
 				var result, err = tx.Run(ctx,
-					"MATCH (user1:User {username: \"$usernameOfFollower\"}) "+
-						"MATCH (user2:User {username: \"$usernameToFollow\"}) "+
-						"CREATE (user1)-[r:FOLLOWS {status: \"PENDING\"}]->(user2) "+
-						"RETURN r.status",
+					"optional match (u1:User), (u2:User) where u1.username = $usernameOfFollower and u2.username = $usernameToFollow Merge (u1)-[r:FOLLOWS{status:\"PENDING\"}]->(u2) RETURN r.status",
 					map[string]any{"usernameOfFollower": usernameOfFollower, "usernameToFollow": usernameToFollow})
 
 				if err != nil {
@@ -113,10 +110,7 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 		createdRelationship, err1 := session.ExecuteWrite(ctx,
 			func(tx neo4j.ManagedTransaction) (any, error) {
 				var result, err = tx.Run(ctx,
-					"MATCH (user1:User {username: \"$usernameOfFollower\"}) "+
-						"MATCH (user2:User {username: \"$usernameToFollow\"}) "+
-						"CREATE (user1)-[r:FOLLOWS {status: \"FOLLOWS\"}]->(user2) "+
-						"RETURN r.status",
+					"optional match (u1:User), (u2:User) where u1.username = $usernameOfFollower and u2.username = $usernameToFollow Merge (u1)-[r:FOLLOWS{status:\"FOLLOWS\"}]->(u2) RETURN r.status",
 					map[string]any{"usernameOfFollower": usernameOfFollower, "usernameToFollow": usernameToFollow})
 
 				if err != nil {
