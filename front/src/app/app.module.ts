@@ -23,6 +23,7 @@ import { RecoverAccountComponent } from './recover-account/recover-account.compo
 import { Guard } from './guard/guard';
 import { httpInterceptorProviders } from 'src';
 import { LikesComponent } from "./post/likes/likes.component";
+import { RequestsComponent } from "./my-profile/requests/requests.component";
 
 @NgModule({
     declarations: [
@@ -40,7 +41,8 @@ import { LikesComponent } from "./post/likes/likes.component";
         SignupBusinessComponent,
         ProfileRecoveryComponent,
         RecoverAccountComponent,
-        LikesComponent
+        LikesComponent,
+        RequestsComponent
     ],
     providers: [httpInterceptorProviders, Guard],
     bootstrap: [AppComponent],

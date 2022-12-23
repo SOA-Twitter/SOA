@@ -78,6 +78,22 @@ export class AuthService {
       return this.httpClient.put('https://localhost:8081/tweet/like/' + id, { "liked" : liked })
     }
 
+    followUser(username: string): Observable<any>{
+      return this.httpClient.post('https://localhost:8081/social/follow', {"username" : username})
+    }
+
+    getRequests(): Observable<any>{
+      return this.httpClient.get('https://localhost:8081/social/pending')
+    }
+
+    acceptReq(username: string): Observable<any>{
+      return this.httpClient.put('https://localhost:8081/social/accept', {"username" : username})
+    }
+
+    decline(username: string): Observable<any>{
+      return this.httpClient.put('https://localhost:8081/social/decline', {"username" : username})
+    }
+
     get isAuthenticated() {
         return this.getToken();
     }

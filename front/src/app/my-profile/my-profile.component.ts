@@ -1,8 +1,12 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { CheckboxControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { Post } from '../model/post';
+import { Request } from '../model/request';
+
+declare var window:any;
 
 @Component({
   selector: 'app-my-profile',
@@ -12,28 +16,31 @@ import { Post } from '../model/post';
 export class MyProfileComponent implements OnInit {
 
   posts: Post[] = [];
+  usernames: Request[] = [];
+
+  formModal: any;
 
   currentUser = {
-    "username" : "",
-    "first_name" : "",
-    "last_name" : "",
-    "email" : "",
-    "gender" : "",
-    "country" : "",
-    "age" : 0,
+    "username": "",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "gender": "",
+    "country": "",
+    "age": 0,
     "company_name": "",
     "company_website": "",
-    "private" : false,
+    "private": false,
     "role": ""
   };
 
   constructor(
     private service: AuthService,
     private route: ActivatedRoute,
-  ){}
+  ) { }
 
   ngOnInit(): void {
-    
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       let username = params.get('username') || ""
 
@@ -63,28 +70,55 @@ export class MyProfileComponent implements OnInit {
     });
   }
 
-  protected canEditPrivacy() : boolean{
-      return this.currentUser.username === this.service.getUsername();
+  protected canEditPrivacy(): boolean {
+    return this.currentUser.username === this.service.getUsername();
   }
 
-  protected changePrivacy(){
+  protected changePrivacy() {
     var checkBoxElem = document.getElementById('privacy-checkbox') as HTMLInputElement;
     // console.log(checkBoxElem.checked);
     checkBoxElem.disabled = true;
 
-    this.service.changeProfilePrivacy(checkBoxElem.checked).subscribe( 
+    this.service.changeProfilePrivacy(checkBoxElem.checked).subscribe(
       (privacy) => {
-          console.log(JSON.stringify(privacy));
-          checkBoxElem.disabled = false;
+        console.log(JSON.stringify(privacy));
+        checkBoxElem.disabled = false;
       },
-      (error :HttpErrorResponse) => {
-          console.log(JSON.stringify(error));
-          alert("An error occured during privacy change request.");
-          // Revert checkbox value to previous state, before the request
-          checkBoxElem.checked = this.currentUser.private;
-          checkBoxElem.disabled = false;
+      (error: HttpErrorResponse) => {
+        console.log(JSON.stringify(error));
+        alert("An error occured during privacy change request.");
+        // Revert checkbox value to previous state, before the request
+        checkBoxElem.checked = this.currentUser.private;
+        checkBoxElem.disabled = false;
       }
     );
+  }
+
+  showModal(){
+    this.formModal = new window.bootstrap.Modal(
+      document.getElementById("req")
+    );
+
+    this.service.getRequests().subscribe((usernames) => {this.usernames = usernames});
+
+    this.formModal.show();
+  }
+
+  closeModal(){
+    this.formModal.hide();
+  }
+
+  followUser(){
+    var followbtn = document.getElementById("followBtn") as HTMLInputElement
+    // followbtn.disabled = false
+
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let username = params.get('username') || ""
+      this.service.followUser((username)).subscribe(() => {
+        followbtn.disabled = true
+        followbtn.innerHTML = "requested"
+      })
+    })
   }
 
 }

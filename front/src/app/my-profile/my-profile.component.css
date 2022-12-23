@@ -37,6 +37,21 @@ body{
     margin-right: 8px;
 }
 
+.requests, .follow{
+    border-color: #1DA1F2;
+    color: #1DA1F2;
+    fill: #1DA1F2;
+    border: 1px solid;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
+    text-transform: uppercase;
+    padding: 3px 16px;
+}
+
 .post{
     margin-top: 10px;
     display: block;

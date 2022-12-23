@@ -1,0 +1,11 @@
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+<div *ngIf="username1">
+    <div class="col-sm-12">
+        <a href="profile/{{username1.username}}">{{username1.username}}</a>
+        <button class="btn accept shadow-none" (click)="accept(username1.username)">✅</button>
+        <button class="btn shadow-none" (click)="decline(username1.username)">❌</button>
+    </div>
+</div>
