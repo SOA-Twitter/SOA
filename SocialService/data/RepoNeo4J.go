@@ -151,11 +151,10 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 	ctx := context.Background()
 	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
-
 	pendingRequests, err := session.ExecuteRead(ctx,
 		func(transaction neo4j.ManagedTransaction) (any, error) {
 			result, err := transaction.Run(ctx,
-				`MATCH (u:User)-[r:FOLLOWS]->(u1:User) where u1.username = $username and r.status = "PENDING" RETURN u.username`,
+				"MATCH (u:User)-[r:FOLLOWS]->(u1:User) where u1.username = $username and r.status = \"PENDING\" RETURN u.username as username",
 				map[string]any{"username": usernameOfRequester})
 			if err != nil {
 				return nil, err
@@ -164,18 +163,22 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 			var pendingList []*social.PendingFollower
 			for result.Next(ctx) {
 				record := result.Record()
-				username, _ := record.Get("username")
+				username, ok := record.Get("username")
+				if !ok {
+					nr.log.Println("Nije dobro ne valja")
+					//username = "toki"
+				}
 				pendingList = append(pendingList, &social.PendingFollower{
 					Username: username.(string),
 				})
 			}
+
 			return pendingList, nil
 		})
 	if err != nil {
 		nr.log.Println("Error querying search:", err)
 		return nil, err
 	}
-	nr.log.Println(pendingRequests)
 	return pendingRequests.([]*social.PendingFollower), nil
 }
 
