@@ -110,7 +110,7 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 		createdRelationship, err1 := session.ExecuteWrite(ctx,
 			func(tx neo4j.ManagedTransaction) (any, error) {
 				var result, err = tx.Run(ctx,
-					"optional match (u1:User), (u2:User) where u1.username = $usernameOfFollower and u2.username = $usernameToFollow Merge (u1)-[r:FOLLOWS{status:\"FOLLOWS\"}]->(u2) RETURN r.status",
+					"optional match (u1:User), (u2:User) where u1.username = $usernameOfFollower and u2.username = $usernameToFollow Merge (u1)-[r:FOLLOWS{status:\"ACCEPTED\"}]->(u2) RETURN r.status",
 					map[string]any{"usernameOfFollower": usernameOfFollower, "usernameToFollow": usernameToFollow})
 
 				if err != nil {
@@ -130,7 +130,6 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 		nr.log.Println(createdRelationship)
 		return nil
 	}
-	return nil
 }
 
 // *TODO: db delete relationship query
@@ -185,12 +184,37 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 func (nr *Neo4JRepo) IsFollowed(requesterUsername string, targetUsername string) (bool, error) {
 	nr.log.Println("RepoNeo4j - Is Followed")
 
-	follows := false
-	//	TODO db query requesterUsername-->follows (accepted)-->targetUsername
-	//   follows, errDB := query()
-	//	 if errDB != nil {
-	//		 nr.log.Println("RepoNeo4j - Error getting Is Followed info from db")
-	//		 return follows, errDB
+	isFollowed := false
 
-	return follows, nil
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+	_, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				"MATCH (u:User)-[r:FOLLOWS]->(u1:User) where u.username = $requesterUsername and u1.username = $targetUsername and r.status = \"ACCEPTED\" RETURN count(r) as relationshipCount",
+				map[string]any{"requesterUsername": requesterUsername, "targetUsername": targetUsername})
+			if err != nil {
+				nr.log.Println("RepoNeo4j - Error getting Is Followed info")
+				return isFollowed, err
+			}
+
+			record := result.Record()
+			relationshipCount, ok := record.Get("relationshipCount")
+			if !ok {
+				nr.log.Println("Could not get relationship Count from query result")
+			}
+
+			if relationshipCount.(int) == 1 {
+				isFollowed = true
+			}
+			return isFollowed, nil
+
+		})
+	if err != nil {
+		nr.log.Println("Error querying db:", err)
+		return isFollowed, err
+	}
+
+	return isFollowed, nil
 }
