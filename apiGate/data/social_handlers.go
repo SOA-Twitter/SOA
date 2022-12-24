@@ -147,3 +147,59 @@ func (h *SocialHandler) IsFollowed(writer http.ResponseWriter, request *http.Req
 		return
 	}
 }
+
+func (h *SocialHandler) AcceptFollowRequest(writer http.ResponseWriter, request *http.Request) {
+	h.l.Println("apiGate - Accept Follow Request Handler")
+
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
+	userTarget := UserNode{}
+	err := FromJSON(&userTarget, request.Body)
+	if err != nil {
+		h.l.Println(unMarshall)
+		http.Error(writer, invalidJson, http.StatusBadRequest)
+		return
+	}
+
+	_, errSocial := h.pr.AcceptFollowRequest(context.Background(), &social.ManageFollowRequest{
+		Requester: c,
+		Target:    userTarget.Username,
+	})
+	if errSocial != nil {
+		h.l.Println("Unable to accept follow req")
+		http.Error(writer, "Cannot accept follow req", http.StatusNotFound)
+		return
+	}
+}
+
+func (h *SocialHandler) DeclineFollowRequest(writer http.ResponseWriter, request *http.Request) {
+	h.l.Println("apiGate - Decline Follow Request Handler")
+
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
+	userTarget := UserNode{}
+	err := FromJSON(&userTarget, request.Body)
+	if err != nil {
+		h.l.Println(unMarshall)
+		http.Error(writer, invalidJson, http.StatusBadRequest)
+		return
+	}
+
+	_, errSocial := h.pr.DeclineFollowRequest(context.Background(), &social.ManageFollowRequest{
+		Requester: c,
+		Target:    userTarget.Username,
+	})
+	if errSocial != nil {
+		h.l.Println("Unable to decline follow req")
+		http.Error(writer, "Cannot decline follow req", http.StatusNotFound)
+		return
+	}
+}

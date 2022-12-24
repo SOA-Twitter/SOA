@@ -132,19 +132,40 @@ func (nr *Neo4JRepo) Follow(usernameOfFollower string, usernameToFollow string, 
 	}
 }
 
-// *TODO: db delete relationship query
 func (nr *Neo4JRepo) Unfollow(usernameOfRequester string, usernameToUnfollow string) error {
 	nr.log.Println("RepoNeo4j - Unfollow User")
 
-	// TODO db delete relationship query:
-	// ...
-	// return err
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err1 := session.ExecuteWrite(ctx,
+		func(tx neo4j.ManagedTransaction) (any, error) {
+			var result, err = tx.Run(ctx,
+				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfRequester and u2.username = $usernameToUnfollow DELETE r",
+				map[string]any{"usernameOfRequester": usernameOfRequester, "usernameToUnfollow": usernameToUnfollow})
+
+			if err != nil {
+				nr.log.Println(err)
+				return nil, err
+			}
+
+			if result.Next(ctx) {
+				return result.Record().Values[0], nil
+			}
+
+			return nil, result.Err()
+		})
+	if err1 != nil {
+		nr.log.Println(err1)
+		return err1
+	}
 
 	// Final return after no errors:
 	return nil
 }
 
-// *TODO: db get username of Nodes whose relationship Status towards "usernameOfRequester" == pending
+// *db get username of Nodes whose relationship Status towards "usernameOfRequester" == pending
 func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.PendingFollower, error) {
 	nr.log.Println("RepoNeo4j - Get Pending Followers")
 	ctx := context.Background()
@@ -217,4 +238,70 @@ func (nr *Neo4JRepo) IsFollowed(requesterUsername string, targetUsername string)
 	}
 
 	return isFollowed, nil
+}
+
+func (nr *Neo4JRepo) DeclineFollowRequest(usernameOfRequester string, usernameOfTarget string) error {
+	nr.log.Println("RepoNeo4j - Decline Follow Request")
+
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err1 := session.ExecuteWrite(ctx,
+		func(tx neo4j.ManagedTransaction) (any, error) {
+			var result, err = tx.Run(ctx,
+				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfRequester and u2.username = $usernameOfTarget DELETE r",
+				map[string]any{"usernameOfRequester": usernameOfRequester, "usernameOfTarget": usernameOfTarget})
+
+			if err != nil {
+				nr.log.Println(err)
+				return nil, err
+			}
+
+			if result.Next(ctx) {
+				return result.Record().Values[0], nil
+			}
+
+			return nil, result.Err()
+		})
+	if err1 != nil {
+		nr.log.Println(err1)
+		return err1
+	}
+
+	// Final return after no errors:
+	return nil
+}
+
+func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfRequester string, usernameOfTarget string) error {
+	nr.log.Println("RepoNeo4j - Accept Follow Request")
+
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	_, err1 := session.ExecuteWrite(ctx,
+		func(tx neo4j.ManagedTransaction) (any, error) {
+			var result, err = tx.Run(ctx,
+				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfRequester and u2.username = $usernameOfTarget and r.status = \"PENDING\" SET r.status =\"ACCEPTED\" RETURN r.status as status",
+				map[string]any{"usernameOfRequester": usernameOfRequester, "usernameOfTarget": usernameOfTarget})
+
+			if err != nil {
+				nr.log.Println(err)
+				return nil, err
+			}
+
+			if result.Next(ctx) {
+				return result.Record().Values[0], nil
+			}
+
+			return nil, result.Err()
+		})
+	if err1 != nil {
+		nr.log.Println(err1)
+		return err1
+	}
+
+	// Final return after no errors:
+	return nil
 }

@@ -118,3 +118,37 @@ func (s *SocialHandler) IsFollowed(ctx context.Context, r *social.IsFollowedRequ
 		IsFollowedByLogged: result,
 	}, nil
 }
+
+func (s *SocialHandler) DeclineFollowRequest(ctx context.Context, r *social.ManageFollowRequest) (*social.ManageFollowResponse, error) {
+	s.l.Println("Social service - Decline Follow Request")
+
+	claims, err := data.GetFromClaims(r.Requester)
+	if err != nil {
+		s.l.Println("Error getting claims")
+		return &social.ManageFollowResponse{}, err
+	}
+
+	err1 := s.repoImpl.DeclineFollowRequest(claims.Username, r.Target)
+	if err1 != nil {
+		s.l.Println("Error Declining follow request from ", claims.Username)
+		return &social.ManageFollowResponse{}, err1
+	}
+	return &social.ManageFollowResponse{}, nil
+}
+
+func (s *SocialHandler) AcceptFollowRequest(ctx context.Context, r *social.ManageFollowRequest) (*social.ManageFollowResponse, error) {
+	s.l.Println("Social service - Accept Follow Request")
+
+	claims, err := data.GetFromClaims(r.Requester)
+	if err != nil {
+		s.l.Println("Error getting claims")
+		return &social.ManageFollowResponse{}, err
+	}
+
+	err1 := s.repoImpl.AcceptFollowRequest(claims.Username, r.Target)
+	if err1 != nil {
+		s.l.Println("Error Accepting follow request from  ", claims.Username)
+		return &social.ManageFollowResponse{}, err1
+	}
+	return &social.ManageFollowResponse{}, nil
+}

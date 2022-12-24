@@ -7,6 +7,8 @@ service SocialService {
   rpc Unfollow(FollowRequest) returns(UnfollowResponse){}
   rpc GetPendingFollowRequests(GetPendingRequest) returns(PendingFollowerResponse){}
   rpc IsFollowed(IsFollowedRequest) returns(IsFollowedResponse){}
+  rpc AcceptFollowRequest(ManageFollowRequest) returns(ManageFollowResponse){}
+  rpc DeclineFollowRequest(ManageFollowRequest) returns(ManageFollowResponse){}
 }
 message RegUserRequest{
   string username = 1;
@@ -40,4 +42,11 @@ message IsFollowedRequest{
 }
 message IsFollowedResponse{
   bool isFollowedByLogged = 1;
+}
+
+message ManageFollowRequest{
+  string requester = 1;
+  string target = 2;
+}
+message ManageFollowResponse{
 }
