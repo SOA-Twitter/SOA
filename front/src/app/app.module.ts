@@ -18,38 +18,40 @@ import { NgxCaptchaModule } from 'ngx-captcha';
 import { MyProfileComponent } from './my-profile/my-profile.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { SignupBusinessComponent } from './signup-business/signup-business.component';
-import { MyProfileBusinessComponent } from './my-profile-business/my-profile-business.component';
 import { ProfileRecoveryComponent } from './profile-recovery/profile-recovery.component';
 import { RecoverAccountComponent } from './recover-account/recover-account.component';
 import { Guard } from './guard/guard';
 import { httpInterceptorProviders } from 'src';
+import { LikesComponent } from "./post/likes/likes.component";
+import { RequestsComponent } from "./my-profile/requests/requests.component";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavbarComponent,
-    UnloggedHomeComponent,
-    LoginComponent,
-    SignupComponent,
-    PostComponentComponent,
-    LoggedHomeComponent,
-    LoggedNavbarComponent,
-    CreatePostComponent,
-    MyProfileComponent,
-    ChangePasswordComponent,
-    SignupBusinessComponent,
-    MyProfileBusinessComponent,
-    ProfileRecoveryComponent,
-    RecoverAccountComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    NgxCaptchaModule
-  ],
-  providers: [httpInterceptorProviders, Guard],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        NavbarComponent,
+        UnloggedHomeComponent,
+        LoginComponent,
+        SignupComponent,
+        PostComponentComponent,
+        LoggedHomeComponent,
+        LoggedNavbarComponent,
+        CreatePostComponent,
+        MyProfileComponent,
+        ChangePasswordComponent,
+        SignupBusinessComponent,
+        ProfileRecoveryComponent,
+        RecoverAccountComponent,
+        LikesComponent,
+        RequestsComponent
+    ],
+    providers: [httpInterceptorProviders, Guard],
+    bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        NgxCaptchaModule,
+    ]
 })
 export class AppModule { }

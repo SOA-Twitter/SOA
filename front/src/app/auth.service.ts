@@ -13,6 +13,9 @@ import { uuid } from "./model/uuid";
 import jwt_decode, { JwtPayload } from "jwt-decode";
 import { JsonPipe } from "@angular/common";
 import { MyToken } from "./model/myToken";
+import { createPost } from "./model/createPost";
+import { Post } from "./model/post";
+import { Like } from "./model/like";
 
 @Injectable({
     providedIn: 'root'
@@ -51,86 +54,101 @@ export class AuthService {
       return this.httpClient.post<ChangePassword>('https://localhost:8081/profile/changePassword', changePassword)
     }
 
+    createPost(post: createPost): Observable<createPost>{
+      return this.httpClient.post<createPost>("https://localhost:8081/tweet/postTweets", post)
+    }
+
+    getProfileDetails(username: string): Observable<any>{
+      return this.httpClient.get('https://localhost:8081/profile/' + username)
+    }
+
+    getPostByLoggedUser(username: string): Observable<Post[]>{
+      return this.httpClient.get<Post[]>(`https://localhost:8081/tweet/getTweets/${username}`)
+    }
+
+    changeProfilePrivacy(privacy: boolean): Observable<any>{
+      return this.httpClient.put('https://localhost:8081/profile/privacy', { "private" : privacy })
+    }
+
+    getLikesByTweetId(id: string): Observable<Like[]>{
+      return this.httpClient.get<Like[]>(`https://localhost:8081/tweet/getTweetLikes/${id}`);
+    }
+
+    like(liked: boolean, id: string): Observable<any>{
+      return this.httpClient.put('https://localhost:8081/tweet/like/' + id, { "liked" : liked })
+    }
+
+    followUser(username: string): Observable<any>{
+      return this.httpClient.post('https://localhost:8081/social/follow', {"username" : username})
+    }
+
+    getRequests(): Observable<any>{
+      return this.httpClient.get('https://localhost:8081/social/pending')
+    }
+
+    acceptReq(username: string): Observable<any>{
+      return this.httpClient.put('https://localhost:8081/social/accept', {"username" : username})
+    }
+
+    decline(username: string): Observable<any>{
+      return this.httpClient.put('https://localhost:8081/social/decline', {"username" : username})
+    }
+
+    isFollowed(username: string): Observable<any>{
+      return this.httpClient.get('https://localhost:8081/social/isFollowed/'+ username)
+    }
+
     get isAuthenticated() {
         return this.getToken();
     }
 
     logout() {
-        localStorage.removeItem('token');
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-        this.router.navigateByUrl('/login');
+      localStorage.removeItem('jwt token')
+      this.router.navigateByUrl('/login');
     }
-    
-    getUsername() {
+
+    getUsername(): string {
       let token = this.parseToken();
-        if (token) {
-          // return this.parseToken()['sub']
-          return this.parseToken()?.email;
-        }
+      if (token) {
+        return this.parseToken()['Username']
+      }
       return "";
     }
-    
-    getRoles() {
-      // let token = this.parseToken();
-      // if (token) {
-      //   return this.parseToken();
-      // }
-      // return []
-      var rola = this.parseToken()?.role;
-      return rola;
-    }
-    
-    private parseToken() {
-      // NPR. COOKIE JWT VALUE  token=aiwomdwoaimd.awdawdwadwadaw.awdawdwadawda;cookie=wa,da;d,;
-      let jwt = this.getToken();
-      // alert(jwt);
-      if (jwt !== null) {
-        var decoded = jwt_decode<MyToken>(jwt);
-        console.log(decoded);
-        return decoded;
+  
+    getEmail(): string {
+      let token = this.parseToken();
+      if (token) {
+        return this.parseToken()['Email']
       }
-      return
-      
+      return "";
     }
-
-    setCookieToken(token: string){
-      document.cookie = "token="+token;
+  
+    getRoles() {
+      let token = this.parseToken();
+      if (token) {
+        return this.parseToken()['Role'];
+      }
+      return []
     }
-    
+  
+    private parseToken() {
+      let jwt = localStorage.getItem('jwt token');
+      if (jwt !== null) {
+        let jwtData = jwt.split('.')[1];
+        let decodedJwtJsonData = atob(jwtData);
+        let decodedJwtData = JSON.parse(decodedJwtJsonData);
+        return decodedJwtData;
+      }
+    }
+  
     tokenIsPresent(): Boolean {
       let token = this.getToken()
-      return token != null && token != "" && token != undefined;
+      return token != null;
     }
-    
-    // TODO check if it takes token from cookie & if guards work consequently as expected
+  
     getToken() {
-      // let token = localStorage.getItem('token');
-      let token = this.getCookieToken();
-      
+      let token = localStorage.getItem('jwt token');
       return token
-    }
-
-    getCookieToken() {
-      // alert("cookie value: " + document.cookie);
-
-      let name = "token" + "=";
-      let decodedCookie = decodeURIComponent(document.cookie);
-      let ca = decodedCookie.split(';');
-      for(let i = 0; i <ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') {
-          c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-          // alert("C var/ cookie whole: " + c);
-          // return c.substring(name.length, c.length);
-          return c;
-        }
-      }
-      // DELETE THIS alert
-      // alert(this.parseToken());
-      return "";
     }
 
 }

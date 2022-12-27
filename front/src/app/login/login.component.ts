@@ -37,11 +37,10 @@ export class LoginComponent implements OnInit {
     this.userLogin = new UserLogin(this.loginForm.value);
     this.authService.login(this.userLogin).subscribe((token: string) => 
     {
-      token = token.replace("\"", "");
-      token = token.replace("\"", "");
       this.router.navigateByUrl("/logged-home"); 
-      localStorage.setItem('token', token);
-      this.authService.setCookieToken(token);
+      token = token.replace("\"", "");
+      token = token.replace("\"", "");
+      localStorage.setItem('jwt token', token);
     },
     () => {window.alert('Invalid credentials!')});
   }
