@@ -1,11 +1,11 @@
 export class ChangePassword{
-    old_password: string | undefined;
-    new_password: string | undefined;
-    repeated_password: string | undefined;
+    old_password: string;
+    new_password: string;
+    repeated_password: string;
 
     constructor(obj?: any){
-        this.old_password && obj.old_password || null;
-        this.new_password && obj.new_password || null;
-        this.repeated_password && obj.repeated_password || null;
+        this.old_password = obj && obj.old_password || null;
+        this.new_password = obj && obj.new_password || null;
+        this.repeated_password = obj && obj.repeated_password || null;
     }
 }

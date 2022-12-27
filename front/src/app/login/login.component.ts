@@ -1,5 +1,5 @@
-import { Component, OnInit, SecurityContext } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { UserLogin } from '../model/userLogin';
@@ -18,16 +18,16 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private sanitizer: DomSanitizer
-  ) { 
+  ) {
     this.createForm()
   }
 
   createForm(){
     this.loginForm = this.fb.group({
-      'email' : new UntypedFormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
-      'password': new UntypedFormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')])
+      'email' : new FormControl(null, [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
+      'password': new FormControl('', [Validators.required, Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')])
     });
   }
 
@@ -35,15 +35,15 @@ export class LoginComponent implements OnInit {
 
   submit(){
     this.userLogin = new UserLogin(this.loginForm.value);
-    this.authService.login(this.userLogin).subscribe((token: string) => 
+    this.authService.login(this.userLogin).subscribe((token: string) =>
     {
-      this.router.navigateByUrl("/logged-home"); 
+      this.router.navigateByUrl("/logged-home");
       token = token.replace("\"", "");
       token = token.replace("\"", "");
       localStorage.setItem('jwt token', token);
     },
     () => {window.alert('Invalid credentials!')});
   }
-  
+
 
 }

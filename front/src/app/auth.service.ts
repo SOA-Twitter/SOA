@@ -4,15 +4,10 @@ import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { BuisnessUser } from "./model/businessUser";
 import { ChangePassword } from "./model/changePassword";
-import { recoverProfile } from "./model/recoverProfile";
 import { recoverProfileWithUuid } from "./model/recoverProfileWithUuid";
 import { recoveryMail } from "./model/recoveryMail";
 import { User } from "./model/user";
 import { UserLogin } from "./model/userLogin";
-import { uuid } from "./model/uuid";
-import jwt_decode, { JwtPayload } from "jwt-decode";
-import { JsonPipe } from "@angular/common";
-import { MyToken } from "./model/myToken";
 import { createPost } from "./model/createPost";
 import { Post } from "./model/post";
 import { Like } from "./model/like";
@@ -22,7 +17,7 @@ import { Like } from "./model/like";
 })
 
 export class AuthService {
-    
+
     constructor (
         private httpClient: HttpClient,
         private router: Router
@@ -114,7 +109,7 @@ export class AuthService {
       }
       return "";
     }
-  
+
     getEmail(): string {
       let token = this.parseToken();
       if (token) {
@@ -122,7 +117,7 @@ export class AuthService {
       }
       return "";
     }
-  
+
     getRoles() {
       let token = this.parseToken();
       if (token) {
@@ -130,7 +125,7 @@ export class AuthService {
       }
       return []
     }
-  
+
     private parseToken() {
       let jwt = localStorage.getItem('jwt token');
       if (jwt !== null) {
@@ -140,12 +135,12 @@ export class AuthService {
         return decodedJwtData;
       }
     }
-  
-    tokenIsPresent(): Boolean {
+
+    tokenIsPresent(): boolean {
       let token = this.getToken()
       return token != null;
     }
-  
+
     getToken() {
       let token = localStorage.getItem('jwt token');
       return token

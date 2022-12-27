@@ -140,7 +140,6 @@ func (ps *AuthRepoPostgres) SaveActivationRequest(activationUUID string, registe
 		ActivationUUID: activationUUID,
 		Email:          registeredEmail,
 	}
-	//*TODO: check if db.Create() makes another table for new Struct, or whether it tries saving in Users table
 	createdRequest := ps.db.Create(activationRequest)
 	var errMessage = createdRequest.Error
 	if createdRequest.Error != nil {
@@ -176,7 +175,6 @@ func (ps *AuthRepoPostgres) SaveRecoveryRequest(recoveryUUID string, registeredE
 		RecoveryUUID: recoveryUUID,
 		Email:        registeredEmail,
 	}
-	//*TODO: check if db.Create() makes another table for new Struct, or whether it tries saving in Users table
 	createdRequest := ps.db.Create(recoveryRequest)
 	var errMessage = createdRequest.Error
 	if createdRequest.Error != nil {

@@ -1,4 +1,4 @@
-import { Component, OnInit, SecurityContext } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {  Validators, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { User } from 'src/app/model/user';
 import { AuthService } from '../auth.service';
@@ -37,16 +37,16 @@ export class SignupComponent implements OnInit {
   ngOnInit() {}
 
   submit(){
-    this.user = new User(this.register.value); 
-    this.authService.signUp(this.user).subscribe((res) => 
+    this.user = new User(this.register.value);
+    this.authService.signUp(this.user).subscribe((res) =>
     {
       if (res.toString() == 'Created' || res.toString() == '201' || res.toString() == 'Ok' || res.toString() == '200') {
         this.router.navigateByUrl("/login");
       }else{
         alert("An error occurred while registrating. Please try again later!");
       }
-      
-    
+
+
     });
   }
 

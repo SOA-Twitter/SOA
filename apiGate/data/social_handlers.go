@@ -8,6 +8,10 @@ import (
 	"net/http"
 )
 
+const (
+	cookieErrMsg = "Unauthorized! NO COOKIE"
+)
+
 type SocialHandler struct {
 	l  *log.Logger
 	pr social.SocialServiceClient
@@ -23,7 +27,7 @@ func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
-		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
 		return
 	}
 
@@ -53,7 +57,6 @@ func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request
 		return
 	}
 
-	// TODO look how "response" JSON is shown on client side !
 	err = ToJSON(response, writer)
 	if err != nil {
 		h.l.Println(jsonErrMsg)
@@ -67,7 +70,7 @@ func (h *SocialHandler) Unfollow(writer http.ResponseWriter, request *http.Reque
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
-		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
 		return
 	}
 
@@ -95,7 +98,7 @@ func (h *SocialHandler) GetPendingFollowRequests(writer http.ResponseWriter, req
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
-		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
 		return
 	}
 
@@ -120,7 +123,7 @@ func (h *SocialHandler) IsFollowed(writer http.ResponseWriter, request *http.Req
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
-		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
 		return
 	}
 
@@ -148,7 +151,7 @@ func (h *SocialHandler) AcceptFollowRequest(writer http.ResponseWriter, request 
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
-		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
 		return
 	}
 
@@ -176,7 +179,7 @@ func (h *SocialHandler) DeclineFollowRequest(writer http.ResponseWriter, request
 
 	c := request.Header.Get("Authorization")
 	if c == "" {
-		http.Error(writer, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
 		return
 	}
 

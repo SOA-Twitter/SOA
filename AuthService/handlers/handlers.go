@@ -100,7 +100,6 @@ func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRe
 	errDelRecoveryReq := a.repo.DeleteRecoveryRequest(recoveryReq.RecoveryUUID, recoveryReq.Email)
 	if errDelRecoveryReq != nil {
 		a.l.Println("Error Deleting Password Recovery Request")
-		//	*TODO: NEKAKAV ROLLBACK?
 	}
 
 	return &auth.ChangePasswordResponse{
@@ -182,7 +181,6 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 	errDelAccActReq := a.repo.DeleteActivationRequest(activationReq.ActivationUUID, activationReq.Email)
 	if errDelAccActReq != nil {
 		a.l.Println("Error Deleting Account Activation Request")
-		//	*TODO: NEKAKAV ROLLBACK?
 	}
 
 	return &auth.ActivationResponse{
