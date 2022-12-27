@@ -3,6 +3,7 @@ package data
 import (
 	"apiGate/protos/social"
 	"context"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -123,25 +124,18 @@ func (h *SocialHandler) IsFollowed(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	userTarget := UserNode{}
-	err := FromJSON(&userTarget, request.Body)
-	h.l.Println("from REQUEST BODY target username: ", userTarget.Username)
-	if err != nil {
-		h.l.Println(unMarshall)
-		http.Error(writer, invalidJson, http.StatusBadRequest)
-		return
-	}
+	targetUsername := mux.Vars(request)["username"]
 
 	response, errSocial := h.pr.IsFollowed(context.Background(), &social.IsFollowedRequest{
 		Requester: c,
-		Target:    userTarget.Username,
+		Target:    targetUsername,
 	})
 	if errSocial != nil {
 		h.l.Println("Unable to get IsFollowed info")
 		http.Error(writer, "Cannot get IsFollowed info", http.StatusNotFound)
 		return
 	}
-	err1 := ToJSON(response.IsFollowedByLogged, writer)
+	err1 := ToJSON(UserIsFollowed{IsFollowed: response.IsFollowedByLogged}, writer)
 	if err1 != nil {
 		h.l.Println(jsonErrMsg)
 		http.Error(writer, jsonErrMsg, http.StatusInternalServerError)

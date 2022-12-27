@@ -32,6 +32,9 @@ type UserInfo struct {
 	Private        bool   `json:"private"`
 	Role           string `json:"role"`
 }
+type UserIsFollowed struct {
+	IsFollowed bool `json:"is_followed"`
+}
 type UserNode struct {
 	Username string `json:"username"`
 }

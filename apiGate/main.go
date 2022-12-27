@@ -96,7 +96,7 @@ func main() {
 	socialRouter.HandleFunc("/follow", socialHandler.Follow).Methods(http.MethodPost)
 	socialRouter.HandleFunc("/unfollow", socialHandler.Unfollow).Methods(http.MethodDelete)
 	socialRouter.HandleFunc("/pending", socialHandler.GetPendingFollowRequests).Methods(http.MethodGet)
-	socialRouter.HandleFunc("/isFollowed", socialHandler.IsFollowed).Methods(http.MethodGet)
+	socialRouter.HandleFunc("/isFollowed/{username}", socialHandler.IsFollowed).Methods(http.MethodGet)
 	socialRouter.HandleFunc("/accept", socialHandler.AcceptFollowRequest).Methods(http.MethodPut)
 	socialRouter.HandleFunc("/decline", socialHandler.DeclineFollowRequest).Methods(http.MethodPut)
 
