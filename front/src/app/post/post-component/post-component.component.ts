@@ -58,7 +58,7 @@ export class PostComponentComponent implements OnInit {
 
   showModal(){
     this.formModal = new window.bootstrap.Modal(
-      document.getElementById("allLikesModal")
+      document.getElementById(this.post1.id + 1)
     );
 
     this.result = this.likes.filter(like => like.liked === true);
