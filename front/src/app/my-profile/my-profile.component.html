@@ -1,6 +1,7 @@
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <app-logged-navbar></app-logged-navbar>
 
-<div class="container">
+<div class="container bootstrap snippets bootdey">
   <div class="main-body">
 
     <div class="row gutters-sm">
@@ -102,6 +103,8 @@
             <div class="row">
               <div class="col-sm-12">
                 <input type="button" class="changePass" routerLink="/change-password" value="Change password" [hidden]="!canEditPrivacy()">
+                <input type="button" class="requests" value="Follow Requests" [hidden]="!canEditPrivacy()" (click)="showModal()">
+                <input id="followBtn" type="button" class="follow" value="Follow" [hidden]="canEditPrivacy() && !isFollowedByLoggedUser" (click)="followUser()">
               </div>
             </div>
           </div>
@@ -122,7 +125,7 @@
           <h5 class="modal-title" id="exampleModalLabel">Follow Requests</h5>
         </div>
         <div class="modal-body" *ngFor="let username of usernames">
-          <app-requests [username]="username"></app-requests>
+          <app-requests [username]="username" (handledFollowRequest)="removeHandledFollowRequest($event)"></app-requests>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>

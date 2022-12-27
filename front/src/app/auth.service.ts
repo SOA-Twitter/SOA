@@ -94,6 +94,10 @@ export class AuthService {
       return this.httpClient.put('https://localhost:8081/social/decline', {"username" : username})
     }
 
+    isFollowed(username: string): Observable<any>{
+      return this.httpClient.get('https://localhost:8081/social/isFollowed/'+ username)
+    }
+
     get isAuthenticated() {
         return this.getToken();
     }

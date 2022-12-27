@@ -17,6 +17,7 @@ export class MyProfileComponent implements OnInit {
 
   posts: Post[] = [];
   usernames: Request[] = [];
+  isFollowedByLoggedUser = false;
 
   formModal: any;
 
@@ -68,6 +69,8 @@ export class MyProfileComponent implements OnInit {
       let username = params.get('username') || ""
       this.service.getPostByLoggedUser((username)).subscribe(posts => { this.posts = posts })
     });
+
+    this.isFollowedByLoggedUser = this.isFollowed();
   }
 
   protected canEditPrivacy(): boolean {
@@ -109,16 +112,47 @@ export class MyProfileComponent implements OnInit {
   }
 
   followUser(){
-    var followbtn = document.getElementById("followBtn") as HTMLInputElement
+    let followbtn = document.getElementById("followBtn") as HTMLInputElement
     // followbtn.disabled = false
 
-    this.route.paramMap.subscribe((params: ParamMap) => {
-      let username = params.get('username') || ""
-      this.service.followUser((username)).subscribe(() => {
+    // this.route.paramMap.subscribe((params: ParamMap) => {
+    //   let usernameFromUrl = params.get('username') || "";
+    // })
+      let usernameFromUrl = this.route.snapshot.params['username'];
+      this.service.followUser(usernameFromUrl).subscribe(() => {
         followbtn.disabled = true
-        followbtn.innerHTML = "requested"
-      })
+        followbtn.value = "Requested"
+      })  
+  }
+
+  protected removeHandledFollowRequest(requester_username: string) {
+  
+    this.usernames = this.usernames.filter( (request_iter)=> {
+      request_iter.username != requester_username;
     })
   }
 
+  private isFollowed() : boolean{
+
+    let isFollowedInfo: boolean;
+    let followbtn = document.getElementById("followBtn") as HTMLInputElement;
+
+    this.service.isFollowed(this.route.snapshot.params['username']).subscribe(
+      (isFollowedObj) => {
+        isFollowedInfo = isFollowedObj.is_followed;
+        if (isFollowedInfo) {
+          followbtn.value = 'Following';
+          followbtn.disabled = true;
+          return true;
+        }
+        else{
+          return false;
+        }
+      },
+      (error: HttpErrorResponse) => {
+        console.log(JSON.stringify(error));
+      }
+    );
+    return false;
+  }
 }

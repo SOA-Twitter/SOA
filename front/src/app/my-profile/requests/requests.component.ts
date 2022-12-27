@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/auth.service';
 import { Request } from 'src/app/model/request';
 
@@ -11,23 +11,40 @@ export class RequestsComponent implements OnInit {
 
   @Input()
   username!: Request;
+  @Output()
+  handledFollowRequest: EventEmitter<any>;
 
-  constructor(private service: AuthService) { }
+  constructor(private service: AuthService) {
+    this.handledFollowRequest = new EventEmitter<string>();
+  }
 
   ngOnInit(): void {
   }
 
-  get username1(){
-    console.log(this.username)
-    return this.username;
+  get username1() {
+    let username2 = this.username;
+    return username2;
   }
 
-  accept(username: string){
-    this.service.acceptReq(username).subscribe()
+  protected accept(username: string) {
+    this.service.acceptReq(username).subscribe(
+      () => {
+        this.handledFollowRequest.emit(username);
+      },
+      (error) => {
+
+      }
+    )
   }
 
-  decline(username: string){
-    this.service.decline(username).subscribe()
+  protected decline(username: string) {
+    this.service.decline(username).subscribe(
+      () => {
+        this.handledFollowRequest.emit(username);
+      },
+      (error) => {
+
+      })
   }
 
 }
