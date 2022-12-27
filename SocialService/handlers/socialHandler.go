@@ -103,12 +103,14 @@ func (s *SocialHandler) GetPendingFollowRequests(ctx context.Context, r *social.
 func (s *SocialHandler) IsFollowed(ctx context.Context, r *social.IsFollowedRequest) (*social.IsFollowedResponse, error) {
 	s.l.Println("Social service - Is Followed by logged user")
 
+	s.l.Println("Social Svc - JWToken: ", r.Requester)
 	claims, err := data.GetFromClaims(r.Requester)
 	if err != nil {
 		s.l.Println("Error getting claims")
 		return nil, err
 	}
 
+	s.l.Println("Social Svc - Logged: ", claims.Username, "Target user: ", r.Target)
 	result, err := s.repoImpl.IsFollowed(claims.Username, r.Target)
 	if err != nil {
 		s.l.Println("Error returning Is Followed info")

@@ -204,7 +204,7 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 
 func (nr *Neo4JRepo) IsFollowed(requesterUsername string, targetUsername string) (bool, error) {
 	nr.log.Println("RepoNeo4j - Is Followed")
-
+	nr.log.Println("RepoNeo4j - Logged: ", requesterUsername, "Target user: ", targetUsername)
 	isFollowed := false
 
 	ctx := context.Background()
@@ -219,28 +219,31 @@ func (nr *Neo4JRepo) IsFollowed(requesterUsername string, targetUsername string)
 				nr.log.Println("RepoNeo4j - Error getting Is Followed info")
 				return isFollowed, err
 			}
+			for result.Next(ctx) {
+				record := result.Record()
+				relationshipCount, ok := record.Get("relationshipCount")
+				if !ok {
+					nr.log.Println("Could not get relationship Count from query result")
+				}
+				nr.log.Println("Casting relationshipCount found to int...")
+				nr.log.Println(relationshipCount)
+				if relationshipCount.(int64) == 1 {
+					isFollowed = true
+					nr.log.Println("isFollowed should be true here:", isFollowed)
+				}
 
-			record := result.Record()
-			relationshipCount, ok := record.Get("relationshipCount")
-			if !ok {
-				nr.log.Println("Could not get relationship Count from query result")
-			}
-
-			if relationshipCount.(int) == 1 {
-				isFollowed = true
 			}
 			return isFollowed, nil
-
 		})
 	if err != nil {
 		nr.log.Println("Error querying db:", err)
 		return isFollowed, err
 	}
-
+	nr.log.Println("isFollowed bool end of func:", isFollowed)
 	return isFollowed, nil
 }
 
-func (nr *Neo4JRepo) DeclineFollowRequest(usernameOfRequester string, usernameOfTarget string) error {
+func (nr *Neo4JRepo) DeclineFollowRequest(usernameOfFollowed string, usernameOfFollower string) error {
 	nr.log.Println("RepoNeo4j - Decline Follow Request")
 
 	ctx := context.Background()
@@ -250,8 +253,8 @@ func (nr *Neo4JRepo) DeclineFollowRequest(usernameOfRequester string, usernameOf
 	_, err1 := session.ExecuteWrite(ctx,
 		func(tx neo4j.ManagedTransaction) (any, error) {
 			var result, err = tx.Run(ctx,
-				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfRequester and u2.username = $usernameOfTarget DELETE r",
-				map[string]any{"usernameOfRequester": usernameOfRequester, "usernameOfTarget": usernameOfTarget})
+				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfFollower and u2.username = $usernameOfFollowed DELETE r",
+				map[string]any{"usernameOfFollowed": usernameOfFollowed, "usernameOfFollower": usernameOfFollower})
 
 			if err != nil {
 				nr.log.Println(err)
@@ -273,7 +276,7 @@ func (nr *Neo4JRepo) DeclineFollowRequest(usernameOfRequester string, usernameOf
 	return nil
 }
 
-func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfRequester string, usernameOfTarget string) error {
+func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfFollowed string, usernameOfFollower string) error {
 	nr.log.Println("RepoNeo4j - Accept Follow Request")
 
 	ctx := context.Background()
@@ -283,11 +286,11 @@ func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfRequester string, usernameOfT
 	_, err1 := session.ExecuteWrite(ctx,
 		func(tx neo4j.ManagedTransaction) (any, error) {
 			var result, err = tx.Run(ctx,
-				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfRequester and u2.username = $usernameOfTarget and r.status = \"PENDING\" SET r.status =\"ACCEPTED\" RETURN r.status as status",
-				map[string]any{"usernameOfRequester": usernameOfRequester, "usernameOfTarget": usernameOfTarget})
+				"MATCH (u1:User)-[r:FOLLOWS]->(u2:User) where u1.username = $usernameOfFollower and u2.username = $usernameOfFollowed and r.status = \"PENDING\" SET r.status =\"ACCEPTED\" RETURN r.status as status",
+				map[string]any{"usernameOfFollowed": usernameOfFollowed, "usernameOfFollower": usernameOfFollower})
 
 			if err != nil {
-				nr.log.Println(err)
+				nr.log.Println("ERROR running the query: ", err)
 				return nil, err
 			}
 
@@ -298,7 +301,7 @@ func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfRequester string, usernameOfT
 			return nil, result.Err()
 		})
 	if err1 != nil {
-		nr.log.Println(err1)
+		nr.log.Println("ERROR executing the querying func: ", err1)
 		return err1
 	}
 

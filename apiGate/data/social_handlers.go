@@ -125,6 +125,7 @@ func (h *SocialHandler) IsFollowed(writer http.ResponseWriter, request *http.Req
 
 	userTarget := UserNode{}
 	err := FromJSON(&userTarget, request.Body)
+	h.l.Println("from REQUEST BODY target username: ", userTarget.Username)
 	if err != nil {
 		h.l.Println(unMarshall)
 		http.Error(writer, invalidJson, http.StatusBadRequest)

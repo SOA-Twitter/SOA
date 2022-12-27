@@ -8,6 +8,6 @@ type SocialRepo interface {
 	Unfollow(usernameOfRequester string, usernameToUnfollow string) error
 	GetPendingFollowers(usernameOfRequester string) ([]*social.PendingFollower, error)
 	IsFollowed(requesterUsername string, targetUsername string) (bool, error)
-	DeclineFollowRequest(usernameOfRequester string, usernameOfTarget string) error
-	AcceptFollowRequest(usernameOfRequester string, usernameOfTarget string) error
+	DeclineFollowRequest(usernameOfFollowed string, usernameOfFollower string) error
+	AcceptFollowRequest(usernameOfFollowed string, usernameOfFollower string) error
 }
