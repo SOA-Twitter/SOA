@@ -9,6 +9,7 @@ service SocialService {
   rpc IsFollowed(IsFollowedRequest) returns(IsFollowedResponse){}
   rpc AcceptFollowRequest(ManageFollowRequest) returns(ManageFollowResponse){}
   rpc DeclineFollowRequest(ManageFollowRequest) returns(ManageFollowResponse){}
+  rpc HomeFeed(HomeFeedRequest) returns(HomeFeedResponse){}
 }
 message RegUserRequest{
   string username = 1;
@@ -35,7 +36,6 @@ message PendingFollower{
 message PendingFollowerResponse{
   repeated PendingFollower pending_followers = 1;
 }
-
 message IsFollowedRequest{
   string requester = 1;
   string target = 2;
@@ -49,4 +49,12 @@ message ManageFollowRequest{
   string target = 2;
 }
 message ManageFollowResponse{
+}
+message HomeFeedRequest{
+  string token = 1;
+
+}
+message HomeFeedResponse{
+  repeated string usernames = 1;
+
 }

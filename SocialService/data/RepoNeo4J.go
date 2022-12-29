@@ -308,3 +308,6 @@ func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfFollowed string, usernameOfFo
 	// Final return after no errors:
 	return nil
 }
+func (nr *Neo4JRepo) GetFollowers(username string) ([]string, error) {
+	return nil, nil
+}

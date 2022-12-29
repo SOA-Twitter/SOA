@@ -10,4 +10,5 @@ type SocialRepo interface {
 	IsFollowed(requesterUsername string, targetUsername string) (bool, error)
 	DeclineFollowRequest(usernameOfFollowed string, usernameOfFollower string) error
 	AcceptFollowRequest(usernameOfFollowed string, usernameOfFollower string) error
+	GetFollowers(username string) ([]string, error)
 }

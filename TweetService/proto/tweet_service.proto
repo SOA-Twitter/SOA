@@ -8,6 +8,7 @@ service TweetService {
   rpc LikeTweet(LikeTweetRequest) returns(LikeTweetResponse){}
   rpc GetLikes(GetLikesByTweetIdRequest) returns(GetLikesByTweetIdResponse){}
   rpc GetLikesByUser(GetLikesByUserRequest) returns(GetLikesByUserResponse){}
+  rpc HomeFeed(GetUsernamesRequest) returns(GetTweetListResponse){}
 }
 
 message Tweet{
@@ -63,4 +64,11 @@ message LikeTweetRequest{
 
 message LikeTweetResponse{
 
+}
+message Username{}
+message GetUsernamesRequest{
+  repeated string usernames = 1;
+}
+message GetTweetListResponse{
+  repeated Tweet tweets = 1;
 }

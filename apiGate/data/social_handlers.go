@@ -2,6 +2,7 @@ package data
 
 import (
 	"apiGate/protos/social"
+	"apiGate/protos/tweet"
 	"context"
 	"github.com/gorilla/mux"
 	"log"
@@ -15,11 +16,12 @@ const (
 type SocialHandler struct {
 	l  *log.Logger
 	pr social.SocialServiceClient
+	tw tweet.TweetServiceClient
 }
 
-func NewSocialHandler(l *log.Logger, pr social.SocialServiceClient) *SocialHandler {
+func NewSocialHandler(l *log.Logger, pr social.SocialServiceClient, tw tweet.TweetServiceClient) *SocialHandler {
 	return &SocialHandler{
-		l, pr}
+		l, pr, tw}
 }
 
 func (h *SocialHandler) Follow(writer http.ResponseWriter, request *http.Request) {
@@ -200,4 +202,33 @@ func (h *SocialHandler) DeclineFollowRequest(writer http.ResponseWriter, request
 		http.Error(writer, "Cannot decline follow req", http.StatusNotFound)
 		return
 	}
+}
+
+func (h *SocialHandler) HomeFeed(writer http.ResponseWriter, request *http.Request) {
+	h.l.Println("Api - home feed")
+	c := request.Header.Get("Authorization")
+	if c == "" {
+		http.Error(writer, cookieErrMsg, http.StatusUnauthorized)
+		return
+	}
+	usernames, err := h.pr.HomeFeed(context.Background(), &social.HomeFeedRequest{
+		Token: c,
+	})
+	if err != nil {
+		h.l.Println("Unable to get usernames from social service")
+		http.Error(writer, "Unable to get usernames from social service", http.StatusNotFound)
+		return
+	}
+
+	response, err1 := h.tw.HomeFeed(context.Background(), &tweet.GetUsernamesRequest{
+		Usernames: usernames.Usernames,
+	})
+	if err1 != nil {
+		h.l.Println("Unable to get tweets from tweet service")
+		http.Error(writer, "Unable to get tweets from tweet service", http.StatusNotFound)
+		return
+	}
+	err = ToJSON(response.Tweets, writer)
+	h.l.Println("tweets", response)
+
 }

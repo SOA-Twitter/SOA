@@ -89,7 +89,7 @@ func main() {
 	}
 	defer socialConn.Close()
 	socialClient := social.NewSocialServiceClient(socialConn)
-	socialHandler := data.NewSocialHandler(l, socialClient)
+	socialHandler := data.NewSocialHandler(l, socialClient, tweetClient)
 
 	socialRouter := r.PathPrefix("/social").Subrouter()
 	tweetRouter.Use(authHandler.Authorize)
@@ -99,6 +99,7 @@ func main() {
 	socialRouter.HandleFunc("/isFollowed/{username}", socialHandler.IsFollowed).Methods(http.MethodGet)
 	socialRouter.HandleFunc("/accept", socialHandler.AcceptFollowRequest).Methods(http.MethodPut)
 	socialRouter.HandleFunc("/decline", socialHandler.DeclineFollowRequest).Methods(http.MethodPut)
+	socialRouter.HandleFunc("/homeFeed", socialHandler.HomeFeed).Methods(http.MethodGet)
 
 	defer socialConn.Close()
 

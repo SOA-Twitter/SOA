@@ -154,3 +154,23 @@ func (s *SocialHandler) AcceptFollowRequest(ctx context.Context, r *social.Manag
 	}
 	return &social.ManageFollowResponse{}, nil
 }
+
+func (s *SocialHandler) HomeFeed(ctx context.Context, r *social.HomeFeedRequest) (*social.HomeFeedResponse, error) {
+	s.l.Println("Social service - Home feed")
+	claims, err := data.GetFromClaims(r.Token)
+	if err != nil {
+		s.l.Println("Error getting claims")
+		return &social.HomeFeedResponse{}, err
+	}
+
+	usernames, err1 := s.repoImpl.GetFollowers(claims.Username)
+	if err1 != nil {
+		s.l.Println("Error getting followers from database")
+		return &social.HomeFeedResponse{}, err1
+	}
+
+	return &social.HomeFeedResponse{
+		Usernames: usernames,
+	}, nil
+
+}
