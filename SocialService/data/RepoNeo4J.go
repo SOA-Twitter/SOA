@@ -161,11 +161,9 @@ func (nr *Neo4JRepo) Unfollow(usernameOfRequester string, usernameToUnfollow str
 		return err1
 	}
 
-	// Final return after no errors:
 	return nil
 }
 
-// *db get username of Nodes whose relationship Status towards "usernameOfRequester" == pending
 func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.PendingFollower, error) {
 	nr.log.Println("RepoNeo4j - Get Pending Followers")
 	ctx := context.Background()
@@ -185,8 +183,7 @@ func (nr *Neo4JRepo) GetPendingFollowers(usernameOfRequester string) ([]*social.
 				record := result.Record()
 				username, ok := record.Get("username")
 				if !ok {
-					nr.log.Println("Nije dobro ne valja")
-					//username = "toki"
+					nr.log.Println("Error getting username")
 				}
 				pendingList = append(pendingList, &social.PendingFollower{
 					Username: username.(string),
@@ -272,7 +269,6 @@ func (nr *Neo4JRepo) DeclineFollowRequest(usernameOfFollowed string, usernameOfF
 		return err1
 	}
 
-	// Final return after no errors:
 	return nil
 }
 
@@ -305,9 +301,36 @@ func (nr *Neo4JRepo) AcceptFollowRequest(usernameOfFollowed string, usernameOfFo
 		return err1
 	}
 
-	// Final return after no errors:
 	return nil
 }
+
 func (nr *Neo4JRepo) GetFollowers(username string) ([]string, error) {
-	return nil, nil
+	ctx := context.Background()
+	session := nr.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+	usernameList, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				"match (u:User)-[r:FOLLOWS]->(u1:User) where u.username= $username and r.status = \"ACCEPTED\" return u1.username as username",
+				map[string]any{"username": username})
+			if err != nil {
+				return nil, err
+			}
+
+			var followers []string
+			for result.Next(ctx) {
+				record := result.Record()
+				username1, ok := record.Get("username")
+				if !ok {
+					nr.log.Println("Error getting username")
+				}
+				followers = append(followers, username1.(string))
+			}
+			return followers, nil
+		})
+	if err != nil {
+		nr.log.Println("Error querying search:", err)
+		return nil, err
+	}
+	return usernameList.([]string), nil
 }

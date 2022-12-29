@@ -95,23 +95,28 @@ func (t *TweetHandler) GetLikes(ctx context.Context, r *tweet.GetLikesByTweetIdR
 		LikeList: likes,
 	}, nil
 }
+
 func (t *TweetHandler) HomeFeed(ctx context.Context, r *tweet.GetUsernamesRequest) (*tweet.GetTweetListResponse, error) {
 	t.l.Println("Tweet service - Get Post by followers")
 
 	var tweetsByFollower []*tweet.Tweet
-	for i, v := range r.Usernames {
+	for _, v := range r.Usernames {
 		tweets, err := t.repoImpl.GetTweetsByUsername(v)
+		t.l.Println(tweets)
 		if err != nil {
 			t.l.Println("Error getting Tweets by username from cassandra")
 			return nil, err
-
 		}
-		tweetsByFollower = append(tweetsByFollower, &tweet.Tweet{
-			Id:       tweets[i].Id,
-			Username: tweets[i].Username,
-			Text:     tweets[i].Text,
-		})
+
+		for _, tweet1 := range tweets {
+			tweetsByFollower = append(tweetsByFollower, &tweet.Tweet{
+				Id:       tweet1.Id,
+				Username: tweet1.Username,
+				Text:     tweet1.Text,
+			})
+		}
 	}
+
 	return &tweet.GetTweetListResponse{
 		Tweets: tweetsByFollower,
 	}, nil
