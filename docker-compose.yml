@@ -54,7 +54,7 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASS}
       POSTGRES_DB: ${AUTH_DB}
     healthcheck:
-      test: echo 'db.runCommand("ping").ok'
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 10s
       retries: 20
