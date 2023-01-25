@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 type TweetHandler struct {
@@ -24,6 +25,7 @@ func (tw *TweetHandler) GetTweetsByUsername(w http.ResponseWriter, r *http.Reque
 	resp, err := tw.pr.GetTweets(context.Background(), &tweet.GetTweetRequest{
 		Username: username,
 	})
+
 	if err != nil {
 		tw.l.Println("Error getting tweets")
 		http.Error(w, "Error getting tweets", http.StatusNotFound)
@@ -47,6 +49,13 @@ func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {
 	c := r.Header.Get("Authorization")
 	if c == "" {
 		http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		return
+	}
+
+	_, error1 := regexp.MatchString("([a-zA-Z-'_./0-9]+)", dao.Text)
+	if error1 != nil {
+		tw.l.Println("Text of the tweet cannot be empty")
+		http.Error(w, "Text of the tweet cannot be empty", http.StatusBadRequest)
 		return
 	}
 
