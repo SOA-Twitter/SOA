@@ -71,15 +71,10 @@ func (t *TweetRepoCassandra) CreateTable() {
 func (t *TweetRepoCassandra) GetTweetsByUsername(username string) ([]*tweet.Tweet, error) {
 	t.log.Println("TweetRepoCassandra - Get tweets by username")
 
-	scanner := t.session.Query(`SELECT id, text, username, toString(creationdate) FROM tweets_by_username WHERE username = ?`, username).Iter().Scanner()
+	scanner := t.session.Query(`SELECT id, text, username, CAST(toTimestamp(creationdate) as text) FROM tweets_by_username WHERE username = ?`, username).Iter().Scanner()
 	var tweetsByUser []*tweet.Tweet
 	for scanner.Next() {
 		var tweet1 tweet.Tweet
-		//tweetCreationDate := &tweet1.CreationDate
-		//newTweetCreationDate := (*tweetCreationDate).String()
-		//t.log.Println("----------------")
-		//t.log.Println(newTweetCreationDate)
-		//t.log.Println("----------------")
 		err := scanner.Scan(&tweet1.Id, &tweet1.Text, &tweet1.Username, &tweet1.CreationDate)
 		if err != nil {
 			t.log.Println(err)
@@ -91,9 +86,6 @@ func (t *TweetRepoCassandra) GetTweetsByUsername(username string) ([]*tweet.Twee
 		t.log.Println(err)
 		return nil, err
 	}
-	t.log.Println("----------------")
-	t.log.Println(tweetsByUser)
-	t.log.Println("----------------")
 	return tweetsByUser, nil
 }
 
