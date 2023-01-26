@@ -33,7 +33,7 @@ func (tw *TweetHandler) GetTweetsByUsername(w http.ResponseWriter, r *http.Reque
 	}
 
 	err = ToJSON(resp.TweetList, w)
-	tw.l.Println("Resp", resp)
+	tw.l.Println("Resp", resp.TweetList)
 }
 
 func (tw *TweetHandler) PostTweet(w http.ResponseWriter, r *http.Request) {

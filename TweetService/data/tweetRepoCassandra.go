@@ -6,7 +6,6 @@ import (
 	"github.com/gocql/gocql"
 	"log"
 	"os"
-	"time"
 )
 
 type TweetRepoCassandra struct {
@@ -49,8 +48,9 @@ func CassandraConnection(log *log.Logger) (*TweetRepoCassandra, error) {
 func (t *TweetRepoCassandra) CreateTable() {
 	err := t.session.Query(
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s 
-					(id UUID, text text, username text, creationdate timestamp,
-					PRIMARY KEY ((username), id))`,
+					(id UUID, text text, username text, creationdate timeuuid,
+					PRIMARY KEY ((username), creationdate, id)) WITH CLUSTERING 
+					    ORDER BY (creationdate DESC);`,
 			"tweets_by_username")).Exec()
 	if err != nil {
 		t.log.Println(err)
@@ -71,31 +71,39 @@ func (t *TweetRepoCassandra) CreateTable() {
 func (t *TweetRepoCassandra) GetTweetsByUsername(username string) ([]*tweet.Tweet, error) {
 	t.log.Println("TweetRepoCassandra - Get tweets by username")
 
-	scanner := t.session.Query(`SELECT id, text, username FROM tweets_by_username WHERE username = ?`, username).Iter().Scanner()
+	scanner := t.session.Query(`SELECT id, text, username, toString(creationdate) FROM tweets_by_username WHERE username = ?`, username).Iter().Scanner()
 	var tweetsByUser []*tweet.Tweet
 	for scanner.Next() {
-		var tweet tweet.Tweet
-		err := scanner.Scan(&tweet.Id, &tweet.Text, &tweet.Username)
+		var tweet1 tweet.Tweet
+		//tweetCreationDate := &tweet1.CreationDate
+		//newTweetCreationDate := (*tweetCreationDate).String()
+		//t.log.Println("----------------")
+		//t.log.Println(newTweetCreationDate)
+		//t.log.Println("----------------")
+		err := scanner.Scan(&tweet1.Id, &tweet1.Text, &tweet1.Username, &tweet1.CreationDate)
 		if err != nil {
 			t.log.Println(err)
 			return nil, err
 		}
-		tweetsByUser = append(tweetsByUser, &tweet)
+		tweetsByUser = append(tweetsByUser, &tweet1)
 	}
 	if err := scanner.Err(); err != nil {
 		t.log.Println(err)
 		return nil, err
 	}
+	t.log.Println("----------------")
+	t.log.Println(tweetsByUser)
+	t.log.Println("----------------")
 	return tweetsByUser, nil
 }
 
 func (t *TweetRepoCassandra) CreateTweet(tw *Tweet) error {
 	t.log.Println("TweetRepoCassandra - Create tweet")
 	id, _ := gocql.RandomUUID()
-
-	err := t.session.Query(`INSERT INTO tweets_by_username(id, text, username, creationdate) VALUES(?, ?, ?, ?)`, id, tw.Text, tw.Username, time.Now()).Exec()
+	err := t.session.Query(`INSERT INTO tweets_by_username(id, text, username, creationdate) VALUES(?, ?, ?, ?)`, id, tw.Text, tw.Username, gocql.TimeUUID()).Exec()
 	if err != nil {
 		t.log.Println("Error happened during Querying")
+		t.log.Println(err)
 		return err
 	}
 	return nil

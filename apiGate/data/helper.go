@@ -64,9 +64,10 @@ type RecoverProfile struct {
 }
 
 type Tweet struct {
-	Id       string `json:"id"`
-	Text     string `json:"text" validate:"required"`
-	Username string `json:"username"`
+	Id           string `json:"id"`
+	Text         string `json:"text" validate:"required"`
+	Username     string `json:"username"`
+	CreationDate string `json:"creationdate"`
 }
 
 type Tweets struct {
