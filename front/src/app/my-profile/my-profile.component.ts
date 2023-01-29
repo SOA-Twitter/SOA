@@ -73,6 +73,21 @@ export class MyProfileComponent implements OnInit {
     this.isFollowedByLoggedUser = this.isFollowed();
   }
 
+  protected getPosts(){
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let username = params.get('username') || ""
+      this.service.getPostByLoggedUser((username)).subscribe(posts => { this.posts = posts })
+    })
+  }
+
+  protected isPrivateAndIsNotFollowed(): boolean{
+    if(this.currentUser.private && !this.isFollowedByLoggedUser){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
   protected canEditPrivacy(): boolean {
     return this.currentUser.username === this.service.getUsername();
   }
@@ -140,12 +155,18 @@ export class MyProfileComponent implements OnInit {
     this.service.isFollowed(this.route.snapshot.params['username']).subscribe(
       (isFollowedObj) => {
         isFollowedInfo = isFollowedObj.is_followed;
-        if (isFollowedInfo) {
+        if (this.canEditPrivacy()){
+          this.getPosts();
+          return false;
+        } else if (isFollowedInfo) {
           followbtn.value = 'Following';
           followbtn.disabled = true;
+          this.isFollowedByLoggedUser = true;
+          this.getPosts();
           return true;
         }
         else{
+          this.isFollowedByLoggedUser = false;
           return false;
         }
       },

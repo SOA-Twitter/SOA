@@ -2,7 +2,6 @@ import { Component, OnInit, SecurityContext } from '@angular/core';
 import {  Validators, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { User } from 'src/app/model/user';
 import { AuthService } from '../auth.service';
-import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
 @Component({
@@ -16,7 +15,7 @@ export class SignupComponent implements OnInit {
   register!: FormGroup;
   siteKey: string;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private sanitizer: DomSanitizer, private router: Router){
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router){
     this.createForm();
     this.siteKey = '6Lcq4CYjAAAAAC28ZFxmcXD5w-D7UxBpQalorlnJ';
   }

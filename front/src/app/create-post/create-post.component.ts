@@ -22,7 +22,7 @@ export class CreatePostComponent implements OnInit {
 
   createForm(){
     this.postForm = this.fb.group({
-      text: new FormControl('', Validators.required)
+      'text' : new FormControl(null, [Validators.required, Validators.pattern('[a-zA-Z-\'_./0-9]+')]),
     })
   }
 

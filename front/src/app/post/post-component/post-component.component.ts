@@ -29,8 +29,8 @@ export class PostComponentComponent implements OnInit {
   }
   
   isLikedByMe():boolean{
-    for (let i =0; i < this.likes.length; i++){
-      if(this.likes[i].username === this.authService.getUsername() && this.likes[i].liked === true){
+    for (let like of this.likes){
+      if(like.username === this.authService.getUsername() && like.liked){
         return true;
       }
     }
@@ -58,7 +58,7 @@ export class PostComponentComponent implements OnInit {
 
   showModal(){
     this.formModal = new window.bootstrap.Modal(
-      document.getElementById("allLikesModal")
+      document.getElementById(this.post1.id + 1)
     );
 
     this.result = this.likes.filter(like => like.liked === true);

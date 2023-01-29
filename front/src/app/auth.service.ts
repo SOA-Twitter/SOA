@@ -4,15 +4,10 @@ import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { BuisnessUser } from "./model/businessUser";
 import { ChangePassword } from "./model/changePassword";
-import { recoverProfile } from "./model/recoverProfile";
 import { recoverProfileWithUuid } from "./model/recoverProfileWithUuid";
 import { recoveryMail } from "./model/recoveryMail";
 import { User } from "./model/user";
 import { UserLogin } from "./model/userLogin";
-import { uuid } from "./model/uuid";
-import jwt_decode, { JwtPayload } from "jwt-decode";
-import { JsonPipe } from "@angular/common";
-import { MyToken } from "./model/myToken";
 import { createPost } from "./model/createPost";
 import { Post } from "./model/post";
 import { Like } from "./model/like";
@@ -82,8 +77,8 @@ export class AuthService {
       return this.httpClient.post('https://localhost:8081/social/follow', {"username" : username})
     }
 
-    getRequests(): Observable<any>{
-      return this.httpClient.get('https://localhost:8081/social/pending')
+    getRequests(): Observable<Request[]>{
+      return this.httpClient.get<Request[]>('https://localhost:8081/social/pending')
     }
 
     acceptReq(username: string): Observable<any>{
@@ -96,6 +91,10 @@ export class AuthService {
 
     isFollowed(username: string): Observable<any>{
       return this.httpClient.get('https://localhost:8081/social/isFollowed/'+ username)
+    }
+
+    getHomePageForLoggedUser(): Observable<Post[]>{
+      return this.httpClient.get<Post[]>("https://localhost:8081/social/homeFeed")
     }
 
     get isAuthenticated() {
