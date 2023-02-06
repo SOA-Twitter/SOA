@@ -6,7 +6,6 @@ import (
 	"TweetService/proto/tweet"
 	"context"
 	"log"
-	"net/http"
 )
 
 type TweetHandler struct {
@@ -27,28 +26,32 @@ func NewTweet(l *log.Logger, repoImpl data.TweetRepo, ac auth.AuthServiceClient)
 }
 
 func (t *TweetHandler) GetTweets(ctx context.Context, r *tweet.GetTweetRequest) (*tweet.GetTweetResponse, error) {
-	t.l.Println("Handle GET tweet")
+	t.l.Println("Tweet service - Get tweets by username")
 	// tweets := data.GetAll()
 
-	tweets := t.repoImpl.GetAll()
+	tweets, err := t.repoImpl.GetTweetsByUsername(r.Username)
+	if err != nil {
+		t.l.Println("Error getting Tweets by username from cassandra")
+		return nil, err
+
+	}
 	return &tweet.GetTweetResponse{
 		TweetList: tweets,
 	}, nil
 }
+
 func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest) (*tweet.PostTweetResponse, error) {
-	t.l.Println("Handle POST tweet")
+	t.l.Println("Tweet service - Post tweet")
 	resp, err := t.ac.GetUser(context.Background(), &auth.UserRequest{
 		Token: r.Token,
 	})
 	if err != nil {
-		t.l.Println("Error creating tweet")
-		t.l.Println(err)
+		t.l.Println("Error getting user")
 		return nil, err
 	}
 	res := &data.Tweet{
-		Text:      r.Text,
-		Picture:   r.Picture,
-		UserEmail: resp.UserEmail,
+		Text:     r.Text,
+		Username: resp.Username,
 	}
 	errorcic := t.repoImpl.CreateTweet(res)
 	if errorcic != nil {
@@ -59,27 +62,62 @@ func (t *TweetHandler) PostTweet(ctx context.Context, r *tweet.PostTweetRequest)
 	//data.RenderJson(w, tweet)
 }
 
-func (t *TweetHandler) MiddlewareProductValidation(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, h *http.Request) {
-		tweet, err := data.DecodeBody(h.Body)
+func (t *TweetHandler) LikeTweet(ctx context.Context, r *tweet.LikeTweetRequest) (*tweet.LikeTweetResponse, error) {
+	t.l.Println("Tweet service - Like Tweet")
+	resp, err := t.ac.GetUser(context.Background(), &auth.UserRequest{
+		Token: r.Token,
+	})
+	if err != nil {
+		t.l.Println("Error getting user")
+		return nil, err
+	}
+
+	err1 := t.repoImpl.LikeTweet(r.TweetID, resp.Username, r.Like)
+
+	if err1 != nil {
+		t.l.Println("Error occurred during liking tweet")
+		return nil, err1
+	}
+	return &tweet.LikeTweetResponse{}, nil
+
+}
+
+func (t *TweetHandler) GetLikes(ctx context.Context, r *tweet.GetLikesByTweetIdRequest) (*tweet.GetLikesByTweetIdResponse, error) {
+	t.l.Println("Tweet service - Get likes by tweet id")
+
+	likes, err := t.repoImpl.GetLikesByTweetId(r.Id)
+	if err != nil {
+		t.l.Println("Error getting likes by tweet id")
+		return nil, err
+	}
+
+	return &tweet.GetLikesByTweetIdResponse{
+		LikeList: likes,
+	}, nil
+}
+
+func (t *TweetHandler) HomeFeed(ctx context.Context, r *tweet.GetUsernamesRequest) (*tweet.GetTweetListResponse, error) {
+	t.l.Println("Tweet service - Get Post by followers")
+
+	var tweetsByFollower []*tweet.Tweet
+	for _, v := range r.Usernames {
+		tweets, err := t.repoImpl.GetTweetsByUsername(v)
+		t.l.Println(tweets)
 		if err != nil {
-			http.Error(w, "Unable to decode json", http.StatusBadRequest)
-			t.l.Fatal(err)
-			return
+			t.l.Println("Error getting Tweets by username from cassandra")
+			return nil, err
 		}
 
-		ctx := context.WithValue(h.Context(), KeyProduct{}, tweet)
-		h = h.WithContext(ctx)
+		for _, tweet1 := range tweets {
+			tweetsByFollower = append(tweetsByFollower, &tweet.Tweet{
+				Id:       tweet1.Id,
+				Username: tweet1.Username,
+				Text:     tweet1.Text,
+			})
+		}
+	}
 
-		next.ServeHTTP(w, h)
-	})
-}
-func (t *TweetHandler) MiddlewareContentTypeSet(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
-		t.l.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
-
-		rw.Header().Add("Content-Type", "application/json")
-
-		next.ServeHTTP(rw, h)
-	})
+	return &tweet.GetTweetListResponse{
+		Tweets: tweetsByFollower,
+	}, nil
 }

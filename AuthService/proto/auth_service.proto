@@ -31,6 +31,7 @@ message RegisterRequest{
   string companyName = 9;
   string companyWebsite = 10;
   string role = 11;
+  bool private = 12;
 }
 
 message RegisterResponse{
@@ -50,6 +51,7 @@ message UserRequest{
 message UserResponse {
   string userRole = 1;
   string userEmail = 2;
+  string username = 3;
 }
 message ChangePasswordRequest{
   string token = 1;

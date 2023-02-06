@@ -45,6 +45,8 @@ func main() {
 		l.Println(conn)
 	}
 	defer conn.Close()
+	tweetRepoImpl.CreateTable()
+
 	ac := auth.NewAuthServiceClient(conn)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))

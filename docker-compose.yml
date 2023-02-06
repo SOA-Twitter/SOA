@@ -15,6 +15,8 @@ services:
       TWEET_PORT: ${TWEET_PORT}
       PROFILE_HOST: ${PROFILE_HOST}
       PROFILE_PORT: ${PROFILE_PORT}
+      SOCIAL_HOST: ${SOCIAL_HOST}
+      SOCIAL_PORT: ${SOCIAL_PORT}
     ports:
       - '8081:8081'
 
@@ -34,6 +36,8 @@ services:
       SECRET: ${SECRET}
       MAIL_ADDRESS: ${MAIL_ADDRESS}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SOCIAL_HOST: ${SOCIAL_HOST}
+      SOCIAL_PORT: ${SOCIAL_PORT}
     ports:
       - ${AUTH_PORT}:${AUTH_PORT}
     depends_on:
@@ -44,13 +48,13 @@ services:
     volumes:
       - postgres:/postgres/data
     container_name: user_db
-    restart: on-failure
+    restart: always
     environment:
       POSTGRES_USER: ${AUTH_DB_USER}
       POSTGRES_PASSWORD: ${AUTH_DB_PASS}
       POSTGRES_DB: ${AUTH_DB}
     healthcheck:
-      test: echo 'db.runCommand("ping").ok'
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 10s
       retries: 20
@@ -96,6 +100,8 @@ services:
       PORT: ${PROFILE_PORT}
       AUTH_HOST: ${AUTH_HOST}
       AUTH_PORT: ${AUTH_PORT}
+      SOCIAL_HOST: ${SOCIAL_HOST}
+      SOCIAL_PORT: ${SOCIAL_PORT}
       MONGO_DB_URI: mongodb://root:pass@mongo:27017
     depends_on:
       mongo:
@@ -130,12 +136,54 @@ services:
     depends_on:
       - mongo
     ports:
-      - "8085:8085"
+      - "8085:8081"
     volumes:
       - mongo_express_data:/data/db
+
+  social_service:
+    build:
+      context: ./SocialService/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - ${SOCIAL_PORT}:${SOCIAL_PORT}
+    environment:
+      PORT: ${SOCIAL_PORT}
+      NEO4J_DB: ${NEO4J_DB}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASS: ${NEO4J_PASS}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
+      PROFILE_PORT: ${PROFILE_PORT}
+      PROFILE_HOST: ${PROFILE_HOST}
+    depends_on:
+      neo4j:
+        condition: service_healthy
+
+  neo4j:
+    image: neo4j
+    restart: always
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+      - "7473:7473"
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "echo RETURN 1 | cypher-shell -a bolt://neo4j:7687 -u neo4j -p pass || exit 1",
+      ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+#      NEO4J_dbms_security_auth__minimum__password__length: 4      nece ovo ili ne moze samo broj da se napise idk
+      - NEO4J_AUTH=none
+    volumes:
+      - neo4j_data:/data
 
 volumes:
   mongo:
   mongo_express_data:
   cassandra:
+  neo4j_data:
   postgres:

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { createPost } from '../model/createPost';
@@ -10,11 +10,11 @@ import { createPost } from '../model/createPost';
   styleUrls: ['./create-post.component.css']
 })
 export class CreatePostComponent implements OnInit {
-  
+
   postForm!: FormGroup;
   post!:createPost;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) { 
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.createForm();
   }
 

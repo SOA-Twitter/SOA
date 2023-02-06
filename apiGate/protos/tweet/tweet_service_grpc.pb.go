@@ -24,6 +24,10 @@ const _ = grpc.SupportPackageIsVersion7
 type TweetServiceClient interface {
 	GetTweets(ctx context.Context, in *GetTweetRequest, opts ...grpc.CallOption) (*GetTweetResponse, error)
 	PostTweet(ctx context.Context, in *PostTweetRequest, opts ...grpc.CallOption) (*PostTweetResponse, error)
+	LikeTweet(ctx context.Context, in *LikeTweetRequest, opts ...grpc.CallOption) (*LikeTweetResponse, error)
+	GetLikes(ctx context.Context, in *GetLikesByTweetIdRequest, opts ...grpc.CallOption) (*GetLikesByTweetIdResponse, error)
+	GetLikesByUser(ctx context.Context, in *GetLikesByUserRequest, opts ...grpc.CallOption) (*GetLikesByUserResponse, error)
+	HomeFeed(ctx context.Context, in *GetUsernamesRequest, opts ...grpc.CallOption) (*GetTweetListResponse, error)
 }
 
 type tweetServiceClient struct {
@@ -52,12 +56,52 @@ func (c *tweetServiceClient) PostTweet(ctx context.Context, in *PostTweetRequest
 	return out, nil
 }
 
+func (c *tweetServiceClient) LikeTweet(ctx context.Context, in *LikeTweetRequest, opts ...grpc.CallOption) (*LikeTweetResponse, error) {
+	out := new(LikeTweetResponse)
+	err := c.cc.Invoke(ctx, "/TweetService/LikeTweet", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tweetServiceClient) GetLikes(ctx context.Context, in *GetLikesByTweetIdRequest, opts ...grpc.CallOption) (*GetLikesByTweetIdResponse, error) {
+	out := new(GetLikesByTweetIdResponse)
+	err := c.cc.Invoke(ctx, "/TweetService/GetLikes", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tweetServiceClient) GetLikesByUser(ctx context.Context, in *GetLikesByUserRequest, opts ...grpc.CallOption) (*GetLikesByUserResponse, error) {
+	out := new(GetLikesByUserResponse)
+	err := c.cc.Invoke(ctx, "/TweetService/GetLikesByUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tweetServiceClient) HomeFeed(ctx context.Context, in *GetUsernamesRequest, opts ...grpc.CallOption) (*GetTweetListResponse, error) {
+	out := new(GetTweetListResponse)
+	err := c.cc.Invoke(ctx, "/TweetService/HomeFeed", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TweetServiceServer is the server API for TweetService service.
 // All implementations must embed UnimplementedTweetServiceServer
 // for forward compatibility
 type TweetServiceServer interface {
 	GetTweets(context.Context, *GetTweetRequest) (*GetTweetResponse, error)
 	PostTweet(context.Context, *PostTweetRequest) (*PostTweetResponse, error)
+	LikeTweet(context.Context, *LikeTweetRequest) (*LikeTweetResponse, error)
+	GetLikes(context.Context, *GetLikesByTweetIdRequest) (*GetLikesByTweetIdResponse, error)
+	GetLikesByUser(context.Context, *GetLikesByUserRequest) (*GetLikesByUserResponse, error)
+	HomeFeed(context.Context, *GetUsernamesRequest) (*GetTweetListResponse, error)
 	mustEmbedUnimplementedTweetServiceServer()
 }
 
@@ -70,6 +114,18 @@ func (UnimplementedTweetServiceServer) GetTweets(context.Context, *GetTweetReque
 }
 func (UnimplementedTweetServiceServer) PostTweet(context.Context, *PostTweetRequest) (*PostTweetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostTweet not implemented")
+}
+func (UnimplementedTweetServiceServer) LikeTweet(context.Context, *LikeTweetRequest) (*LikeTweetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LikeTweet not implemented")
+}
+func (UnimplementedTweetServiceServer) GetLikes(context.Context, *GetLikesByTweetIdRequest) (*GetLikesByTweetIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLikes not implemented")
+}
+func (UnimplementedTweetServiceServer) GetLikesByUser(context.Context, *GetLikesByUserRequest) (*GetLikesByUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLikesByUser not implemented")
+}
+func (UnimplementedTweetServiceServer) HomeFeed(context.Context, *GetUsernamesRequest) (*GetTweetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HomeFeed not implemented")
 }
 func (UnimplementedTweetServiceServer) mustEmbedUnimplementedTweetServiceServer() {}
 
@@ -120,6 +176,78 @@ func _TweetService_PostTweet_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TweetService_LikeTweet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikeTweetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TweetServiceServer).LikeTweet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TweetService/LikeTweet",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TweetServiceServer).LikeTweet(ctx, req.(*LikeTweetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TweetService_GetLikes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLikesByTweetIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TweetServiceServer).GetLikes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TweetService/GetLikes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TweetServiceServer).GetLikes(ctx, req.(*GetLikesByTweetIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TweetService_GetLikesByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLikesByUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TweetServiceServer).GetLikesByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TweetService/GetLikesByUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TweetServiceServer).GetLikesByUser(ctx, req.(*GetLikesByUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TweetService_HomeFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsernamesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TweetServiceServer).HomeFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TweetService/HomeFeed",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TweetServiceServer).HomeFeed(ctx, req.(*GetUsernamesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TweetService_ServiceDesc is the grpc.ServiceDesc for TweetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +262,22 @@ var TweetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostTweet",
 			Handler:    _TweetService_PostTweet_Handler,
+		},
+		{
+			MethodName: "LikeTweet",
+			Handler:    _TweetService_LikeTweet_Handler,
+		},
+		{
+			MethodName: "GetLikes",
+			Handler:    _TweetService_GetLikes_Handler,
+		},
+		{
+			MethodName: "GetLikesByUser",
+			Handler:    _TweetService_GetLikesByUser_Handler,
+		},
+		{
+			MethodName: "HomeFeed",
+			Handler:    _TweetService_HomeFeed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

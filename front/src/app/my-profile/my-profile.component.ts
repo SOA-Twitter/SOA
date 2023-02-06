@@ -1,6 +1,5 @@
-import { HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { CheckboxControlValueAccessor } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { Post } from '../model/post';
@@ -93,8 +92,7 @@ export class MyProfileComponent implements OnInit {
   }
 
   protected changePrivacy() {
-    var checkBoxElem = document.getElementById('privacy-checkbox') as HTMLInputElement;
-    // console.log(checkBoxElem.checked);
+    let checkBoxElem = document.getElementById('privacy-checkbox') as HTMLInputElement;
     checkBoxElem.disabled = true;
 
     this.service.changeProfilePrivacy(checkBoxElem.checked).subscribe(
@@ -128,20 +126,15 @@ export class MyProfileComponent implements OnInit {
 
   followUser(){
     let followbtn = document.getElementById("followBtn") as HTMLInputElement
-    // followbtn.disabled = false
-
-    // this.route.paramMap.subscribe((params: ParamMap) => {
-    //   let usernameFromUrl = params.get('username') || "";
-    // })
       let usernameFromUrl = this.route.snapshot.params['username'];
       this.service.followUser(usernameFromUrl).subscribe(() => {
         followbtn.disabled = true
         followbtn.value = "Requested"
-      })  
+      })
   }
 
   protected removeHandledFollowRequest(requester_username: string) {
-  
+
     this.usernames = this.usernames.filter( (request_iter)=> {
       request_iter.username != requester_username;
     })

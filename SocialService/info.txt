@@ -1,0 +1,7 @@
+protoc --go_out=./social --go_opt=paths=source_relative --go-grpc_out=./social --go-grpc_opt=paths=source_relative social_service.proto
+
+
+MATCH (user1:User {username: "usernameNeki"})
+MATCH (user2:User {username: "usernameNeki"})
+CREATE (user1)-[r:FOLLOWS {status: "PENDING"}]->(user2)
+RETURN r.status

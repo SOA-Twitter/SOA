@@ -17,6 +17,7 @@ import (
 const (
 	INTENTION_RECOVERY   = "recovery"
 	INTENTION_ACTIVATION = "activation"
+	errorDeletingUser    = "Error deleting user with email "
 )
 
 type AuthHandler struct {
@@ -35,7 +36,7 @@ func NewAuthHandler(l *log.Logger, repo data.AuthRepo, ps profile.ProfileService
 }
 
 func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecoveryEmailRequest) (*auth.RecoveryPasswordResponse, error) {
-	a.l.Println("{authService} Send Recovery Email Handler")
+	a.l.Println("Auth Service - Send Recovery Email")
 
 	activationUUID, errEmailing := data.SendEmail(r.RecoveryEmail, INTENTION_RECOVERY)
 	if errEmailing != nil {
@@ -59,6 +60,7 @@ func (a *AuthHandler) SendRecoveryEmail(ctx context.Context, r *auth.SendRecover
 }
 
 func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRequest) (*auth.ChangePasswordResponse, error) {
+	a.l.Println("Auth Service - Reset password")
 
 	recoveryReq, errNotFound := a.repo.FindRecoveryRequest(r.RecoveryUUID)
 	if errNotFound != nil {
@@ -98,7 +100,6 @@ func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRe
 	errDelRecoveryReq := a.repo.DeleteRecoveryRequest(recoveryReq.RecoveryUUID, recoveryReq.Email)
 	if errDelRecoveryReq != nil {
 		a.l.Println("Error Deleting Password Recovery Request")
-		//	*TODO: NEKAKAV ROLLBACK?
 	}
 
 	return &auth.ChangePasswordResponse{
@@ -108,7 +109,7 @@ func (a *AuthHandler) ResetPassword(ctx context.Context, r *auth.ResetPasswordRe
 }
 
 func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePasswordRequest) (*auth.ChangePasswordResponse, error) {
-	a.l.Println("{authService} - Change password handler")
+	a.l.Println("Auth Service - Change password")
 
 	// find user by email from Cookie->Jwt CLAIMS; hash New-come Password & Compare to Old-db password; Write new Password hashed
 	claims, err := data.GetFromClaims(r.Token)
@@ -152,7 +153,7 @@ func (a *AuthHandler) ChangePassword(ctx context.Context, r *auth.ChangePassword
 func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationRequest) (*auth.ActivationResponse, error) {
 	// Find {{KEY}} in DB, that equals to URL final section (activationUUID); Then set user.IsActivated = true, for user.Email == value of {{KEY}}
 	// Finally delete the used acc. activation request from db
-	a.l.Println("{authService} ActivateProfile Handler")
+	a.l.Println("Auth Service - Activate Profile")
 
 	activationReq, errNotFound := a.repo.FindActivationRequest(r.ActivationUUID)
 	if errNotFound != nil {
@@ -180,7 +181,6 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 	errDelAccActReq := a.repo.DeleteActivationRequest(activationReq.ActivationUUID, activationReq.Email)
 	if errDelAccActReq != nil {
 		a.l.Println("Error Deleting Account Activation Request")
-		//	*TODO: NEKAKAV ROLLBACK?
 	}
 
 	return &auth.ActivationResponse{
@@ -189,7 +189,7 @@ func (a *AuthHandler) ActivateProfile(ctx context.Context, r *auth.ActivationReq
 }
 
 func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.LoginResponse, error) {
-	a.l.Println("Login handler")
+	a.l.Println("Auth Service - Login")
 	res := &data.User{
 		Email:    r.Email,
 		Password: r.Password,
@@ -200,15 +200,14 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 			Status: http.StatusNotFound,
 		}, err
 	}
-	email, role, err2 := a.repo.FindUserEmail(res.Email)
+	user, err2 := a.repo.FindUser(res.Email)
 	if err2 != nil {
 		a.l.Println("Cannot find user")
 		return &auth.LoginResponse{
 			Status: http.StatusNotFound,
 		}, err2
 	}
-	a.l.Println(role)
-	tokenString, _ := data.CreateJwt(email, role)
+	tokenString, _ := data.CreateJwt(user.Email, user.Role, user.Username)
 	return &auth.LoginResponse{
 		Token:  tokenString,
 		Status: http.StatusOK,
@@ -217,8 +216,9 @@ func (a *AuthHandler) Login(ctx context.Context, r *auth.LoginRequest) (*auth.Lo
 }
 
 func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*auth.RegisterResponse, error) {
-	a.l.Println("Register handler")
+	a.l.Println("Auth Service - Register")
 	user := &data.User{
+		Username:    r.Username,
 		Email:       r.Email,
 		Password:    r.Password,
 		Role:        r.Role,
@@ -231,6 +231,15 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusBadRequest,
 		}, err
 	}
+
+	usernameError := a.repo.FindUserByUsername(user.Username)
+	if usernameError == nil {
+		a.l.Println("Username already exists")
+		return &auth.RegisterResponse{
+			Status: http.StatusBadRequest,
+		}, usernameError
+	}
+
 	file, err1 := os.Open("10k-most-common.txt")
 	if err1 != nil {
 		a.l.Println("Error opening 10k-most-common.txt file")
@@ -268,15 +277,13 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 			Status: http.StatusInternalServerError,
 		}, err3
 	}
-	a.l.Println("______________________________")
-	a.l.Println(user.Role)
 
 	activationUUID, errEmailing := data.SendEmail(user.Email, INTENTION_ACTIVATION)
 	if errEmailing != nil {
 		a.l.Println("ACTIVATION Email delivery failed for: ", r.Email, errEmailing)
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
-			a.l.Println("Error deleting user with email " + user.Email)
+			a.l.Println(errorDeletingUser + user.Email)
 			return &auth.RegisterResponse{
 				Status: http.StatusInternalServerError,
 			}, error1
@@ -291,7 +298,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 	if errActivationReqSave != nil {
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
-			a.l.Println("Error deleting user with email " + user.Email)
+			a.l.Println(errorDeletingUser + user.Email)
 			return &auth.RegisterResponse{
 				Status: http.StatusInternalServerError,
 			}, error1
@@ -312,6 +319,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 		Age:            r.Age,
 		CompanyWebsite: r.CompanyWebsite,
 		CompanyName:    r.CompanyName,
+		Role:           r.Role,
 	})
 
 	if err4 != nil {
@@ -327,7 +335,7 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 
 		error1 := a.repo.Delete(r.Email)
 		if error1 != nil {
-			a.l.Println("Error deleting user with email " + user.Email)
+			a.l.Println(errorDeletingUser + user.Email)
 			return &auth.RegisterResponse{
 				Status: http.StatusInternalServerError,
 			}, error1
@@ -344,13 +352,13 @@ func (a *AuthHandler) Register(ctx context.Context, r *auth.RegisterRequest) (*a
 }
 
 func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*auth.VerifyResponse, error) {
-	a.l.Println("Verify JWT")
+	a.l.Println("Auth Service - Verify JWT")
 	err := data.ValidateJwt(r.Token)
 	if err != nil {
 		a.l.Println("JWT expired")
 		return &auth.VerifyResponse{
 			Status: http.StatusUnauthorized,
-		}, nil
+		}, err
 	}
 	claims := &data.Claims{}
 	_, err = jwt.ParseWithClaims(r.Token, claims, func(token *jwt.Token) (interface{}, error) {
@@ -363,7 +371,7 @@ func (a *AuthHandler) VerifyJwt(ctx context.Context, r *auth.VerifyRequest) (*au
 }
 
 func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.UserResponse, error) {
-	a.l.Println("Get User from JWT")
+	a.l.Println("Auth Service - Get User")
 	claims, err := data.GetFromClaims(r.Token)
 	if err != nil {
 		return nil, err
@@ -371,5 +379,6 @@ func (a *AuthHandler) GetUser(ctx context.Context, r *auth.UserRequest) (*auth.U
 	return &auth.UserResponse{
 		UserEmail: claims.Email,
 		UserRole:  claims.Role,
+		Username:  claims.Username,
 	}, nil
 }

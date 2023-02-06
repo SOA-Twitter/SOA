@@ -11,12 +11,13 @@ import (
 
 var SampleSecretKey = []byte("SecretYouShouldHide")
 
-func CreateJwt(email string, role string) (string, error) {
+func CreateJwt(email string, role string, username string) (string, error) {
 	claims := &Claims{
-		Role:  role,
-		Email: email,
+		Role:     role,
+		Email:    email,
+		Username: username,
 		StandardClaims: &jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Second * 1200).Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * 120).Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -47,8 +48,6 @@ func ValidateJwt(tokenString string) error {
 
 func SendEmail(providedEmail string, intention string) (string, error) {
 	const accountActivationPath = "https://localhost:8081/auth/activate/"
-
-	// TODO baciti korisnika na stranicu na frontu za unos, umesto url ispod?
 	const accountRecoveryPath = "https://localhost:4200/recover-account"
 	// Sender data
 	from := os.Getenv("MAIL_ADDRESS")

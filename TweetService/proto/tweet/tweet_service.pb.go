@@ -25,9 +25,10 @@ type Tweet struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Text    string `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
-	Picture string `protobuf:"bytes,3,opt,name=picture,proto3" json:"picture,omitempty"`
+	Id           string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username     string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Text         string `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
+	CreationDate string `protobuf:"bytes,4,opt,name=creationDate,proto3" json:"creationDate,omitempty"`
 }
 
 func (x *Tweet) Reset() {
@@ -69,6 +70,13 @@ func (x *Tweet) GetId() string {
 	return ""
 }
 
+func (x *Tweet) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
 func (x *Tweet) GetText() string {
 	if x != nil {
 		return x.Text
@@ -76,9 +84,9 @@ func (x *Tweet) GetText() string {
 	return ""
 }
 
-func (x *Tweet) GetPicture() string {
+func (x *Tweet) GetCreationDate() string {
 	if x != nil {
-		return x.Picture
+		return x.CreationDate
 	}
 	return ""
 }
@@ -87,6 +95,8 @@ type GetTweetRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 }
 
 func (x *GetTweetRequest) Reset() {
@@ -119,6 +129,13 @@ func (x *GetTweetRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetTweetRequest.ProtoReflect.Descriptor instead.
 func (*GetTweetRequest) Descriptor() ([]byte, []int) {
 	return file_tweet_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetTweetRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
 }
 
 type GetTweetResponse struct {
@@ -168,20 +185,270 @@ func (x *GetTweetResponse) GetTweetList() []*Tweet {
 	return nil
 }
 
+type Like struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TweetId  string `protobuf:"bytes,1,opt,name=tweetId,proto3" json:"tweetId,omitempty"`
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Liked    bool   `protobuf:"varint,3,opt,name=liked,proto3" json:"liked,omitempty"`
+}
+
+func (x *Like) Reset() {
+	*x = Like{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Like) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Like) ProtoMessage() {}
+
+func (x *Like) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Like.ProtoReflect.Descriptor instead.
+func (*Like) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Like) GetTweetId() string {
+	if x != nil {
+		return x.TweetId
+	}
+	return ""
+}
+
+func (x *Like) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *Like) GetLiked() bool {
+	if x != nil {
+		return x.Liked
+	}
+	return false
+}
+
+type GetLikesByTweetIdRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetLikesByTweetIdRequest) Reset() {
+	*x = GetLikesByTweetIdRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetLikesByTweetIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLikesByTweetIdRequest) ProtoMessage() {}
+
+func (x *GetLikesByTweetIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLikesByTweetIdRequest.ProtoReflect.Descriptor instead.
+func (*GetLikesByTweetIdRequest) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetLikesByTweetIdRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetLikesByTweetIdResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LikeList []*Like `protobuf:"bytes,1,rep,name=like_list,json=likeList,proto3" json:"like_list,omitempty"`
+}
+
+func (x *GetLikesByTweetIdResponse) Reset() {
+	*x = GetLikesByTweetIdResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetLikesByTweetIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLikesByTweetIdResponse) ProtoMessage() {}
+
+func (x *GetLikesByTweetIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLikesByTweetIdResponse.ProtoReflect.Descriptor instead.
+func (*GetLikesByTweetIdResponse) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetLikesByTweetIdResponse) GetLikeList() []*Like {
+	if x != nil {
+		return x.LikeList
+	}
+	return nil
+}
+
+type GetLikesByUserRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+}
+
+func (x *GetLikesByUserRequest) Reset() {
+	*x = GetLikesByUserRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetLikesByUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLikesByUserRequest) ProtoMessage() {}
+
+func (x *GetLikesByUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLikesByUserRequest.ProtoReflect.Descriptor instead.
+func (*GetLikesByUserRequest) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetLikesByUserRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type GetLikesByUserResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LikeList []*Like `protobuf:"bytes,1,rep,name=like_list,json=likeList,proto3" json:"like_list,omitempty"`
+}
+
+func (x *GetLikesByUserResponse) Reset() {
+	*x = GetLikesByUserResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetLikesByUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLikesByUserResponse) ProtoMessage() {}
+
+func (x *GetLikesByUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLikesByUserResponse.ProtoReflect.Descriptor instead.
+func (*GetLikesByUserResponse) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetLikesByUserResponse) GetLikeList() []*Like {
+	if x != nil {
+		return x.LikeList
+	}
+	return nil
+}
+
 type PostTweetRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Text    string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	Picture string `protobuf:"bytes,2,opt,name=picture,proto3" json:"picture,omitempty"`
-	Token   string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Text  string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 }
 
 func (x *PostTweetRequest) Reset() {
 	*x = PostTweetRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_tweet_service_proto_msgTypes[3]
+		mi := &file_tweet_service_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -194,7 +461,7 @@ func (x *PostTweetRequest) String() string {
 func (*PostTweetRequest) ProtoMessage() {}
 
 func (x *PostTweetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tweet_service_proto_msgTypes[3]
+	mi := &file_tweet_service_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -207,19 +474,12 @@ func (x *PostTweetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PostTweetRequest.ProtoReflect.Descriptor instead.
 func (*PostTweetRequest) Descriptor() ([]byte, []int) {
-	return file_tweet_service_proto_rawDescGZIP(), []int{3}
+	return file_tweet_service_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PostTweetRequest) GetText() string {
 	if x != nil {
 		return x.Text
-	}
-	return ""
-}
-
-func (x *PostTweetRequest) GetPicture() string {
-	if x != nil {
-		return x.Picture
 	}
 	return ""
 }
@@ -240,7 +500,7 @@ type PostTweetResponse struct {
 func (x *PostTweetResponse) Reset() {
 	*x = PostTweetResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_tweet_service_proto_msgTypes[4]
+		mi := &file_tweet_service_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -253,7 +513,7 @@ func (x *PostTweetResponse) String() string {
 func (*PostTweetResponse) ProtoMessage() {}
 
 func (x *PostTweetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_tweet_service_proto_msgTypes[4]
+	mi := &file_tweet_service_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -266,39 +526,324 @@ func (x *PostTweetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PostTweetResponse.ProtoReflect.Descriptor instead.
 func (*PostTweetResponse) Descriptor() ([]byte, []int) {
-	return file_tweet_service_proto_rawDescGZIP(), []int{4}
+	return file_tweet_service_proto_rawDescGZIP(), []int{9}
+}
+
+type LikeTweetRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Like    bool   `protobuf:"varint,1,opt,name=like,proto3" json:"like,omitempty"`
+	Token   string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	TweetID string `protobuf:"bytes,3,opt,name=tweetID,proto3" json:"tweetID,omitempty"`
+}
+
+func (x *LikeTweetRequest) Reset() {
+	*x = LikeTweetRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LikeTweetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LikeTweetRequest) ProtoMessage() {}
+
+func (x *LikeTweetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LikeTweetRequest.ProtoReflect.Descriptor instead.
+func (*LikeTweetRequest) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *LikeTweetRequest) GetLike() bool {
+	if x != nil {
+		return x.Like
+	}
+	return false
+}
+
+func (x *LikeTweetRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *LikeTweetRequest) GetTweetID() string {
+	if x != nil {
+		return x.TweetID
+	}
+	return ""
+}
+
+type LikeTweetResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *LikeTweetResponse) Reset() {
+	*x = LikeTweetResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LikeTweetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LikeTweetResponse) ProtoMessage() {}
+
+func (x *LikeTweetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LikeTweetResponse.ProtoReflect.Descriptor instead.
+func (*LikeTweetResponse) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{11}
+}
+
+type Username struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Username) Reset() {
+	*x = Username{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Username) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Username) ProtoMessage() {}
+
+func (x *Username) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Username.ProtoReflect.Descriptor instead.
+func (*Username) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{12}
+}
+
+type GetUsernamesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Usernames []string `protobuf:"bytes,1,rep,name=usernames,proto3" json:"usernames,omitempty"`
+}
+
+func (x *GetUsernamesRequest) Reset() {
+	*x = GetUsernamesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetUsernamesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUsernamesRequest) ProtoMessage() {}
+
+func (x *GetUsernamesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUsernamesRequest.ProtoReflect.Descriptor instead.
+func (*GetUsernamesRequest) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetUsernamesRequest) GetUsernames() []string {
+	if x != nil {
+		return x.Usernames
+	}
+	return nil
+}
+
+type GetTweetListResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tweets []*Tweet `protobuf:"bytes,1,rep,name=tweets,proto3" json:"tweets,omitempty"`
+}
+
+func (x *GetTweetListResponse) Reset() {
+	*x = GetTweetListResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_tweet_service_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTweetListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTweetListResponse) ProtoMessage() {}
+
+func (x *GetTweetListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tweet_service_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTweetListResponse.ProtoReflect.Descriptor instead.
+func (*GetTweetListResponse) Descriptor() ([]byte, []int) {
+	return file_tweet_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetTweetListResponse) GetTweets() []*Tweet {
+	if x != nil {
+		return x.Tweets
+	}
+	return nil
 }
 
 var File_tweet_service_proto protoreflect.FileDescriptor
 
 var file_tweet_service_proto_rawDesc = []byte{
 	0x0a, 0x13, 0x74, 0x77, 0x65, 0x65, 0x74, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x45, 0x0a, 0x05, 0x54, 0x77, 0x65, 0x65, 0x74, 0x12, 0x0e,
-	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12,
-	0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65,
-	0x78, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x69, 0x63, 0x74, 0x75, 0x72, 0x65, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x69, 0x63, 0x74, 0x75, 0x72, 0x65, 0x22, 0x11, 0x0a, 0x0f,
-	0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22,
-	0x39, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x0a, 0x74, 0x77, 0x65, 0x65, 0x74, 0x5f, 0x6c, 0x69, 0x73,
-	0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x06, 0x2e, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52,
-	0x09, 0x74, 0x77, 0x65, 0x65, 0x74, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x56, 0x0a, 0x10, 0x50, 0x6f,
-	0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12,
-	0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65,
-	0x78, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x69, 0x63, 0x74, 0x75, 0x72, 0x65, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x69, 0x63, 0x74, 0x75, 0x72, 0x65, 0x12, 0x14, 0x0a, 0x05,
-	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b,
-	0x65, 0x6e, 0x22, 0x13, 0x0a, 0x11, 0x50, 0x6f, 0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x78, 0x0a, 0x0c, 0x54, 0x77, 0x65, 0x65, 0x74,
-	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x54, 0x77,
-	0x65, 0x65, 0x74, 0x73, 0x12, 0x10, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65,
-	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x09, 0x50,
-	0x6f, 0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x12, 0x11, 0x2e, 0x50, 0x6f, 0x73, 0x74, 0x54,
-	0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x50, 0x6f,
-	0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x00, 0x42, 0x0d, 0x5a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x74, 0x77, 0x65, 0x65, 0x74,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x6b, 0x0a, 0x05, 0x54, 0x77, 0x65, 0x65, 0x74, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1a,
+	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65,
+	0x78, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x12, 0x22,
+	0x0a, 0x0c, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x65, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x61,
+	0x74, 0x65, 0x22, 0x2d, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x22, 0x39, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x0a, 0x74, 0x77, 0x65, 0x65, 0x74, 0x5f, 0x6c,
+	0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x06, 0x2e, 0x54, 0x77, 0x65, 0x65,
+	0x74, 0x52, 0x09, 0x74, 0x77, 0x65, 0x65, 0x74, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x52, 0x0a, 0x04,
+	0x4c, 0x69, 0x6b, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x74, 0x77, 0x65, 0x65, 0x74, 0x49, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x74, 0x77, 0x65, 0x65, 0x74, 0x49, 0x64, 0x12, 0x1a,
+	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69,
+	0x6b, 0x65, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x64,
+	0x22, 0x2a, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x54, 0x77,
+	0x65, 0x65, 0x74, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x3f, 0x0a, 0x19,
+	0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x54, 0x77, 0x65, 0x65, 0x74, 0x49,
+	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a, 0x09, 0x6c, 0x69, 0x6b,
+	0x65, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x05, 0x2e, 0x4c,
+	0x69, 0x6b, 0x65, 0x52, 0x08, 0x6c, 0x69, 0x6b, 0x65, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x33, 0x0a,
+	0x15, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x55, 0x73, 0x65, 0x72, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61,
+	0x6d, 0x65, 0x22, 0x3c, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79,
+	0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a, 0x09,
+	0x6c, 0x69, 0x6b, 0x65, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x05, 0x2e, 0x4c, 0x69, 0x6b, 0x65, 0x52, 0x08, 0x6c, 0x69, 0x6b, 0x65, 0x4c, 0x69, 0x73, 0x74,
+	0x22, 0x3c, 0x0a, 0x10, 0x50, 0x6f, 0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x13,
+	0x0a, 0x11, 0x50, 0x6f, 0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x56, 0x0a, 0x10, 0x4c, 0x69, 0x6b, 0x65, 0x54, 0x77, 0x65, 0x65, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6c, 0x69, 0x6b, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x6c, 0x69, 0x6b, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74,
+	0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x12, 0x18, 0x0a, 0x07, 0x74, 0x77, 0x65, 0x65, 0x74, 0x49, 0x44, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x74, 0x77, 0x65, 0x65, 0x74, 0x49, 0x44, 0x22, 0x13, 0x0a, 0x11, 0x4c,
+	0x69, 0x6b, 0x65, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x0a, 0x0a, 0x08, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x33, 0x0a, 0x13,
+	0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x73,
+	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x22, 0x36, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x4c, 0x69, 0x73,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x06, 0x74, 0x77, 0x65,
+	0x65, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x06, 0x2e, 0x54, 0x77, 0x65, 0x65,
+	0x74, 0x52, 0x06, 0x74, 0x77, 0x65, 0x65, 0x74, 0x73, 0x32, 0xf3, 0x02, 0x0a, 0x0c, 0x54, 0x77,
+	0x65, 0x65, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x09, 0x47, 0x65,
+	0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x73, 0x12, 0x10, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65,
+	0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x11, 0x2e, 0x47, 0x65, 0x74, 0x54,
+	0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x34,
+	0x0a, 0x09, 0x50, 0x6f, 0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x12, 0x11, 0x2e, 0x50, 0x6f,
+	0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12,
+	0x2e, 0x50, 0x6f, 0x73, 0x74, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x34, 0x0a, 0x09, 0x4c, 0x69, 0x6b, 0x65, 0x54, 0x77, 0x65, 0x65,
+	0x74, 0x12, 0x11, 0x2e, 0x4c, 0x69, 0x6b, 0x65, 0x54, 0x77, 0x65, 0x65, 0x74, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x4c, 0x69, 0x6b, 0x65, 0x54, 0x77, 0x65, 0x65, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x08, 0x47, 0x65,
+	0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x12, 0x19, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65,
+	0x73, 0x42, 0x79, 0x54, 0x77, 0x65, 0x65, 0x74, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1a, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x54, 0x77,
+	0x65, 0x65, 0x74, 0x49, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x43, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x55, 0x73, 0x65,
+	0x72, 0x12, 0x16, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x55, 0x73,
+	0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x47, 0x65, 0x74, 0x4c,
+	0x69, 0x6b, 0x65, 0x73, 0x42, 0x79, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x08, 0x48, 0x6f, 0x6d, 0x65, 0x46, 0x65, 0x65, 0x64,
+	0x12, 0x14, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x77, 0x65, 0x65,
+	0x74, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42,
+	0x0d, 0x5a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x74, 0x77, 0x65, 0x65, 0x74, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -313,25 +858,46 @@ func file_tweet_service_proto_rawDescGZIP() []byte {
 	return file_tweet_service_proto_rawDescData
 }
 
-var file_tweet_service_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_tweet_service_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_tweet_service_proto_goTypes = []interface{}{
-	(*Tweet)(nil),             // 0: Tweet
-	(*GetTweetRequest)(nil),   // 1: GetTweetRequest
-	(*GetTweetResponse)(nil),  // 2: GetTweetResponse
-	(*PostTweetRequest)(nil),  // 3: PostTweetRequest
-	(*PostTweetResponse)(nil), // 4: PostTweetResponse
+	(*Tweet)(nil),                     // 0: Tweet
+	(*GetTweetRequest)(nil),           // 1: GetTweetRequest
+	(*GetTweetResponse)(nil),          // 2: GetTweetResponse
+	(*Like)(nil),                      // 3: Like
+	(*GetLikesByTweetIdRequest)(nil),  // 4: GetLikesByTweetIdRequest
+	(*GetLikesByTweetIdResponse)(nil), // 5: GetLikesByTweetIdResponse
+	(*GetLikesByUserRequest)(nil),     // 6: GetLikesByUserRequest
+	(*GetLikesByUserResponse)(nil),    // 7: GetLikesByUserResponse
+	(*PostTweetRequest)(nil),          // 8: PostTweetRequest
+	(*PostTweetResponse)(nil),         // 9: PostTweetResponse
+	(*LikeTweetRequest)(nil),          // 10: LikeTweetRequest
+	(*LikeTweetResponse)(nil),         // 11: LikeTweetResponse
+	(*Username)(nil),                  // 12: Username
+	(*GetUsernamesRequest)(nil),       // 13: GetUsernamesRequest
+	(*GetTweetListResponse)(nil),      // 14: GetTweetListResponse
 }
 var file_tweet_service_proto_depIdxs = []int32{
-	0, // 0: GetTweetResponse.tweet_list:type_name -> Tweet
-	1, // 1: TweetService.GetTweets:input_type -> GetTweetRequest
-	3, // 2: TweetService.PostTweet:input_type -> PostTweetRequest
-	2, // 3: TweetService.GetTweets:output_type -> GetTweetResponse
-	4, // 4: TweetService.PostTweet:output_type -> PostTweetResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0,  // 0: GetTweetResponse.tweet_list:type_name -> Tweet
+	3,  // 1: GetLikesByTweetIdResponse.like_list:type_name -> Like
+	3,  // 2: GetLikesByUserResponse.like_list:type_name -> Like
+	0,  // 3: GetTweetListResponse.tweets:type_name -> Tweet
+	1,  // 4: TweetService.GetTweets:input_type -> GetTweetRequest
+	8,  // 5: TweetService.PostTweet:input_type -> PostTweetRequest
+	10, // 6: TweetService.LikeTweet:input_type -> LikeTweetRequest
+	4,  // 7: TweetService.GetLikes:input_type -> GetLikesByTweetIdRequest
+	6,  // 8: TweetService.GetLikesByUser:input_type -> GetLikesByUserRequest
+	13, // 9: TweetService.HomeFeed:input_type -> GetUsernamesRequest
+	2,  // 10: TweetService.GetTweets:output_type -> GetTweetResponse
+	9,  // 11: TweetService.PostTweet:output_type -> PostTweetResponse
+	11, // 12: TweetService.LikeTweet:output_type -> LikeTweetResponse
+	5,  // 13: TweetService.GetLikes:output_type -> GetLikesByTweetIdResponse
+	7,  // 14: TweetService.GetLikesByUser:output_type -> GetLikesByUserResponse
+	14, // 15: TweetService.HomeFeed:output_type -> GetTweetListResponse
+	10, // [10:16] is the sub-list for method output_type
+	4,  // [4:10] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_tweet_service_proto_init() }
@@ -377,7 +943,7 @@ func file_tweet_service_proto_init() {
 			}
 		}
 		file_tweet_service_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PostTweetRequest); i {
+			switch v := v.(*Like); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -389,7 +955,127 @@ func file_tweet_service_proto_init() {
 			}
 		}
 		file_tweet_service_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetLikesByTweetIdRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetLikesByTweetIdResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetLikesByUserRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetLikesByUserResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PostTweetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PostTweetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LikeTweetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LikeTweetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Username); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetUsernamesRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_tweet_service_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTweetListResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -407,7 +1093,7 @@ func file_tweet_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_tweet_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

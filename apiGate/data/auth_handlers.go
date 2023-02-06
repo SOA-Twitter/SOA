@@ -23,10 +23,15 @@ type Gender string
 type Role string
 
 const (
-	Male         Gender = "Male"
-	Female       Gender = "Female"
-	RegularUser  Role   = "RegularUser"
-	BusinessUser Role   = "BusinessUser"
+	Male                Gender = "Male"
+	Female              Gender = "Female"
+	RegularUser         Role   = "RegularUser"
+	BusinessUser        Role   = "BusinessUser"
+	unMarshall                 = "Cannot unmarshal json"
+	invalidJson                = "Invalid JSON format"
+	wrongPasswordFormat        = "Wrong password format"
+	passwordRegexErrMsg        = "Password must be at least 8 characters long, with at least one upper and one lower case letter, one special character and one number."
+	passwrodMatchErrMsg        = "Passwords do NOT match"
 )
 
 func (gender Gender) IsValid() error {
@@ -37,33 +42,6 @@ func (gender Gender) IsValid() error {
 	return fmt.Errorf("invalid gender")
 }
 
-type User struct {
-	Username       string `json:"username"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
-	Gender         Gender `json:"gender"`
-	Country        string `json:"country"`
-	Age            int    `json:"age"`
-	CompanyName    string `json:"company_name"`
-	CompanyWebsite string `json:"company_website"`
-	Role           Role   `json:"role"`
-}
-type ChangePass struct {
-	OldPassword      string `json:"old_password"`
-	NewPassword      string `json:"new_password"`
-	RepeatedPassword string `json:"repeated_password"`
-}
-type Email struct {
-	Email string `json:"email"`
-}
-type RecoverProfile struct {
-	NewPassword      string `json:"new_password"`
-	RepeatedPassword string `json:"repeated_password"`
-	RecoveryUUID     string `json:"recovery_uuid"`
-}
-
 func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{l, pr}
 }
@@ -71,12 +49,12 @@ func NewAuthHandler(l *log.Logger, pr auth.AuthServiceClient) *AuthHandler {
 func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Login")
 
-	var expirationTime = time.Now().Add(time.Second * 1200)
+	var expirationTime = time.Now().Add(time.Minute * 120)
 	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 
@@ -94,18 +72,19 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 		Expires: expirationTime,
 	})
-	ah.l.Println("\n\n" + token.Token + "----------------------\n")
 	json.NewEncoder(w).Encode(token.Token)
 }
+
 func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API - Gate -Send Recovery Email")
 	email := Email{}
 	err := FromJSON(&email, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
+
 	res, err := ah.pr.SendRecoveryEmail(context.Background(), &auth.SendRecoveryEmailRequest{
 		RecoveryEmail: email.Email,
 	})
@@ -116,33 +95,31 @@ func (ah *AuthHandler) SendRecoveryEmail(w http.ResponseWriter, r *http.Request)
 	}
 	json.NewEncoder(w).Encode(res.Status)
 }
+
 func (ah *AuthHandler) RecoverProfile(w http.ResponseWriter, r *http.Request) {
 	ah.l.Println("API-Gate - Recover profile")
 	recProfil := RecoverProfile{}
 	err := FromJSON(&recProfil, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 	err3 := ValidatePassword(recProfil.NewPassword)
 	if err3 != nil {
-		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 8 characters long, with at least"+
-			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		ah.l.Println(wrongPasswordFormat)
+		http.Error(w, passwordRegexErrMsg, http.StatusBadRequest)
 		return
 	}
 	if recProfil.NewPassword != recProfil.RepeatedPassword {
-		ah.l.Println("Passwords do NOT match")
-		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
+		ah.l.Println(passwrodMatchErrMsg)
+		http.Error(w, passwrodMatchErrMsg, http.StatusBadRequest)
 		return
 	}
 	res, err := ah.pr.ResetPassword(context.Background(), &auth.ResetPasswordRequest{
 		NewPassword:      recProfil.NewPassword,
 		RepeatedPassword: recProfil.RepeatedPassword,
-		// TODO premestiti da se prima iz JSON body recoveryid?
-		//RecoveryUUID: mux.Vars(r)["recId"],
-		RecoveryUUID: recProfil.RecoveryUUID,
+		RecoveryUUID:     recProfil.RecoveryUUID,
 	})
 	if err != nil {
 		ah.l.Println("Cannot recover profile")
@@ -174,42 +151,37 @@ func (ah *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	pass := ChangePass{}
 	err := FromJSON(&pass, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 	err3 := ValidatePassword(pass.NewPassword)
 	if err3 != nil {
-		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 8 characters long, with at least"+
-			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		ah.l.Println(wrongPasswordFormat)
+		http.Error(w, passwordRegexErrMsg, http.StatusBadRequest)
 		return
 	}
 	if pass.NewPassword != pass.RepeatedPassword {
-		ah.l.Println("Passwords do NOT match")
-		http.Error(w, "Passwords do NOT match", http.StatusBadRequest)
+		ah.l.Println(passwrodMatchErrMsg)
+		http.Error(w, passwrodMatchErrMsg, http.StatusBadRequest)
 		return
 	}
-	c, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-			return
-		}
-		http.Error(w, "Bad request!", http.StatusBadRequest)
+	c := r.Header.Get("Authorization")
+	if c == "" {
+		http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
 		return
 	}
 	res, err := ah.pr.ChangePassword(context.Background(), &auth.ChangePasswordRequest{
 		OldPassword: pass.OldPassword,
 		NewPassword: pass.NewPassword,
-		Token:       c.Value,
+		Token:       c,
 	})
 	if err != nil {
 		json.NewEncoder(w).Encode(res.Status)
 		http.Error(w, "Unable to save new password", http.StatusBadRequest)
 		return
 	}
-	json.NewEncoder(w).Encode(http.StatusOK)
+	json.NewEncoder(w).Encode(res.Status)
 }
 
 func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -218,13 +190,14 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	user := User{}
 	err := FromJSON(&user, r.Body)
 	if err != nil {
-		ah.l.Println("Cannot unmarshal json")
-		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		ah.l.Println(unMarshall)
+		http.Error(w, invalidJson, http.StatusBadRequest)
 		return
 	}
 
 	_, err1 := mail.ParseAddress(user.Email)
-	if err1 != nil {
+	_, err2 := regexp.MatchString("[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", user.Email)
+	if err1 != nil || err2 != nil {
 		ah.l.Println("Wrong email format")
 		http.Error(w, "Wrong email format!.", http.StatusBadRequest)
 		return
@@ -232,9 +205,8 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err3 := ValidatePassword(user.Password)
 	if err3 != nil {
-		ah.l.Println("Wrong password format")
-		http.Error(w, "Password must be at least 8 characters long, with at least"+
-			" one upper and one lower case letter, one special character and one number.", http.StatusBadRequest)
+		ah.l.Println(wrongPasswordFormat)
+		http.Error(w, passwordRegexErrMsg, http.StatusBadRequest)
 		return
 	}
 
@@ -247,7 +219,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, error2 := regexp.MatchString("([a-zA-Z-']+)", user.CompanyWebsite)
+		_, error2 := regexp.MatchString("([a-zA-Z-'_./]+)", user.CompanyWebsite)
 		if error2 != nil {
 			ah.l.Println("Company website must not be empty")
 			http.Error(w, "Company website must not be empty", http.StatusBadRequest)
@@ -261,6 +233,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			CompanyName:    user.CompanyName,
 			CompanyWebsite: user.CompanyWebsite,
 			Role:           string(BusinessUser),
+			Private:        true,
 		})
 
 		if err5 != nil {
@@ -323,6 +296,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Country:   user.Country,
 			Age:       int32(user.Age),
 			Role:      string(RegularUser),
+			Private:   true,
 		})
 
 		if err != nil {
@@ -330,7 +304,7 @@ func (ah *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Registration unsuccessful", http.StatusBadRequest)
 			return
 		}
-		json.NewEncoder(w).Encode(http.StatusOK)
+		json.NewEncoder(w).Encode(res.Status)
 	}
 }
 
@@ -346,16 +320,25 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ah.l.Println("Api-gate Middleware- Verify JWT")
 		ah.l.Println(r.Method, r.URL.Path)
-		c, err := r.Cookie("token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
-				return
-			}
-			http.Error(w, "Bad request!", http.StatusBadRequest)
+		c := r.Header.Get("Authorization")
+
+		if c == "" {
+			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
 			return
 		}
-		tokenString := c.Value
+		//} else {
+		//	c, err := r.Cookie("token")
+		//	if err != nil {
+		//		if err == http.ErrNoCookie {
+		//			http.Error(w, "Unauthorized! NO COOKIE", http.StatusUnauthorized)
+		//			return
+		//		}
+		//		http.Error(w, "Bad request!", http.StatusBadRequest)
+		//		return
+		//	}
+		//	tokenString = c.Value
+		//}
+		tokenString := c
 		resp, err := ah.pr.VerifyJwt(context.Background(), &auth.VerifyRequest{
 			Token: tokenString,
 		})
@@ -363,12 +346,11 @@ func (ah *AuthHandler) Authorize(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized!", http.StatusUnauthorized)
 			return
 		}
-		if !HasPermission(resp.UserRole, r.URL.Path, r.Method) {
-			ah.l.Printf("User '%s' is not allowed to '%s' resource '%s'", resp.UserRole, r.Method, r.URL.Path)
-			w.WriteHeader(http.StatusForbidden)
-			return
-		}
+		//if !HasPermission(resp.UserRole, r.URL.Path, r.Method) {
+		//	ah.l.Printf("User '%s' is not allowed to '%s' resource '%s'", resp.UserRole, r.Method, r.URL.Path)
+		//	w.WriteHeader(http.StatusForbidden)
+		//	return
+		//}
 		next.ServeHTTP(w, r)
-
 	})
 }

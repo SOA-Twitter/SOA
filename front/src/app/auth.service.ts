@@ -17,7 +17,7 @@ import { Like } from "./model/like";
 })
 
 export class AuthService {
-    
+
     constructor (
         private httpClient: HttpClient,
         private router: Router
@@ -113,7 +113,7 @@ export class AuthService {
       }
       return "";
     }
-  
+
     getEmail(): string {
       let token = this.parseToken();
       if (token) {
@@ -121,7 +121,7 @@ export class AuthService {
       }
       return "";
     }
-  
+
     getRoles() {
       let token = this.parseToken();
       if (token) {
@@ -129,7 +129,7 @@ export class AuthService {
       }
       return []
     }
-  
+
     private parseToken() {
       let jwt = localStorage.getItem('jwt token');
       if (jwt !== null) {
@@ -139,12 +139,12 @@ export class AuthService {
         return decodedJwtData;
       }
     }
-  
-    tokenIsPresent(): Boolean {
+
+    tokenIsPresent(): boolean {
       let token = this.getToken()
       return token != null;
     }
-  
+
     getToken() {
       let token = localStorage.getItem('jwt token');
       return token

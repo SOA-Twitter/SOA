@@ -4,6 +4,7 @@ import (
 	"apiGate/data"
 	"apiGate/protos/auth"
 	"apiGate/protos/profile"
+	"apiGate/protos/social"
 	"apiGate/protos/tweet"
 	"context"
 	gorillaHandlers "github.com/gorilla/handlers"
@@ -68,8 +69,39 @@ func main() {
 
 	tweetRouter := r.PathPrefix("/tweet").Subrouter()
 	tweetRouter.Use(authHandler.Authorize)
-	tweetRouter.HandleFunc("/getTweets", tweetHandler.GetTweets).Methods(http.MethodGet)
+	tweetRouter.HandleFunc("/getTweets/{username}", tweetHandler.GetTweetsByUsername).Methods(http.MethodGet)
+	tweetRouter.HandleFunc("/getTweetLikes/{id}", tweetHandler.GetLikesByTweetId).Methods(http.MethodGet)
 	tweetRouter.HandleFunc("/postTweets", tweetHandler.PostTweet).Methods(http.MethodPost)
+	tweetRouter.HandleFunc("/like/{id}", tweetHandler.LikeTweet).Methods(http.MethodPut)
+
+	//----------------------------------------------------------SOCIAL SERVICE
+
+	socialPort := os.Getenv("SOCIAL_PORT")
+	socialHost := os.Getenv("SOCIAL_HOST")
+	socialConn, err := grpc.DialContext(
+		context.Background(),
+		socialHost+":"+socialPort,
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		l.Fatalf("Error connecting to Social_Service: %v\n", err)
+	}
+	defer socialConn.Close()
+	socialClient := social.NewSocialServiceClient(socialConn)
+	socialHandler := data.NewSocialHandler(l, socialClient, tweetClient)
+
+	socialRouter := r.PathPrefix("/social").Subrouter()
+	tweetRouter.Use(authHandler.Authorize)
+	socialRouter.HandleFunc("/follow", socialHandler.Follow).Methods(http.MethodPost)
+	socialRouter.HandleFunc("/unfollow", socialHandler.Unfollow).Methods(http.MethodDelete)
+	socialRouter.HandleFunc("/pending", socialHandler.GetPendingFollowRequests).Methods(http.MethodGet)
+	socialRouter.HandleFunc("/isFollowed/{username}", socialHandler.IsFollowed).Methods(http.MethodGet)
+	socialRouter.HandleFunc("/accept", socialHandler.AcceptFollowRequest).Methods(http.MethodPut)
+	socialRouter.HandleFunc("/decline", socialHandler.DeclineFollowRequest).Methods(http.MethodPut)
+	socialRouter.HandleFunc("/homeFeed", socialHandler.HomeFeed).Methods(http.MethodGet)
+
+	defer socialConn.Close()
 
 	//----------------------------------------------------------
 	profileHost := os.Getenv("PROFILE_HOST")
@@ -90,12 +122,13 @@ func main() {
 
 	profileRouter := r.PathPrefix("/profile").Subrouter()
 	profileRouter.Use(authHandler.Authorize)
-	profileRouter.HandleFunc("/", profileHandler.UserProfile).Methods(http.MethodPost)
+	profileRouter.HandleFunc("/{username}", profileHandler.UserProfile).Methods(http.MethodGet)
 	profileRouter.HandleFunc("/changePassword", authHandler.ChangePassword).Methods(http.MethodPost)
+	profileRouter.HandleFunc("/privacy", profileHandler.ManagePrivacy).Methods(http.MethodPut)
 
-	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}),
+	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"https://localhost:4200"}),
 		gorillaHandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
-		gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"}),
+		gorillaHandlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
 		gorillaHandlers.AllowCredentials())
 
 	s := &http.Server{

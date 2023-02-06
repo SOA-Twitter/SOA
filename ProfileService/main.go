@@ -5,6 +5,7 @@ import (
 	"ProfileService/handlers"
 	"ProfileService/proto/auth"
 	"ProfileService/proto/profile"
+	"ProfileService/proto/social"
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
@@ -50,12 +51,21 @@ func main() {
 	as := auth.NewAuthServiceClient(conn)
 	//-------------------------------------------------
 
+	socialPort := os.Getenv("SOCIAL_PORT")
+	socialHost := os.Getenv("SOCIAL_HOST")
+	sCon, err := grpc.Dial(socialHost+":"+socialPort, grpc.WithInsecure())
+	if err != nil {
+		l.Println("Error connecting to social service")
+	}
+	defer sCon.Close()
+	ss := social.NewSocialServiceClient(sCon)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		l.Fatalf("Failed to listen")
 	}
 	grpcServer := grpc.NewServer()
-	profileHandler := handlers.NewProfileHandler(l, profileRepoImpl, as)
+	profileHandler := handlers.NewProfileHandler(l, profileRepoImpl, as, ss)
 	profile.RegisterProfileServiceServer(grpcServer, profileHandler)
 	reflection.Register(grpcServer)
 

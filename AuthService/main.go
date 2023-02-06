@@ -28,6 +28,8 @@ func main() {
 	if err != nil {
 		l.Println("Error connecting to postgres...")
 	}
+	//--------------------Connection with profile service
+
 	profilePort := os.Getenv("PROFILE_PORT")
 	profileHost := os.Getenv("PROFILE_HOST")
 
@@ -42,6 +44,7 @@ func main() {
 	if err != nil {
 		l.Fatalf("Failed to listen: %v", err)
 	}
+
 	authHandler := handlers.NewAuthHandler(l, authRepo, ps)
 	auth.RegisterAuthServiceServer(grpcServer, authHandler)
 	reflection.Register(grpcServer)
