@@ -1,4 +1,4 @@
 <app-logged-navbar></app-logged-navbar> 
-<div class="post">
-    <app-post-component></app-post-component>
+<div class="post" *ngFor="let post of posts">
+    <app-post-component [post]="post"></app-post-component>
 </div>

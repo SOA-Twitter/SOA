@@ -77,8 +77,8 @@ export class AuthService {
       return this.httpClient.post('https://localhost:8081/social/follow', {"username" : username})
     }
 
-    getRequests(): Observable<any>{
-      return this.httpClient.get('https://localhost:8081/social/pending')
+    getRequests(): Observable<Request[]>{
+      return this.httpClient.get<Request[]>('https://localhost:8081/social/pending')
     }
 
     acceptReq(username: string): Observable<any>{
@@ -91,6 +91,10 @@ export class AuthService {
 
     isFollowed(username: string): Observable<any>{
       return this.httpClient.get('https://localhost:8081/social/isFollowed/'+ username)
+    }
+
+    getHomePageForLoggedUser(): Observable<Post[]>{
+      return this.httpClient.get<Post[]>("https://localhost:8081/social/homeFeed")
     }
 
     get isAuthenticated() {

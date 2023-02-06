@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Post } from '../model/post';
 
 @Component({
   selector: 'app-logged-home',
@@ -7,9 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoggedHomeComponent implements OnInit {
 
-  constructor() { }
+  posts: Post[] = [];
+
+  constructor(private service: AuthService) { }
 
   ngOnInit(): void {
+    this.service.getHomePageForLoggedUser().subscribe(posts => { this.posts = posts })
   }
 
 }

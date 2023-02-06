@@ -1,3 +1,4 @@
+<app-logged-navbar></app-logged-navbar>
 <div class="post-section">
     <div class="row justify-content-center">
         <div class="col-md-5">
@@ -13,7 +14,7 @@
                         </div>
 
                         <div class="form-group">
-                            <button type="submit" class="btn btn-primary post">Post</button>
+                            <button type="submit" class="btn btn-primary post" [disabled]="!postForm.valid">Post</button>
                         </div>
     
                     </form>

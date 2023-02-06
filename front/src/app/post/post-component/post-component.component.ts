@@ -31,7 +31,7 @@ export class PostComponentComponent implements OnInit {
   isLikedByMe():boolean{
     for (let like of this.likes){
       if(like.username === this.authService.getUsername() && like.liked){
-        return true
+        return true;
       }
     }
     return false;
