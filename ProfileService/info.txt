@@ -1,0 +1,10 @@
+
+------------------------------------------------------------
+
+Create proto:
+
+protoc --go_out=./profile --go_opt=paths=source_relative --go-grpc_out=./profile --go-grpc_opt=paths=source_relative profile_service.proto
+
+
+Eo kul linka pa bacite pog
+https://codevoweb.com/crud-grpc-server-api-client-with-golang-and-mongodb/

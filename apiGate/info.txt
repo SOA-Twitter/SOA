@@ -1,0 +1,27 @@
+Create unencrypted private key and CSR with a single command:
+-openssl req -newkey rsa:2048 -nodes -keyout cert.key -out cert.csr
+
+
+Create a Self-Signed Certificate
+    A self-signed certificate is a certificate that's
+    signed with its own private key. It can be used to
+    encrypt data just as well as CA-signed certificates,
+    but our users will be shown a warning that says the certificate isn't trusted.
+-openssl req -key cert.key -new -x509 -days 365 -out cert.crt
+
+
+Create a Certificate authority by creating self-signed rootCA cert
+-openssl req -x509 -sha256 -days 1825 -newkey rsa:2048 -keyout rootCA.key -out rootCA.crt
+
+Create new txt file (root.ext) with this code in it:
+            authorityKeyIdentifier=keyid,issuer
+            basicConstraints=CA:FALSE
+            subjectAltName = @twitter
+            [twitter]
+            DNS.1 = localhost
+
+-openssl x509 -req -CA rootCA.crt -CAkey rootCA.key -in
+ cert.csr -out cert.crt -days 365 -CAcreateserial -extfile root. ext
+
+
+ --------------------------------------------------------------------------------------

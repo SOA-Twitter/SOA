@@ -1,0 +1,58 @@
+body{
+    margin:20px;
+    color: #1a202c;
+    text-align: left;
+    background-color: #e2e8f0;
+}
+.main-body {
+    padding: 15px;
+}
+
+.card {
+    position: relative;
+    flex-direction: column;
+    border: 0 solid rgba(0,0,0,.125);
+    margin-bottom: 10px;
+    display: block;
+    margin-left: 270px;
+    width: 105%;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+}
+
+.changePass{
+    border-color: #1DA1F2;
+    color: #1DA1F2;
+    fill: #1DA1F2;
+    border: 1px solid;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
+    text-transform: uppercase;
+    padding: 3px 16px;
+    margin-right: 8px;
+}
+
+.requests, .follow{
+    border-color: #1DA1F2;
+    color: #1DA1F2;
+    fill: #1DA1F2;
+    border: 1px solid;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
+    text-transform: uppercase;
+    padding: 3px 16px;
+}
+
+.post{
+    margin-top: 10px;
+    display: block;
+    margin-left: auto;
+    width: 80%;
+}

@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+option go_package = "proto/auth";
+service AuthService {
+  rpc Login(LoginRequest) returns(LoginResponse){}
+  rpc Register(RegisterRequest) returns(RegisterResponse){}
+  rpc VerifyJwt(VerifyRequest) returns(VerifyResponse){}
+  rpc GetUser(UserRequest) returns(UserResponse){}
+  rpc ChangePassword(ChangePasswordRequest) returns(ChangePasswordResponse){}
+  rpc ActivateProfile(ActivationRequest) returns(ActivationResponse){}
+  rpc SendRecoveryEmail(SendRecoveryEmailRequest) returns(RecoveryPasswordResponse){}
+  rpc ResetPassword(ResetPasswordRequest) returns(ChangePasswordResponse){}
+}
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+message LoginResponse{
+  string token = 1;
+  int32 status = 2;
+}
+message RegisterRequest{
+  string username = 1;
+  string password = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string email = 5;
+  string gender = 6;
+  string country = 7;
+  int32 age = 8;
+  string companyName = 9;
+  string companyWebsite = 10;
+  string role = 11;
+  bool private = 12;
+}
+
+message RegisterResponse{
+  int32 status = 1;
+}
+message VerifyRequest{
+  string token = 1;
+}
+message VerifyResponse{
+  int32 status = 1;
+  string userRole = 2;
+}
+message UserRequest{
+  string token = 1;
+}
+
+message UserResponse {
+  string userRole = 1;
+  string userEmail = 2;
+  string username = 3;
+}
+message ChangePasswordRequest{
+  string token = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
+}
+message ChangePasswordResponse{
+  int32 status = 1;
+}
+message ActivationRequest{
+  string activationUUID = 1;
+}
+message ActivationResponse{
+  int32 status = 1;
+}
+message SendRecoveryEmailRequest{
+  string recoveryEmail = 1;
+}
+message RecoveryPasswordResponse{
+  int32 status = 1;
+}
+message ResetPasswordRequest{
+  string recoveryUUID = 1;
+  string newPassword = 2;
+  string repeatedPassword = 3;
+}

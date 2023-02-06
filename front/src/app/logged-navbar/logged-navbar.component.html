@@ -1,0 +1,16 @@
+<header>
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <form >
+          <a href="https://localhost:4200/logged-home">
+            <img src="assets/images/logo.png" alt="" width="50" height="40">
+          </a>
+        </form>
+        <form class="form-inline">
+          <button routerLink="/create-post" type="button" class="float-right login mr-2">add post</button>
+          <button type="button" class="float-right signup mr-2" (click)="profile()">profile</button>
+          <button type="button" class="float-right signup mr-2" (click)="logout()">Log out</button>
+        </form>
+      </div>
+    </nav>
+  </header>

@@ -1,0 +1,137 @@
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<app-logged-navbar></app-logged-navbar>
+
+<div class="container bootstrap snippets bootdey">
+  <div class="main-body">
+
+    <div class="row gutters-sm">
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Username</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.username}}
+              </div>
+            </div>
+            <hr>
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">First Name</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.first_name}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Last Name</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.last_name}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Age</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.age}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Country</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.country}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Email</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.email}}
+              </div>
+            </div>
+            <hr>
+            <div class="row" *ngIf="currentUser.role === 'RegularUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Gender</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.gender}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'RegularUser'">
+            <div class="row" *ngIf="currentUser.role === 'BusinessUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Company name</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.company_name}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'BusinessUser'">
+            <div class="row" *ngIf="currentUser.role === 'BusinessUser'">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Company website</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                {{currentUser.company_website}}
+              </div>
+            </div>
+            <hr *ngIf="currentUser.role === 'BusinessUser'">
+            <div class="row">
+              <div class="col-sm-3">
+                <h6 class="mb-0">Private</h6>
+              </div>
+              <div class="col-sm-9 text-secondary">
+                <input type="checkbox" name="private" id="privacy-checkbox" [disabled]="!canEditPrivacy()"
+                  [checked]="currentUser.private" (click)="changePrivacy()">
+              </div>
+            </div>
+            <hr [hidden]="!canEditPrivacy()">
+            <div class="row">
+              <div class="col-sm-12">
+                <input type="button" class="changePass" routerLink="/change-password" value="Change password" [hidden]="!canEditPrivacy()">
+                <input type="button" class="requests" value="Follow Requests" [hidden]="!canEditPrivacy()" (click)="showModal()">
+                <input id="followBtn" type="button" class="follow" value="Follow" [hidden]="canEditPrivacy() && !isFollowedByLoggedUser" (click)="followUser()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div *ngIf="isPrivateAndIsNotFollowed() || canEditPrivacy()">
+        <div class="post" *ngFor="let post of posts">
+          <app-post-component [post]="post"></app-post-component>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="req" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Follow Requests</h5>
+        </div>
+        <div class="modal-body" *ngFor="let username of usernames">
+          <app-requests [username]="username" (handledFollowRequest)="removeHandledFollowRequest($event)"></app-requests>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

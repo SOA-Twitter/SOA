@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+option go_package = "proto/profile";
+
+service ProfileService{
+  rpc Register(ProfileRegisterRequest) returns (ProfileRegisterResponse){}
+  rpc GetUserProfile(UserProfRequest) returns (UserProfResponse){}
+  rpc ManagePrivacy(ManagePrivacyRequest) returns (ManagePrivacyResponse){}
+}
+message ProfileRegisterRequest{
+  string username = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string gender = 5;
+  string country = 6;
+  int32 age = 7;
+  string companyName = 8;
+  string companyWebsite = 9;
+  bool private = 10;
+  string role = 11;
+}
+message ProfileRegisterResponse{
+
+}
+message UserProfRequest{
+  string Username = 1;
+  string Token = 2;
+}
+message UserProfResponse{
+  string username = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string gender = 5;
+  string country = 6;
+  int32 age = 7;
+  string companyName = 8;
+  string companyWebsite = 9;
+  bool private = 10;
+  string role = 11;
+}
+message ManagePrivacyRequest{
+  string Token = 1;
+  bool Privacy = 2;
+}
+message ManagePrivacyResponse{
+  bool Privacy = 1;
+  int32 Status = 2;
+}

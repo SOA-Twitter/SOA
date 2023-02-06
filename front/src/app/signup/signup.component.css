@@ -1,0 +1,31 @@
+.btn{
+    background-color: #1DA1F2;
+    border: #1DA1F2;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	margin: 0;
+}
+
+.form-control {
+    margin-bottom: 10px;
+}
+
+#spanInvalid{
+	color: red;
+	margin: 10px;
+}
+
+.register-section{
+    margin-top: 30px;
+}
+
+.form-group{
+	margin: 1px;
+}
