@@ -15,4 +15,5 @@ Various password validation checks like blacklist check
 
 SonarQube.
 
-![Screenshot from 2023-09-05 15-15-51](https://github.com/SOA-Twitter/SOA/assets/79896979/31b76c9e-aff2-45db-b7e0-272816e7542e)
+
+![Screenshot from 2023-09-05 15-24-04](https://github.com/SOA-Twitter/SOA/assets/79896979/30377095-a91b-4475-a1df-ed4d7ebcd7d1)
